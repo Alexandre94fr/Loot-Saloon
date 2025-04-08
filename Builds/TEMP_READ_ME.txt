@@ -1,0 +1,2 @@
+L'objectif réel de ce dossier est de permettre à des recruteurs de pouvoir tester le projet (une fois terminé)
+Si jamais vous souhaitez transferer une Build à vos collègues veillez passer par le Google Drive.
