@@ -2,21 +2,20 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
-.utmp/
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
+/GameFiles/Loot-Saloon/[Ll]ibrary/
+/GameFiles/Loot-Saloon/[Tt]emp/
+/GameFiles/Loot-Saloon/[Oo]bj/
+/GameFiles/Loot-Saloon/[Bb]uild/
+/GameFiles/Loot-Saloon/[Bb]uilds/
+/GameFiles/Loot-Saloon/[Ll]ogs/
+/GameFiles/Loot-Saloon/[Uu]ser[Ss]ettings/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
-/[Mm]emoryCaptures/
+/GameFiles/Loot-Saloon/[Mm]emoryCaptures/
 
 # Recordings can get excessive in size
-/[Rr]ecordings/
+/GameFiles/Loot-Saloon/[Rr]ecordings/
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*
