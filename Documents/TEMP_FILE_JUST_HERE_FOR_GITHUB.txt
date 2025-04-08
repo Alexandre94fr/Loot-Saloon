@@ -1,0 +1,2 @@
+Afin que GitHub permette de push un dossier, il faut qu'il contienne quelque chose.
+C'est pour cette raison que ce fichier existe.
