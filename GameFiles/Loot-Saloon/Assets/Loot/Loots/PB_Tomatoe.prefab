@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6262198284333202839}
   - component: {fileID: 2830721049040250218}
   m_Layer: 6
-  m_Name: PB_Apple
+  m_Name: PB_Tomatoe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
