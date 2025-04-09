@@ -13,9 +13,10 @@ public abstract class S_Pickable : S_Interactable
         interactable = false;
         
         _trigger.enabled = false;
-        _body.useGravity = false;
-        _body.freezeRotation = true;
-        _body.linearVelocity = Vector3.zero;
+        // _body.isKinematic = true;
+
+        if (_collider != null)
+            _collider.enabled = false;
 
         _transform.SetParent(p_caller, false);
         _transform.localPosition = _onPickUpOffset;
@@ -23,11 +24,14 @@ public abstract class S_Pickable : S_Interactable
 
     public virtual void PutDown()
     {
-        _trigger.enabled = true;
-        _body.useGravity = true;
-        _body.freezeRotation = false;
-        _transform.SetParent(null, true);
-
         interactable = true;
+
+        _trigger.enabled = true;
+        // _body.isKinematic = false;
+
+        if (_collider != null)
+            _collider.enabled = true;
+
+        _transform.SetParent(null, true);
     }
 }

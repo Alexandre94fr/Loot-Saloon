@@ -9,6 +9,8 @@ public abstract class S_Interactable : MonoBehaviour
     public bool interactable {get; protected set;} = true;
 
     [SerializeField] protected Collider _trigger;
+    [SerializeField] protected Collider _collider;
+    
     protected Rigidbody _body;
     protected Transform _transform;
 
