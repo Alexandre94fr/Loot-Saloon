@@ -7,10 +7,10 @@ public class S_PlayerController : MonoBehaviour
     private Vector3 _playerDirection;
     public Vector3 boxExtents = new Vector3(0.4f, 0.05f, 0.4f);
     public LayerMask groundLayer;
-    [SerializeField] private float walkSpeed = 2f;
-    [SerializeField] private float jumpForce = 5f;
-    [SerializeField] private float sprintSpeed = 4f;
-    private float currentSpeed = 4f;
+    [SerializeField] private float _walkSpeed = 2f;
+    [SerializeField] private float _jumpForce = 5f;
+    [SerializeField] private float _sprintSpeed = 4f;
+    private float _currentSpeed = 4f;
     void Start()
     {
         _playerTransform = GameObject.Find("PlayerCharacter").transform;
@@ -40,18 +40,18 @@ public class S_PlayerController : MonoBehaviour
     private void Jump()
     {
         if (Grounded())
-            _playerTransform.GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            _playerTransform.GetComponent<Rigidbody>().AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
     }
 
     private void Move()
     {
         _playerTransform.position += (transform.right * _playerDirection.x + transform.forward * _playerDirection.z)
-                                      * Time.deltaTime * currentSpeed;
+                                      * Time.deltaTime * _currentSpeed;
     }
 
     private void Sprint(bool sprint)
     {
-        currentSpeed = sprint ? sprintSpeed : walkSpeed;
+        _currentSpeed = sprint ? _sprintSpeed : _walkSpeed;
     }
 
     private void GetDirection(Vector3 playerDirection)
