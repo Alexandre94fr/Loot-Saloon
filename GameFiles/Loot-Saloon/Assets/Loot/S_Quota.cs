@@ -11,15 +11,15 @@ public class S_Quota : MonoBehaviour
 
     private void Start()
     {
-        _instantiator.onLootSpawned.AddListener(OnLootSpawned);
+        _instantiator.onVaultFilled.AddListener(OnVaultFilled);
     }
-
-    private void OnLootSpawned(S_Loot loot)
+    
+    public void OnVaultFilled(S_BankVault vault)
     {
-        total += loot.properties.moneyValue;
+        total += vault.moneyValue;
         quota = (int) (total * _fraction);
 
 
-        // print($"total = {total} | quota = {quota}");
+         print($"total = {total} | quota = {quota}");
     }
 }

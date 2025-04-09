@@ -1,28 +1,18 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class S_BankVault : MonoBehaviour
 {
-    public S_LootRandomizer lootRandomizer;
+    public S_LootInstantiator lootInstantiator;
     public Transform[] spawnPoints;
-
-    public List<TempLootType> currentLoots = new();
-    public int vaultValue;
+    public int moneyValue;
 
     public float unlockTime = 6f;
+
 
     private void Start()
     {
         GenerateLoots();
-    }
-
-    private void Update()
-    {
-        if (Input.GetKey(KeyCode.U)) // for test
-        {
-            Interact();
-        }
     }
 
     public void Interact()
@@ -32,18 +22,13 @@ public class S_BankVault : MonoBehaviour
 
     public void GenerateLoots()
     {
-        currentLoots.Clear();
         foreach (Transform point in spawnPoints)
         {
-            TempLootType randomLoot = lootRandomizer.GetRandomLootType();
-            currentLoots.Add(randomLoot);
-            // Loot instantiator
+            int lootIndex = lootInstantiator.GetRandomLootPropertiesIndex(SO_LootProperties.Size.Medium);
+            lootInstantiator.SpawnLoot(this, lootIndex, point);
         }
-    }
 
-    public int GetVaultValue()
-    {
-        return vaultValue;
+        lootInstantiator.UpdateQuota(this);
     }
 
     IEnumerator UnlockSequence()
@@ -55,8 +40,6 @@ public class S_BankVault : MonoBehaviour
             timer += Time.deltaTime;
             yield return null;
         }
-
-        Debug.Log("Vault in unlocked");
     }
 
 }
