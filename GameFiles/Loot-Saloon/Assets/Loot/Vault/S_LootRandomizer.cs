@@ -6,22 +6,20 @@ public class S_LootRandomizer : MonoBehaviour
     [System.Serializable]
     public struct LootEntry
     {
-        public LootType type;
+        public TempLootType type;
         public GameObject prefab;
     }
 
     public List<LootEntry> lootPrefabs;
 
-    public LootType GetRandomLootType()
+    public TempLootType GetRandomLootType()
     {
-        int count = System.Enum.GetValues(typeof(LootType)).Length;
-        return (LootType)Random.Range(0, count);
+        int count = System.Enum.GetValues(typeof(TempLootType)).Length;
+        return (TempLootType)Random.Range(0, count);
     }
-
-    
 }
 
-public enum LootType // temporaly declared here for compilation
+public enum TempLootType // temporaly declared here for compilation
 {
     Loot1,
     Loot2,
