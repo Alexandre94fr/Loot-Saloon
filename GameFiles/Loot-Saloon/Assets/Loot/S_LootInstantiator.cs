@@ -7,8 +7,8 @@ public class S_LootInstantiator : MonoBehaviour
 {
     [SerializeField] private List<SO_LootProperties> _lootProperties = new();
 
-    public UnityEvent<S_Loot> onLootSpawned = new();
-    public UnityEvent<S_BankVault> onVaultFilled = new();
+    public UnityEvent<S_Loot> OnLootSpawned = new();
+    public UnityEvent<S_BankVault> OnVaultFilled = new();
 
     public Transform[] vaultSpawnPoints;
     public GameObject pb_vault;
@@ -28,7 +28,7 @@ public class S_LootInstantiator : MonoBehaviour
         SO_LootProperties properties;
         System.Random rand = new();
 
-        while (tries-- != 0)
+        while (tries-- > 0)
         {
             index = rand.Next(_lootProperties.Count);
             properties = _lootProperties[index];
@@ -68,6 +68,6 @@ public class S_LootInstantiator : MonoBehaviour
 
     public void UpdateQuota(S_BankVault vault)
     {
-        onVaultFilled.Invoke(vault);
+        OnVaultFilled.Invoke(vault);
     }
 }

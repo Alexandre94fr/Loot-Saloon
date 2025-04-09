@@ -457,10 +457,10 @@ MonoBehaviour:
   _lootProperties:
   - {fileID: 11400000, guid: 17f57adfaab8c284ea2e6b7510c9d8e1, type: 2}
   - {fileID: 11400000, guid: 6f26c7054bbaeff4da509d352d37c852, type: 2}
-  onLootSpawned:
+  OnLootSpawned:
     m_PersistentCalls:
       m_Calls: []
-  onVaultFilled:
+  OnVaultFilled:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1273671269}
@@ -636,10 +636,10 @@ MonoBehaviour:
   _lootProperties:
   - {fileID: 11400000, guid: 17f57adfaab8c284ea2e6b7510c9d8e1, type: 2}
   - {fileID: 11400000, guid: 6f26c7054bbaeff4da509d352d37c852, type: 2}
-  onLootSpawned:
+  OnLootSpawned:
     m_PersistentCalls:
       m_Calls: []
-  onVaultFilled:
+  OnVaultFilled:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2145512568}
