@@ -11,6 +11,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public static S_GameLobbyManager instance;
     private List<S_LobbyPlayerData> _lobbyPlayerDatas = new List<S_LobbyPlayerData>();
     private S_LobbyPlayerData _localPlayerData;
+    private S_LobbySettings _lobbySettings = new S_LobbySettings();
 
     private void OnEnable()
     {
@@ -41,7 +42,7 @@ public class S_GameLobbyManager : MonoBehaviour
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
         playerData.Initialize(AuthenticationService.Instance.PlayerId,  PlayerPrefs.GetString("PlayerName", "Host"));
-        bool succeeded = await S_LobbyManager.instance.CreateLobbyAsync(2, false, playerData.Serialize());
+        bool succeeded = await S_LobbyManager.instance.CreateLobbyAsync(_lobbySettings.maxPlayers, _lobbySettings.isPrivate, playerData.Serialize());
         return succeeded;
     }
 
@@ -81,5 +82,10 @@ public class S_GameLobbyManager : MonoBehaviour
     public List<S_LobbyPlayerData> GetPlayers()
     {
         return _lobbyPlayerDatas;
+    }
+
+    public void SetLobbySettings(S_LobbySettings p_lobbySettings)
+    {
+        _lobbySettings = p_lobbySettings;
     }
 }

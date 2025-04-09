@@ -66,6 +66,7 @@ public class S_LobbyManager : MonoBehaviour
             return false;
         }
 
+        Debug.Log($"Lobby created with maxPlayer: {_lobby.MaxPlayers} and isPrivate: {_lobby.IsPrivate}");
         _heartbeatCoroutine = StartCoroutine(HearthbeatLobbyCoroutine(_lobby.Id, 6f));
         _refreshLobbyCoroutine = StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
         return true;
