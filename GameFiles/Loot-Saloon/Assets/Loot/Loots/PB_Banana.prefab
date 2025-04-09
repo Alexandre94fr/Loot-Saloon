@@ -100,5 +100,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e6a46a95b7e954ead2ede36b547fa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactName: Banana
+  interactInstantly: 0
   properties: {fileID: 0}
-  _sr: {fileID: 0}

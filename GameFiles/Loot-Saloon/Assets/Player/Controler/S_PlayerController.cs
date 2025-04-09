@@ -11,6 +11,10 @@ public class S_PlayerController : MonoBehaviour
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private float _sprintSpeed = 4f;
     private float _currentSpeed = 4f;
+
+    private bool _isSprinting = false;
+    private float _speedMult = 1f;
+
     void Start()
     {
         _playerTransform = GameObject.Find("PlayerCharacter").transform;
@@ -34,7 +38,7 @@ public class S_PlayerController : MonoBehaviour
     void Update()
     {
         Move();
-        Debug.Log(Grounded());
+        // Debug.Log(Grounded());
     }
 
     private void Jump()
@@ -51,7 +55,8 @@ public class S_PlayerController : MonoBehaviour
 
     private void Sprint(bool sprint)
     {
-        _currentSpeed = sprint ? _sprintSpeed : _walkSpeed;
+        _currentSpeed = (sprint ? _sprintSpeed : _walkSpeed) * _speedMult;
+        _isSprinting = sprint;
     }
 
     private void GetDirection(Vector3 playerDirection)
@@ -60,4 +65,10 @@ public class S_PlayerController : MonoBehaviour
         _playerDirection.z = playerDirection.y;
     }
     
+    public void OnObjectPickedUp(S_Pickable p_pickable)
+    {
+        // TODO change 20f to the actual player strength
+        _speedMult = p_pickable == null ? 1f : 1f - Mathf.Clamp(p_pickable.weight / 20f, 0f, 1f);
+        Sprint(_isSprinting);
+    }
 }
