@@ -13,7 +13,9 @@ public class S_PlayerInteract : MonoBehaviour
     private List<S_Interactable> _interactables = new();
     private int _interactableIndex = -1;
 
-    [SerializeField] private UnityEvent<S_Pickable> onPickUp = new();
+    [SerializeField] private UnityEvent<S_Pickable> OnPickUp = new();
+
+    public UnityEvent<S_Weapon> OnWeaponPickUp = new();
 
     private void Awake()
     {
@@ -68,14 +70,23 @@ public class S_PlayerInteract : MonoBehaviour
     private void PickUp(S_Pickable p_pickable)
     {
         _pickableHeld = p_pickable;
-        onPickUp.Invoke(p_pickable);
+
+        if(p_pickable is S_Weapon)
+        {
+            OnWeaponPickUp.Invoke(p_pickable.GetComponent<S_Weapon>());
+        }
+        else
+        {
+            OnPickUp.Invoke(p_pickable);
+        }
+
     }
 
     private void PutDownPickable()
     {
         _pickableHeld.PutDown();
         _pickableHeld = null;
-        onPickUp.Invoke(null);
+        OnPickUp.Invoke(null);
     }
 
     private void OnTriggerEnter(Collider p_collider)
@@ -112,12 +123,12 @@ public class S_PlayerInteract : MonoBehaviour
         {
             if (_interactableIndex != old)
             {
-                print($"can interact with {_interactables[_interactableIndex]}");
+                //print($"can interact with {_interactables[_interactableIndex]}");
             }
         }
         else
         {
-            print("can't interact wit anything");
+            //print("can't interact wit anything");
         }
     }
 }
