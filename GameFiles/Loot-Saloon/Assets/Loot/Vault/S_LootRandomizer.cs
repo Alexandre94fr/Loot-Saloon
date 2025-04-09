@@ -20,3 +20,12 @@ public class S_LootRandomizer : MonoBehaviour
 
     
 }
+
+public enum LootType // temporaly declared here for compilation
+{
+    Loot1,
+    Loot2,
+    Loot3,
+    Loot4,
+    Loot5,
+}

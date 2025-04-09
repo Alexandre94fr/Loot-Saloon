@@ -7,10 +7,15 @@ public class S_BankVault : MonoBehaviour
     public Transform[] spawnPoints;
     public List<GameObject> currentLoots = new();
 
-    public void Open()
+    private void Start()
     {
         GenerateLoots();
-        // open animation
+
+    }
+
+    public void Interact()
+    {
+        
     }
 
     public void GenerateLoots()
@@ -33,10 +38,10 @@ public class S_BankVault : MonoBehaviour
         //    Instantiate(prefab, spawnPoint.position, Quaternion.identity);
     }
 
-    enum Size
+    public int GetVaultValue()
     {
-        Small,
-        Medium,
-        Large,
+        int sum;
+        return GetVaultValue();
     }
+
 }
