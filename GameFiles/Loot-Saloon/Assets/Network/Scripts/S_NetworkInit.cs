@@ -44,16 +44,17 @@ public class S_NetworkInit : MonoBehaviour
         {
             throw new Exception("SteamAPI_Init() failed. Make sure Steam is running.");
         }
-        string playerName = SetPlayerNameBySteam();
+
+        SetPlayerNameBySteam();
 
         if (SteamAPI.RestartAppIfNecessary((AppId_t)480))
         {
             Application.Quit();
         }
     }
-    private string SetPlayerNameBySteam()
+    private void SetPlayerNameBySteam()
     {
         string playerName = SteamFriends.GetPersonaName();
-        return playerName;
+        PlayerPrefs.SetString("PlayerName", playerName);
     }
 }

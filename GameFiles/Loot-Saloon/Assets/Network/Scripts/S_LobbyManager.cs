@@ -32,55 +32,68 @@ public class S_LobbyManager : MonoBehaviour
         return _lobby?.LobbyCode;
     }
 
-    public async Task<bool> CreateLobbyAsync(int maxPlayer, bool isPrivate, Dictionary<string, string> data)
+    private void OnDisable()
     {
-        Dictionary<string, PlayerDataObject> playerData = SerializePlayerData(data);
+        if (_heartbeatCoroutine != null)
+        {
+            StopCoroutine(_heartbeatCoroutine);
+            _heartbeatCoroutine = null;
+        }
+
+        if (_refreshLobbyCoroutine != null)
+        {
+            StopCoroutine(_refreshLobbyCoroutine);
+            _refreshLobbyCoroutine = null;
+        }
+    }
+
+    public async Task<bool> CreateLobbyAsync(int p_maxPlayer, bool p_isPrivate, Dictionary<string, string> p_data)
+    {
+        Dictionary<string, PlayerDataObject> playerData = SerializePlayerData(p_data);
         Player player = new Player(AuthenticationService.Instance.PlayerId, null, playerData);
         CreateLobbyOptions lobbyOption = new CreateLobbyOptions
         {
-            IsPrivate = isPrivate,
+            IsPrivate = p_isPrivate,
             Player = player,
         };
 
         try
         {
-            _lobby = await LobbyService.Instance.CreateLobbyAsync("Lobby", maxPlayer, lobbyOption);
+            _lobby = await LobbyService.Instance.CreateLobbyAsync("Lobby", p_maxPlayer, lobbyOption);
         }
         catch (Exception)
         {
             return false;
         }
 
-        Debug.Log("Lobby created successfully with id " + _lobby.Id);
         _heartbeatCoroutine = StartCoroutine(HearthbeatLobbyCoroutine(_lobby.Id, 6f));
         _refreshLobbyCoroutine = StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
         return true;
     }
 
-    private IEnumerator HearthbeatLobbyCoroutine(string id, float waitTimeSeconds)
+    private IEnumerator HearthbeatLobbyCoroutine(string p_id, float p_waitTimeSeconds)
     {
         while (true)
         {
-            Debug.Log("Sending heartbeat to lobby with id " + id);
-            LobbyService.Instance.SendHeartbeatPingAsync(id);
-            yield return new WaitForSecondsRealtime(waitTimeSeconds);
+            LobbyService.Instance.SendHeartbeatPingAsync(p_id);
+            yield return new WaitForSecondsRealtime(p_waitTimeSeconds);
         }
     }
 
-    private IEnumerator RefreshLobbyCoroutine(string id, float waitTimeSeconds)
+    private IEnumerator RefreshLobbyCoroutine(string p_id, float p_waitTimeSeconds)
     {
-        while (true)
+        while (_lobby != null)
         {
-            Task<Lobby> task = LobbyService.Instance.GetLobbyAsync(id);
+            Task<Lobby> task = LobbyService.Instance.GetLobbyAsync(p_id);
             yield return new WaitUntil(() => task.IsCompleted);
-            Lobby newLobby = task.Result;
-            if (newLobby.LastUpdated > _lobby.LastUpdated)
+
+            if (task.Result != null && task.Result.LastUpdated > _lobby.LastUpdated)
             {
-                _lobby = newLobby;
-                Debug.Log("Lobby updated successfully with id " + _lobby.Id);
+                _lobby = task.Result;
+                S_LobbyEvents.onLobbyUpdated?.Invoke(_lobby);
             }
 
-            yield return new WaitForSecondsRealtime(waitTimeSeconds);
+            yield return new WaitForSecondsRealtime(p_waitTimeSeconds);
         }
     }
 
@@ -120,8 +133,18 @@ public class S_LobbyManager : MonoBehaviour
     {
         if (_lobby != null && _lobby.HostId == AuthenticationService.Instance.PlayerId)
         {
-            Debug.Log("Leaving lobby with id " + _lobby.Id);
             LobbyService.Instance.DeleteLobbyAsync(_lobby.Id);
         }
+    }
+
+    public List<Dictionary<string, PlayerDataObject>> GetPlayerData()
+    {
+        List<Dictionary<string, PlayerDataObject>> data = new List<Dictionary<string, PlayerDataObject>>();
+        foreach (Player player in _lobby.Players)
+        {
+            data.Add(player.Data);
+        }
+
+        return data;
     }
 }

@@ -7,7 +7,7 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
 {
     public Button hostBtn;
     public Button joinBtn;
-
+    public string sceneToLoad;
     public InputField codeInputField;
 
     private void Start()
@@ -23,7 +23,8 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
         if(succeeded)
         {
             //TODO : Change Scene To Load
-            await SceneManager.LoadSceneAsync("LobbyTestNetwork");
+            await SceneManager.LoadSceneAsync(sceneToLoad);
+            Debug.Log("Scene Switched");
         }
         else
         {
@@ -37,7 +38,7 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
         bool succedeed = await S_GameLobbyManager.instance.JoinLobby(code);
         if (succedeed)
         {
-            await SceneManager.LoadSceneAsync("Lobby");
+            await SceneManager.LoadSceneAsync(sceneToLoad);
         }
         else
         {

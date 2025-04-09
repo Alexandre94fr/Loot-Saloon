@@ -1,11 +1,28 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
+using Unity.Services.Authentication;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 public class S_GameLobbyManager : MonoBehaviour
 {
     public static S_GameLobbyManager instance;
+    private List<S_LobbyPlayerData> _lobbyPlayerDatas = new List<S_LobbyPlayerData>();
+    private S_LobbyPlayerData _localPlayerData;
+
+    private void OnEnable()
+    {
+        S_LobbyEvents.onLobbyUpdated += OnLobbyUpdated;
+    }
+
+
+    private void OnDisable()
+    {
+        S_LobbyEvents.onLobbyUpdated -= OnLobbyUpdated;
+
+    }
 
     private void Awake()
     {
@@ -22,30 +39,47 @@ public class S_GameLobbyManager : MonoBehaviour
 
     public async Task<bool> CreateLobby()
     {
-        Debug.Log("Creating lobby...");
-
-        Dictionary<string, string> playerData = new Dictionary<string, string>()
-        {
-            { "GamerTag", "HostPlayer" }
-        };
-        bool succeeded = await S_LobbyManager.instance.CreateLobbyAsync(2, false, playerData);
+        S_LobbyPlayerData playerData = new S_LobbyPlayerData();
+        playerData.Initialize(AuthenticationService.Instance.PlayerId,  PlayerPrefs.GetString("PlayerName", "Host"));
+        bool succeeded = await S_LobbyManager.instance.CreateLobbyAsync(2, false, playerData.Serialize());
         return succeeded;
     }
 
     public async Task<bool> JoinLobby(string p_code)
     {
-        Debug.Log("Joining lobby...");
-        Dictionary<string,string> playerData = new Dictionary<string, string>()
-        {
-            { "GamerTag", "JoinPlayer" }
-        };
 
-        bool succeeded = await S_LobbyManager.instance.JoinLobby(p_code, playerData);
+        S_LobbyPlayerData playerData = new S_LobbyPlayerData();
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"));
+
+        bool succeeded = await S_LobbyManager.instance.JoinLobby(p_code, playerData.Serialize());
         return succeeded;
+    }
+
+    private void OnLobbyUpdated(Lobby p_lobby)
+    {
+        List<Dictionary<string,PlayerDataObject>> playerData = S_LobbyManager.instance.GetPlayerData();
+        _lobbyPlayerDatas.Clear();
+        foreach (Dictionary<string,PlayerDataObject> data in playerData)
+        {
+            S_LobbyPlayerData lobbyPlayerData = new S_LobbyPlayerData();
+            lobbyPlayerData.Initialize(data);
+
+            if(lobbyPlayerData.Id == AuthenticationService.Instance.PlayerId)
+            {
+                _localPlayerData = lobbyPlayerData;
+            }
+            _lobbyPlayerDatas.Add(lobbyPlayerData);
+        }
+
     }
 
     public string GetLobbyCode()
     {
         return S_LobbyManager.instance.GetLobbyCode();
+    }
+
+    public List<S_LobbyPlayerData> GetPlayers()
+    {
+        return _lobbyPlayerDatas;
     }
 }

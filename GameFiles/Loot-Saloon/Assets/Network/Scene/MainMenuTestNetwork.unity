@@ -1636,6 +1636,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hostBtn: {fileID: 1406415307}
   joinBtn: {fileID: 629534052}
+  sceneToLoad: LobbyTestNetwork
   codeInputField: {fileID: 1058446170}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
