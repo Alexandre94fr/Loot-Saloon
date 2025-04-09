@@ -6,14 +6,7 @@ public class S_LootInstantiator : MonoBehaviour
 {
     [SerializeField] private List<SO_LootProperties> _lootProperties = new();
 
-    public void SpawnLoot(int p_index, Transform p_where)
-    {
-        SO_LootProperties properties = GetLootProperties(p_index);
-        GameObject lootObject = Instantiate(properties.PB_prefab, p_where.position, Quaternion.identity);
-        lootObject.GetComponent<S_Loot>().properties = properties;
-    }
-
-    public int GetRandomLootPropertiesIndex(SO_LootProperties.Size p_size)
+    public int GetRandomLootPropertiesIndex(SO_LootProperties.Size? p_size)
     {
         int tries = 100;
         int index;
@@ -26,7 +19,7 @@ public class S_LootInstantiator : MonoBehaviour
             index = rand.Next(_lootProperties.Count);
             properties = _lootProperties[index];
 
-            if (properties.size == p_size)
+            if (p_size == null || p_size == properties.size)
                 return index;
         }
 
@@ -36,5 +29,12 @@ public class S_LootInstantiator : MonoBehaviour
     public SO_LootProperties GetLootProperties(int p_index)
     {
         return _lootProperties[p_index];
+    }
+
+    public void SpawnLoot(int p_index, Transform p_where)
+    {
+        SO_LootProperties properties = GetLootProperties(p_index);
+        GameObject lootObject = Instantiate(properties.PB_prefab, p_where.position, Quaternion.identity);
+        lootObject.GetComponent<S_Loot>().properties = Instantiate(properties);
     }
 }
