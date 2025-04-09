@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lootName: Banana
   sprite: {fileID: 0}
-  moneyValue: 1
+  moneyValue: 295
   size: 1
   PB_prefab: {fileID: 1630947326228873354, guid: 4524b27eca883f64dabbaa7bab634d09, type: 3}

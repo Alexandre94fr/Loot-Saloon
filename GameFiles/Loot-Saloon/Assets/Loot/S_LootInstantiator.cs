@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class S_LootInstantiator : MonoBehaviour
 {
     [SerializeField] private List<SO_LootProperties> _lootProperties = new();
+
+    public UnityEvent<S_Loot> onLootSpawned = new();
 
     public int GetRandomLootPropertiesIndex(SO_LootProperties.Size? p_size)
     {
@@ -35,6 +38,10 @@ public class S_LootInstantiator : MonoBehaviour
     {
         SO_LootProperties properties = GetLootProperties(p_index);
         GameObject lootObject = Instantiate(properties.PB_prefab, p_where.position, Quaternion.identity);
-        lootObject.GetComponent<S_Loot>().properties = Instantiate(properties);
+
+        S_Loot loot = lootObject.GetComponent<S_Loot>();
+        loot.properties = Instantiate(properties);
+
+        onLootSpawned.Invoke(loot);
     }
 }
