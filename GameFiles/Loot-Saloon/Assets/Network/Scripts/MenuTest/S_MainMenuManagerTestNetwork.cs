@@ -18,11 +18,9 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
 
     private async void OnHostButtonClicked()
     {
-        Debug.Log("Host button clicked.");
         bool succeeded = await S_GameLobbyManager.instance.CreateLobby();
         if(succeeded)
         {
-            //TODO : Change Scene To Load
             await SceneManager.LoadSceneAsync(sceneToLoad);
             Debug.Log("Scene Switched");
         }
