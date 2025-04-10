@@ -99,7 +99,6 @@ public class S_WeaponSlot : MonoBehaviour
         }
 
         nbBullet--;
-        print("shoot");
     }
 
     public void Reload()
