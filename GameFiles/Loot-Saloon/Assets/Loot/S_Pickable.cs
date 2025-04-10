@@ -14,18 +14,16 @@ public abstract class S_Pickable : S_Interactable
             return;
         interactable = false;
         
-        _trigger.enabled = false;
         _body.isKinematic = true;
 
         _transform.SetParent(p_playerInteract.transform, false);
         _transform.localPosition = _onPickUpOffset;
-        _transform.rotation = p_playerInteract.transform.rotation;
+        _transform.rotation = Quaternion.Euler(p_playerInteract.transform.rotation.eulerAngles + new Vector3(0, 180, 0));
+
 
         foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
         {
             Physics.IgnoreCollision(colliderToIgnore, _collider, true);
-            Physics.IgnoreCollision(colliderToIgnore, _trigger, true);
-
             _ignoredColliders.Add(colliderToIgnore);
         }
     }
@@ -33,17 +31,12 @@ public abstract class S_Pickable : S_Interactable
     public virtual void PutDown()
     {
         interactable = true;
-
-        _trigger.enabled = true;
         _body.isKinematic = false;
 
         _transform.SetParent(null, true);
 
         foreach (Collider colliderToIgnore in _ignoredColliders)
-        {
             Physics.IgnoreCollision(colliderToIgnore, _collider, false);
-            Physics.IgnoreCollision(colliderToIgnore, _trigger, false);
-        }
         _ignoredColliders.Clear();
     }
 }

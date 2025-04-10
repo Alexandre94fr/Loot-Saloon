@@ -11,9 +11,6 @@ public class S_PlayerInteract : MonoBehaviour
     private Transform _cameraTransform;
     private S_Pickable _pickableHeld = null;
 
-    private List<S_Interactable> _interactables = new();
-    private int _interactableIndex = -1;
-
     [SerializeField] private UnityEvent<S_Pickable> _onPickUp = new();
 
     [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
@@ -49,6 +46,9 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void InteractWith(S_Interactable p_interactable)
     {
+        if (p_interactable == null)
+            return;
+
         if (p_interactable is S_Pickable pickable)
         {
             if (_pickableHeld != null)
@@ -57,7 +57,7 @@ public class S_PlayerInteract : MonoBehaviour
             PickUp(pickable);
         }
 
-        _interactables.Remove(p_interactable);
+        p_interactable.Interact(this);
     }
 
     private void PickUp(S_Pickable p_pickable)
@@ -76,7 +76,7 @@ public class S_PlayerInteract : MonoBehaviour
 
     private S_Pickable CheckObjectRaycast()
     {
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward,out RaycastHit hit, 2f, objectLayer))
         {
             return hit.collider.GetComponent<S_Pickable>();
         }

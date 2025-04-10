@@ -8,7 +8,6 @@ public abstract class S_Interactable : MonoBehaviour
 
     public bool interactable {get; protected set;} = true;
 
-    [SerializeField] protected Collider _trigger;
     [SerializeField] protected Collider _collider;
 
     protected Rigidbody _body;
@@ -20,11 +19,5 @@ public abstract class S_Interactable : MonoBehaviour
     {
         _body = GetComponent<Rigidbody>();
         _transform = transform;
-
-        if (_trigger == null)
-            Debug.LogError("interactable has no trigger collider", this);
-        
-        if (!_trigger.isTrigger)
-            Debug.LogError("trigger is not a trigger", this);
     }
 }
