@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
-[RequireComponent(typeof (SphereCollider))]
+[RequireComponent(typeof(SphereCollider))]
 public class S_PlayerInteract : MonoBehaviour
 {
     // [SerializeField] private GameObject _interactPanel;
@@ -17,11 +17,8 @@ public class S_PlayerInteract : MonoBehaviour
     [SerializeField] private UnityEvent<S_Pickable> onPickUp = new();
 
     public LayerMask objectLayer;
-    
-    private Renderer _lastRenderer;
-    
-    public Material normalMaterial;
-    public Material outlineMaterial;
+
+    private Material _lastRenderer;
 
     private void Awake()
     {
@@ -34,7 +31,7 @@ public class S_PlayerInteract : MonoBehaviour
         S_PlayerInputsReciever.OnInteract += Interact;
         S_LifeManager.OnDie += PutDownPickable;
     }
-    
+
     private void Interact()
     {
         if (_pickableHeld != null)
@@ -53,7 +50,7 @@ public class S_PlayerInteract : MonoBehaviour
         {
             if (_pickableHeld != null)
                 return;
-            
+
             PickUp(pickable);
         }
 
@@ -77,7 +74,7 @@ public class S_PlayerInteract : MonoBehaviour
 
     private S_Pickable CheckObjectRaycast()
     {
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward,out RaycastHit hit, 1f, objectLayer))
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
         {
             return hit.collider.GetComponent<S_Pickable>();
         }
@@ -89,23 +86,29 @@ public class S_PlayerInteract : MonoBehaviour
     {
         if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
         {
-            Renderer rend = hit.collider.GetComponent<Renderer>();
-            if (rend != null)
+            MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
+            if (renderer != null)
             {
-                if (_lastRenderer != null && _lastRenderer != rend)
-                    _lastRenderer.material = normalMaterial;
+                Material[] materials = renderer.materials; 
 
-                rend.material = outlineMaterial;
-                _lastRenderer = rend;
+                if (materials.Length > 1)
+                {
+                    if (materials[1].HasProperty("_Scale")) 
+                    {
+                        materials[1].SetFloat("_Scale", 1.05f);
+                        if (_lastRenderer != null && materials[1] != _lastRenderer)
+                        {
+                            _lastRenderer.SetFloat("_Scale", 1f);
+                        }
+                        _lastRenderer = materials[1];
+                    }
+                }
             }
         }
-        else
+        else if (_lastRenderer != null)
         {
-            if (_lastRenderer != null)
-            {
-                _lastRenderer.material = normalMaterial;
-                _lastRenderer = null;
-            }
+            _lastRenderer.SetFloat("_Scale", 1f);
+            _lastRenderer = null;
         }
     }
 }
