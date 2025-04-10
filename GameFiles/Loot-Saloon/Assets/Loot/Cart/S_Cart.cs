@@ -17,7 +17,7 @@ public class S_Cart : S_Pickable
             total += loot.properties.moneyValue;
             print("total cart: " + total);
 
-            // loot.transform.SetParent(slot.transform, true);
+            loot.transform.SetParent(slot.transform, true);
         }
     }
 
@@ -29,7 +29,8 @@ public class S_Cart : S_Pickable
             total -= loot.properties.moneyValue;
             print("total cart: " + total);
 
-            // loot.transform.SetParent(null, true);
+            if (loot.transform.parent == _transform)
+                loot.transform.SetParent(null, true);
         }
     }
 }
