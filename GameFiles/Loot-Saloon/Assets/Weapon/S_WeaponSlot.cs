@@ -21,7 +21,7 @@ public class S_WeaponSlot : MonoBehaviour
 
     private void Start()
     {
-        S_PlayerInputsReciever.OnInteract += Shoot;
+        S_PlayerInputsReciever.OnShoot += Shoot;
         _camera = Camera.main;
 
         if (heldWeapon != null)
@@ -99,6 +99,7 @@ public class S_WeaponSlot : MonoBehaviour
         }
 
         nbBullet--;
+        print("shoot");
     }
 
     public void Reload()
