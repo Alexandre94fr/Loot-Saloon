@@ -853,6 +853,8 @@ MonoBehaviour:
   objectLayer:
     serializedVersion: 2
     m_Bits: 64
+  normalMaterial: {fileID: 2100000, guid: cacd21820ed59cf4b8a11e8b9eeb6fb2, type: 2}
+  outlineMaterial: {fileID: -876546973899608171, guid: 1438d79848dcc40468f1fb791b8facfa, type: 3}
 --- !u!135 &762561210
 SphereCollider:
   m_ObjectHideFlags: 0

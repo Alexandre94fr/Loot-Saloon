@@ -17,6 +17,11 @@ public class S_PlayerInteract : MonoBehaviour
     [SerializeField] private UnityEvent<S_Pickable> onPickUp = new();
 
     public LayerMask objectLayer;
+    
+    private Renderer _lastRenderer;
+    
+    public Material normalMaterial;
+    public Material outlineMaterial;
 
     private void Awake()
     {
@@ -78,5 +83,29 @@ public class S_PlayerInteract : MonoBehaviour
         }
 
         return null;
+    }
+
+    void Update()
+    {
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
+        {
+            Renderer rend = hit.collider.GetComponent<Renderer>();
+            if (rend != null)
+            {
+                if (_lastRenderer != null && _lastRenderer != rend)
+                    _lastRenderer.material = normalMaterial;
+
+                rend.material = outlineMaterial;
+                _lastRenderer = rend;
+            }
+        }
+        else
+        {
+            if (_lastRenderer != null)
+            {
+                _lastRenderer.material = normalMaterial;
+                _lastRenderer = null;
+            }
+        }
     }
 }
