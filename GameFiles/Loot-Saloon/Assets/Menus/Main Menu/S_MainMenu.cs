@@ -1,4 +1,3 @@
-using System;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,7 +20,7 @@ public class S_MainMenu : MonoBehaviour
     public string sceneToLoad;
     public InputField codeInputField;
 
-    [Header("Show Lobbies Panel")] 
+    [Header("Show Lobbies Panel")]
     public GameObject showLobbiesPanel;
     public RectTransform content;
     public GameObject lobbyButtonPrefab;
