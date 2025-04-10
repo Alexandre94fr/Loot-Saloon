@@ -184,10 +184,6 @@ public class S_LobbyManager : MonoBehaviour
                     new QueryFilter(
                         field:QueryFilter.FieldOptions.IsLocked,
                         op: QueryFilter.OpOptions.EQ,
-                        value:"0"),
-                    new QueryFilter(
-                        field:QueryFilter.FieldOptions.AvailableSlots,
-                        op: QueryFilter.OpOptions.LT,
                         value:"0")
                 },
                 Order = new List<QueryOrder>
