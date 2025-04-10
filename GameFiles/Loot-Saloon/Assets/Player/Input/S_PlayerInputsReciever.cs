@@ -10,6 +10,7 @@ public class S_PlayerInputsReciever : MonoBehaviour
     public static event Action<bool> OnSprint;
     public static event Action OnInteract;
     public static event Action<Vector2> OnScroll;
+    public static event Action OnThrow;
 
     public void JumpInput(InputAction.CallbackContext context)
     {
@@ -55,5 +56,13 @@ public class S_PlayerInputsReciever : MonoBehaviour
             return;
         
         OnScroll?.Invoke(context.ReadValue<Vector2>());
+    }
+
+    public void Throw(InputAction.CallbackContext context)
+    {
+        if (!context.started)
+            return;
+        
+        OnThrow?.Invoke();
     }
 }

@@ -11,10 +11,12 @@ public class S_PlayerInteract : MonoBehaviour
     private Transform _cameraTransform;
     private S_Pickable _pickableHeld = null;
 
-    private List<S_Interactable> _interactables = new();
-    private int _interactableIndex = -1;
+    [SerializeField] private UnityEvent<S_Pickable> _onPickUp = new();
 
-    [SerializeField] private UnityEvent<S_Pickable> onPickUp = new();
+    [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
+    public List<Collider> pickableIgnoresColliders = new();
+
+    [SerializeField] [Range(0, 20)] private float _throwForce = 10;
 
     public LayerMask objectLayer;
 
@@ -29,6 +31,7 @@ public class S_PlayerInteract : MonoBehaviour
     private void Start()
     {
         S_PlayerInputsReciever.OnInteract += Interact;
+        S_PlayerInputsReciever.OnThrow += Throw;
         S_LifeManager.OnDie += PutDownPickable;
     }
 
@@ -46,6 +49,9 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void InteractWith(S_Interactable p_interactable)
     {
+        if (p_interactable == null)
+            return;
+
         if (p_interactable is S_Pickable pickable)
         {
             if (_pickableHeld != null)
@@ -54,14 +60,13 @@ public class S_PlayerInteract : MonoBehaviour
             PickUp(pickable);
         }
 
-        _interactables.Remove(p_interactable);
-        p_interactable.Interact(_transform);
+        p_interactable.Interact(this);
     }
 
     private void PickUp(S_Pickable p_pickable)
     {
         _pickableHeld = p_pickable;
-        onPickUp.Invoke(p_pickable);
+        _onPickUp.Invoke(p_pickable);
     }
 
     private void PutDownPickable()
@@ -69,12 +74,12 @@ public class S_PlayerInteract : MonoBehaviour
         if (_pickableHeld == null) return;
         _pickableHeld.PutDown();
         _pickableHeld = null;
-        onPickUp.Invoke(null);
+        _onPickUp.Invoke(null);
     }
 
     private S_Pickable CheckObjectRaycast()
     {
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
             return hit.collider.GetComponent<S_Pickable>();
         }
@@ -110,5 +115,15 @@ public class S_PlayerInteract : MonoBehaviour
             _lastRenderer.SetFloat("_Scale", 1f);
             _lastRenderer = null;
         }
+    }
+
+    private void Throw()
+    {
+        if (_pickableHeld == null)
+            return;
+        
+        // TODO throw object
+        // _pickableHeld.GetComponent<Rigidbody>().AddForce(_pickableHeld.transform.rotation * Vector3.forward * _throwForce, ForceMode.Impulse);
+        PutDownPickable();
     }
 }
