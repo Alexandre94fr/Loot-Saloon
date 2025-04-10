@@ -7,6 +7,8 @@ public class S_Cart : S_Pickable
 
     private HashSet<S_Loot> _inCart = new();
 
+    [SerializeField] private GameObject slot;
+
     private void OnTriggerEnter(Collider p_collider)
     {
         if (p_collider.TryGetComponent(out S_Loot loot) && !_inCart.Contains(loot))
@@ -14,6 +16,8 @@ public class S_Cart : S_Pickable
             _inCart.Add(loot);
             total += loot.properties.moneyValue;
             print("total cart: " + total);
+
+            loot.transform.SetParent(slot.transform, true);
         }
     }
 
@@ -24,6 +28,8 @@ public class S_Cart : S_Pickable
             _inCart.Remove(loot);
             total -= loot.properties.moneyValue;
             print("total cart: " + total);
+
+            loot.transform.SetParent(null, true);
         }
     }
 }
