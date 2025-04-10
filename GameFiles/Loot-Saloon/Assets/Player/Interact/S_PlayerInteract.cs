@@ -16,6 +16,8 @@ public class S_PlayerInteract : MonoBehaviour
     [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
     public List<Collider> pickableIgnoresColliders = new();
 
+    [SerializeField] [Range(0, 20)] private float _throwForce = 10;
+
     public LayerMask objectLayer;
 
     private void Awake()
@@ -27,6 +29,7 @@ public class S_PlayerInteract : MonoBehaviour
     private void Start()
     {
         S_PlayerInputsReciever.OnInteract += Interact;
+        S_PlayerInputsReciever.OnThrow += Throw;
         S_LifeManager.OnDie += PutDownPickable;
     }
     
@@ -74,11 +77,21 @@ public class S_PlayerInteract : MonoBehaviour
 
     private S_Pickable CheckObjectRaycast()
     {
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward,out RaycastHit hit, 2f, objectLayer))
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
             return hit.collider.GetComponent<S_Pickable>();
         }
 
         return null;
+    }
+
+    private void Throw()
+    {
+        if (_pickableHeld == null)
+            return;
+        
+        // TODO throw object
+        // _pickableHeld.GetComponent<Rigidbody>().AddForce(_pickableHeld.transform.rotation * Vector3.forward * _throwForce, ForceMode.Impulse);
+        PutDownPickable();
     }
 }
