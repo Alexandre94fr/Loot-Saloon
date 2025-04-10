@@ -435,6 +435,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 229f347a-4844-4676-a4f9-5600a1a15839
     m_ActionName: 'InGame/Scroll[/Mouse/scroll]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 159402323}
+        m_TargetAssemblyTypeName: S_PlayerInputsReciever, Assembly-CSharp
+        m_MethodName: Throw
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: d9a03079-db4d-4141-b287-68412dc1923d
+    m_ActionName: 'InGame/Throw[/Keyboard/g]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: InGame
@@ -839,6 +855,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   pickableIgnoresColliders: []
+  _throwForce: 10
   objectLayer:
     serializedVersion: 2
     m_Bits: 64
