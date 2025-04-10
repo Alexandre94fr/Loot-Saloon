@@ -4,9 +4,13 @@ using UnityEngine.UIElements;
 public class S_PlayerController : MonoBehaviour
 {
     private Transform _playerTransform;
+    [SerializeField] private Animator _armsAnimator;
+    
     private Vector3 _playerDirection;
     public Vector3 boxExtents = new Vector3(0.4f, 0.05f, 0.4f);
+    
     public LayerMask groundLayer;
+    
     [SerializeField] private float _walkSpeed = 2f;
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private float _sprintSpeed = 4f;
@@ -57,12 +61,21 @@ public class S_PlayerController : MonoBehaviour
     {
         _currentSpeed = (sprint ? _sprintSpeed : _walkSpeed) * _speedMult;
         _isSprinting = sprint;
+        _armsAnimator.speed = sprint ? 2 : 1;
     }
 
     private void GetDirection(Vector3 playerDirection)
     {
         _playerDirection.x = playerDirection.x;
         _playerDirection.z = playerDirection.y;
+        if (_playerDirection.x != 0 || _playerDirection.z != 0)
+        {
+            _armsAnimator.SetBool("Walking", true);
+        }
+        else
+        {
+            _armsAnimator.SetBool("Walking", false);
+        }
     }
     
     public void OnObjectPickedUp(S_Pickable p_pickable)
