@@ -39,9 +39,11 @@ public class S_WeaponSlot : MonoBehaviour
     {
         if (weapon == null)
         {
-            DisableWeapon();
+            DropWeapon();
             return;
         }
+
+        DropWeapon();
 
         SO_WeaponProperties properties = weapon.properties;
         heldWeapon = properties;
@@ -72,6 +74,7 @@ public class S_WeaponSlot : MonoBehaviour
         weaponIsActive = true;
         weaponObject = newWeaponObject;
         weaponObject.SetActive(true);
+
     }
 
     public void DisableWeapon()
@@ -80,6 +83,26 @@ public class S_WeaponSlot : MonoBehaviour
         if (weaponObject != null)
             weaponObject.SetActive(false);
     }
+
+    public void DropWeapon()
+    {
+        if (weaponObject == null)
+            return;
+
+        weaponObject.transform.SetParent(null);
+        weaponObject.transform.position = _camera.transform.position + _camera.transform.forward * 1.5f;
+        weaponObject.SetActive(true);
+
+        if (weaponObject.TryGetComponent(out Rigidbody rb))
+        {
+            rb.isKinematic = false;
+        }
+
+        weaponObject = null;
+        heldWeapon = null;
+        weaponIsActive = false;
+    }
+
 
     public void Shoot()
     {
