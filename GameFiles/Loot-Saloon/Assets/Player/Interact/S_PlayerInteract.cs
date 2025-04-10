@@ -13,7 +13,7 @@ public class S_PlayerInteract : MonoBehaviour
     private List<S_Interactable> _interactables = new();
     private int _interactableIndex = -1;
 
-    [SerializeField] private UnityEvent<S_Pickable> OnPickUp = new();
+    public UnityEvent<S_Pickable> OnPickUp = new();
 
     public UnityEvent<S_Weapon> OnWeaponPickUp = new();
 
@@ -69,17 +69,14 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void PickUp(S_Pickable p_pickable)
     {
-        _pickableHeld = p_pickable;
-
-        if(p_pickable is S_Weapon)
+        if (p_pickable is S_Weapon)
         {
             OnWeaponPickUp.Invoke(p_pickable.GetComponent<S_Weapon>());
-        }
-        else
-        {
-            OnPickUp.Invoke(p_pickable);
+            return;
         }
 
+        _pickableHeld = p_pickable;
+        OnPickUp.Invoke(p_pickable);
     }
 
     private void PutDownPickable()

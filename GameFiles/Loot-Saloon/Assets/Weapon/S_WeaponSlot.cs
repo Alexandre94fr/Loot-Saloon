@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponSlot : MonoBehaviour
+public class S_WeaponSlot : MonoBehaviour
 {
     Camera _camera;
 
@@ -17,23 +15,34 @@ public class WeaponSlot : MonoBehaviour
     public int nbBulletMax;
     public float cooldown;
 
+    private float _lastShotTime;
+
+    public GameObject weaponObject;
+
     private void Start()
     {
         S_PlayerInputsReciever.OnInteract += Shoot;
         _camera = Camera.main;
 
         if (heldWeapon != null)
-            SetWeaponStats(heldWeapon.prefab.GetComponent<S_Weapon>());
+            SetWeaponSlot(heldWeapon.prefab.GetComponent<S_Weapon>());
 
-        interact.OnWeaponPickUp.AddListener(SetWeaponStats);
+        interact.OnWeaponPickUp.AddListener(SetWeaponSlot);
+        interact.OnPickUp.AddListener(OnGenericPickUp);
+
+        _lastShotTime = -cooldown;
 
         TestInstantiateWeapon();
-
     }
 
-    public void SetWeaponStats(S_Weapon weapon)
+    public void SetWeaponSlot(S_Weapon weapon)
     {
-        weaponIsActive = true;
+        if (weapon == null)
+        {
+            DisableWeapon();
+            return;
+        }
+
         SO_WeaponProperties properties = weapon.properties;
         heldWeapon = properties;
         weaponName = properties.weaponName;
@@ -41,28 +50,55 @@ public class WeaponSlot : MonoBehaviour
         nbBullet = properties.nbBullet;
         nbBulletMax = properties.nbBulletMax;
         cooldown = properties.cooldown;
+
+        EnableWeapon(weapon.gameObject);
+    }
+
+    public void OnGenericPickUp(S_Pickable pickable)
+    {
+        if (pickable != null)
+        {
+            DisableWeapon();
+        }
+        else if (weaponObject != null)
+        {
+            EnableWeapon(weaponObject);
+        }
+
+    }
+
+    public void EnableWeapon(GameObject newWeaponObject)
+    {
+        weaponIsActive = true;
+        weaponObject = newWeaponObject;
+        weaponObject.SetActive(true);
+    }
+
+    public void DisableWeapon()
+    {
+        weaponIsActive = false;
+        if (weaponObject != null)
+            weaponObject.SetActive(false);
     }
 
     public void Shoot()
     {
-        if (weaponIsActive)
+        if (!weaponIsActive || Time.time - _lastShotTime < cooldown || nbBullet <= 0)
+            return;
+
+        _lastShotTime = Time.time;
+
+        Vector3 rayOrigin = _camera.ViewportToWorldPoint(new Vector2(0.5f, 0.5f));
+        if (Physics.Raycast(rayOrigin, _camera.transform.forward, out RaycastHit hit))
         {
-            if (nbBullet > 0)
+            if (hit.transform.TryGetComponent(out TempTarget target)) // temp condition for testing
             {
-                Vector3 rayOrigin = _camera.ViewportToWorldPoint(new Vector2(0.5f, 0.5f));
-                if (Physics.Raycast(rayOrigin, _camera.transform.forward, out RaycastHit hit))
-                {
-
-                    if (hit.transform.GetComponent<TempTarget>())
-                    {
-                        print(hit.transform.gameObject.name);
-                    }
-                }
-                nbBullet--;
-
+                print($"Hit: {target.name}");
+                // apply damage
             }
         }
 
+        nbBullet--;
     }
 
     public void Reload()
@@ -81,5 +117,10 @@ public class WeaponSlot : MonoBehaviour
         S_Weapon weapon = weaponObject.GetComponent<S_Weapon>();
         weapon.properties = Instantiate(properties);
 
+    }
+
+    private void OnDestroy()
+    {
+        S_PlayerInputsReciever.OnInteract -= Shoot;
     }
 }
