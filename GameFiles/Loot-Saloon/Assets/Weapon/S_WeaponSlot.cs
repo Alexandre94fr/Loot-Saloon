@@ -107,15 +107,20 @@ public class S_WeaponSlot : MonoBehaviour
     }
 
     public Transform testTransform;
+    public Transform testTransform2;
     public SO_WeaponProperties _weaponProperties;
 
     void TestInstantiateWeapon()
     {
         SO_WeaponProperties properties = _weaponProperties;
-        GameObject weaponObject = Instantiate(properties.prefab, testTransform.position, Quaternion.identity);
+        GameObject weaponObject1 = Instantiate(properties.prefab, testTransform.position, Quaternion.identity);
+        GameObject weaponObject2 = Instantiate(properties.prefab, testTransform2.position, Quaternion.identity);
 
-        S_Weapon weapon = weaponObject.GetComponent<S_Weapon>();
-        weapon.properties = Instantiate(properties);
+        S_Weapon weapon1 = weaponObject1.GetComponent<S_Weapon>();
+        weapon1.properties = Instantiate(properties);
+
+        S_Weapon weapon2 = weaponObject2.GetComponent<S_Weapon>();
+        weapon2.properties = Instantiate(properties);
 
     }
 
