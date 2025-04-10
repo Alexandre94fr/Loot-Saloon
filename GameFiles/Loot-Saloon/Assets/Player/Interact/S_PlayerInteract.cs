@@ -130,7 +130,7 @@ public class S_PlayerInteract : MonoBehaviour
 
         // since we rotate the object by 180 when picking it up,
         // rotate it back when throwing it
-        pickableTransform.rotation = Quaternion.Euler(pickableTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
+        // pickableTransform.rotation = Quaternion.Euler(pickableTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
         pickable.GetComponent<Rigidbody>().AddForce(pickableTransform.rotation * _throwAngle * _throwForce, ForceMode.Impulse);
     }
 }

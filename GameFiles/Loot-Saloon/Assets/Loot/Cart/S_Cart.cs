@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class S_Cart : S_Pickable
 {
@@ -8,6 +10,8 @@ public class S_Cart : S_Pickable
     private HashSet<S_Loot> _inCart = new();
 
     [SerializeField] private GameObject slot;
+    [SerializeField] private UnityEvent OnLootAdded = new();
+    [SerializeField] private UnityEvent OnLootRemoved = new();
 
     private void OnTriggerEnter(Collider p_collider)
     {
@@ -15,9 +19,9 @@ public class S_Cart : S_Pickable
         {
             _inCart.Add(loot);
             total += loot.properties.moneyValue;
-            print("total cart: " + total);
 
             loot.transform.SetParent(slot.transform, true);
+            OnLootAdded.Invoke();
         }
     }
 
@@ -27,10 +31,16 @@ public class S_Cart : S_Pickable
         {
             _inCart.Remove(loot);
             total -= loot.properties.moneyValue;
-            print("total cart: " + total);
 
             if (loot.transform.parent == _transform)
                 loot.transform.SetParent(null, true);
+            
+            OnLootRemoved.Invoke();
         }
+    }
+
+    public void SetTextToTotal(TMP_Text text)
+    {
+        text.text = total.ToString();
     }
 }
