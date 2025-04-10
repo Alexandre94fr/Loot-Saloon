@@ -59,7 +59,8 @@ public class S_LobbyManager : MonoBehaviour
 
         try
         {
-            _lobby = await LobbyService.Instance.CreateLobbyAsync("Lobby", p_maxPlayer, lobbyOption);
+            Debug.Log(AuthenticationService.Instance.PlayerName);
+            _lobby = await LobbyService.Instance.CreateLobbyAsync($"{PlayerPrefs.GetString("PlayerName")}'s Lobby", p_maxPlayer, lobbyOption);
         }
         catch (Exception)
         {
@@ -109,17 +110,17 @@ public class S_LobbyManager : MonoBehaviour
         return playerData;
     }
 
-    public async Task<bool> JoinLobby(string code, Dictionary<string, string> playerData)
+    public async Task<bool> JoinLobby(string p_code, Dictionary<string, string> p_playerData)
     {
         JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions
         {
-            Player = new Player(AuthenticationService.Instance.PlayerId, null, SerializePlayerData(playerData))
+            Player = new Player(AuthenticationService.Instance.PlayerId, null, SerializePlayerData(p_playerData))
         };
 
 
         try
         {
-            _lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, options);
+            _lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(p_code, options);
         }
         catch (Exception)
         {
@@ -129,7 +130,26 @@ public class S_LobbyManager : MonoBehaviour
         StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
         return true;
     }
+    public async Task<bool> JoinLobbyById(string p_id, Dictionary<string, string> p_playerData)
+    {
+        JoinLobbyByIdOptions options = new JoinLobbyByIdOptions
+        {
+            Player = new Player(AuthenticationService.Instance.PlayerId, null, SerializePlayerData(p_playerData))
+        };
 
+
+        try
+        {
+            _lobby = await LobbyService.Instance.JoinLobbyByIdAsync(p_id, options);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
+        return true;
+    }
     public void OnApplicationQuit()
     {
         if (_lobby != null && _lobby.HostId == AuthenticationService.Instance.PlayerId)
@@ -147,5 +167,44 @@ public class S_LobbyManager : MonoBehaviour
         }
 
         return data;
+    }
+
+    public async Task<QueryResponse> QueryLobbiesAsync()
+    {
+        try
+        {
+            QueryLobbiesOptions options = new QueryLobbiesOptions
+            {
+                Filters = new List<QueryFilter>
+                {
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.AvailableSlots,
+                        op: QueryFilter.OpOptions.GT,
+                        value: "0"),
+                    new QueryFilter(
+                        field:QueryFilter.FieldOptions.IsLocked,
+                        op: QueryFilter.OpOptions.EQ,
+                        value:"0"),
+                    new QueryFilter(
+                        field:QueryFilter.FieldOptions.AvailableSlots,
+                        op: QueryFilter.OpOptions.LT,
+                        value:"0")
+                },
+                Order = new List<QueryOrder>
+                {
+                    new QueryOrder(
+                        field: QueryOrder.FieldOptions.Created,
+                        asc: false)
+                }
+            };
+
+            QueryResponse queryResponse = await LobbyService.Instance.QueryLobbiesAsync(options);
+            return queryResponse;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to query lobbies: {ex.Message}");
+            return null;
+        }
     }
 }

@@ -56,6 +56,16 @@ public class S_GameLobbyManager : MonoBehaviour
         return succeeded;
     }
 
+    public async Task<bool> JoinLobbyById(string p_id)
+    {
+
+        S_LobbyPlayerData playerData = new S_LobbyPlayerData();
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"));
+
+        bool succeeded = await S_LobbyManager.instance.JoinLobbyById(p_id, playerData.Serialize());
+        return succeeded;
+    }
+
     private void OnLobbyUpdated(Lobby p_lobby)
     {
         List<Dictionary<string,PlayerDataObject>> playerData = S_LobbyManager.instance.GetPlayerData();
