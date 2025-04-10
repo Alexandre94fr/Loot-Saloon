@@ -8,6 +8,7 @@ public class S_PlayerInteract : MonoBehaviour
     // [SerializeField] private GameObject _interactPanel;
 
     private Transform _transform;
+    private Transform _cameraTransform;
     private S_Pickable _pickableHeld = null;
 
     private List<S_Interactable> _interactables = new();
@@ -15,29 +16,20 @@ public class S_PlayerInteract : MonoBehaviour
 
     [SerializeField] private UnityEvent<S_Pickable> onPickUp = new();
 
+    public LayerMask objectLayer;
+
     private void Awake()
     {
         _transform = transform;
+        _cameraTransform = Camera.main.transform;
     }
 
     private void Start()
     {
         S_PlayerInputsReciever.OnInteract += Interact;
-        S_PlayerInputsReciever.OnScroll   += Scroll;
         S_LifeManager.OnDie += PutDownPickable;
     }
-
-    private void Scroll(Vector2 p_value)
-    {
-        if (_interactableIndex == -1)
-            return;
-
-        int direction = p_value.y == 0 ? 0 : (int) Mathf.Sign(p_value.y);
-        print($"scroll direction: {direction}");
-        S_Utils.ScrollIndex(ref _interactableIndex, _interactables.Count, direction);
-        print($"can interact with {_interactables[_interactableIndex]}");
-    }
-
+    
     private void Interact()
     {
         if (_pickableHeld != null)
@@ -46,8 +38,7 @@ public class S_PlayerInteract : MonoBehaviour
         }
         else
         {
-            if (_interactableIndex != -1)
-                InteractWith(_interactables[_interactableIndex]);
+            InteractWith(CheckObjectRaycast());
         }
     }
 
@@ -62,7 +53,6 @@ public class S_PlayerInteract : MonoBehaviour
         }
 
         _interactables.Remove(p_interactable);
-        SetCorrectIndex();
         p_interactable.Interact(_transform);
     }
 
@@ -80,46 +70,13 @@ public class S_PlayerInteract : MonoBehaviour
         onPickUp.Invoke(null);
     }
 
-    private void OnTriggerEnter(Collider p_collider)
+    private S_Pickable CheckObjectRaycast()
     {
-        foreach (S_Interactable interactable in p_collider.GetComponents<S_Interactable>())
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward,out RaycastHit hit, 1f, objectLayer))
         {
-            if (interactable.interactInstantly)
-                InteractWith(interactable);
-            else
-                _interactables.Add(interactable);
+            return hit.collider.GetComponent<S_Pickable>();
         }
 
-        SetCorrectIndex();
-    }
-
-    private void OnTriggerExit(Collider p_collider)
-    {
-        foreach (S_Interactable interactable in p_collider.GetComponents<S_Interactable>())
-            _interactables.Remove(interactable);
-
-        SetCorrectIndex();
-    }
-
-    private void SetCorrectIndex()
-    {
-        int old = _interactableIndex;
-
-        if (_interactableIndex == -1)
-            _interactableIndex = _interactables.Count != 0 ? 0 : -1;
-        else
-            _interactableIndex = _interactables.Count == 0 ? -1 : _interactableIndex;
-        
-        if (_interactableIndex != -1)
-        {
-            if (_interactableIndex != old)
-            {
-                print($"can interact with {_interactables[_interactableIndex]}");
-            }
-        }
-        else
-        {
-            print("can't interact wit anything");
-        }
+        return null;
     }
 }
