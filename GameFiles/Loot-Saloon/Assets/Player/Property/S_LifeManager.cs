@@ -11,9 +11,10 @@ public class S_LifeManager : MonoBehaviour
         _playerAttributes = GameObject.Find("Attributes").GetComponent<S_PlayerAttributes>();
     }
 
-    private void TakeDamage(float damageToTake)
+    public void TakeDamage(float damageToTake)
     {
         _playerAttributes.Life -= damageToTake;
+        print("test");
         CheckDie();
     }
 

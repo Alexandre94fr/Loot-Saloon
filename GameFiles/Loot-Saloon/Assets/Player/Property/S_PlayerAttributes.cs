@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class S_PlayerAttributes : MonoBehaviour
 {
-    S_PlayerProperties properties;
+    public S_PlayerProperties properties;
     public float Speed;
     public float Life;
     public float MaxLife;
