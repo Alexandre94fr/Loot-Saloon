@@ -10,11 +10,11 @@ public abstract class S_Interactable : MonoBehaviour
 
     [SerializeField] protected Collider _trigger;
     [SerializeField] protected Collider _collider;
-    
+
     protected Rigidbody _body;
     protected Transform _transform;
 
-    public abstract void Interact(Transform p_caller);
+    public abstract void Interact(S_PlayerInteract p_playerInteract);
 
     protected virtual void Awake()
     {
