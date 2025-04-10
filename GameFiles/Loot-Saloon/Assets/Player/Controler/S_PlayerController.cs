@@ -5,6 +5,7 @@ public class S_PlayerController : MonoBehaviour
 {
     private Transform _playerTransform;
     [SerializeField] private Animator _armsAnimator;
+    [SerializeField] private Transform _respawnPoint;
     
     private Vector3 _playerDirection;
     public Vector3 boxExtents = new Vector3(0.4f, 0.05f, 0.4f);
@@ -25,6 +26,7 @@ public class S_PlayerController : MonoBehaviour
         S_PlayerInputsReciever.OnJump += Jump;
         S_PlayerInputsReciever.OnMove += GetDirection;
         S_PlayerInputsReciever.OnSprint += Sprint;
+        S_LifeManager.OnDie += Respawn;
     }
 
     private bool Grounded()
@@ -83,5 +85,10 @@ public class S_PlayerController : MonoBehaviour
         // TODO change 20f to the actual player strength
         _speedMult = p_pickable == null ? 1f : 1f - Mathf.Clamp(p_pickable.weight / 20f, 0f, 1f);
         Sprint(_isSprinting);
+    }
+
+    private void Respawn()
+    {
+        _playerTransform.position = _respawnPoint.position;
     }
 }

@@ -24,6 +24,7 @@ public class S_PlayerInteract : MonoBehaviour
     {
         S_PlayerInputsReciever.OnInteract += Interact;
         S_PlayerInputsReciever.OnScroll   += Scroll;
+        S_LifeManager.OnDie += PutDownPickable;
     }
 
     private void Scroll(Vector2 p_value)
@@ -73,6 +74,7 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void PutDownPickable()
     {
+        if (_pickableHeld == null) return;
         _pickableHeld.PutDown();
         _pickableHeld = null;
         onPickUp.Invoke(null);
