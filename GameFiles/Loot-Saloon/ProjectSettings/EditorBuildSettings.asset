@@ -12,8 +12,8 @@ EditorBuildSettings:
     path: Assets/Network/Scene/LobbyTestNetwork.unity
     guid: ba4a785e0e52e454cadf529f5d238195
   - enabled: 1
-    path: Assets/Network/Scene/GameTestNetwork.unity
-    guid: 49dc3913d51edaf40801e2e1b15be7ce
+    path: Assets/Scenes/SubScenes/Replication/ReplicationScene.unity
+    guid: 14409fcdd2cdae848a2655e2b55e688f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
