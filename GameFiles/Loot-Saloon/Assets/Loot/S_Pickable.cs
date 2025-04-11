@@ -14,17 +14,15 @@ public abstract class S_Pickable : S_Interactable
 
     private List<Collider> _ignoredColliders = new();
 
-    public override void Interact(S_PlayerInteract p_playerInteract, Transform parent)
-
     public S_Cart cart { get; private set; }
 
     public void SetCart(S_Cart cart)
     {
         this.cart = cart;
     }
-    public bool IsEasyToPickUp(S_PlayerInteract player)
+    public bool IsEasyToPickUp(S_PlayerInteract p_player)
     {
-        if (cart == null || cart.KnowPlayer(player))
+        if (cart == null || cart.KnowPlayer(p_player))
             return true;
             
         return false;
@@ -36,17 +34,17 @@ public abstract class S_Pickable : S_Interactable
         S_CircleLoad.OnCircleChange(0);
     }
 
-    public override void Interact(S_PlayerInteract p_playerInteract)
+    public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         if (IsEasyToPickUp(p_playerInteract))
         {
-            PickUp(p_playerInteract);
+            PickUp(p_playerInteract, p_parent);
             return;
         }
-        StartCoroutine(InteractCoroutine(p_playerInteract));
+        StartCoroutine(InteractCoroutine(p_playerInteract, p_parent));
     }
 
-    private IEnumerator InteractCoroutine(S_PlayerInteract p_playerInteract)
+    private IEnumerator InteractCoroutine(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         float timer = 0f;
         _isPickUp = true;
@@ -60,10 +58,10 @@ public abstract class S_Pickable : S_Interactable
             timer += Time.deltaTime;
             yield return null;
         }
-        PickUp(p_playerInteract);
+        PickUp(p_playerInteract, p_parent);
     }
 
-    private void PickUp(S_PlayerInteract p_playerInteract)
+    private void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         if (!interactable)
             return;
@@ -71,7 +69,7 @@ public abstract class S_Pickable : S_Interactable
 
         _body.isKinematic = true;
 
-        _transform.SetParent(parent, false);
+        _transform.SetParent(p_parent, false);
         _transform.localPosition = _onPickUpOffset;
 
         _transform.rotation = p_playerInteract.transform.rotation;

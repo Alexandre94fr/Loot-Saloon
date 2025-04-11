@@ -31,8 +31,12 @@ public class S_PlayerInputsReciever : MonoBehaviour
 
     public void MoveInput(InputAction.CallbackContext context)
     {
+        Debug.Log("Can Move :: " + _canMove);
         if (!_canMove)
+        {
+            OnMove?.Invoke(Vector2.zero);
             return;
+        }
 
         OnMove?.Invoke(context.ReadValue<Vector2>());
     }
@@ -58,12 +62,16 @@ public class S_PlayerInputsReciever : MonoBehaviour
     {
 
         if (context.canceled)
+        {
             OnStopInteract?.Invoke();
+            OnLockMovement?.Invoke(true);
+        }
 
         if (!context.performed)
             return;
         
         OnInteract?.Invoke();
+        OnLockMovement?.Invoke(false);
     }
 
     public void Scroll(InputAction.CallbackContext context)

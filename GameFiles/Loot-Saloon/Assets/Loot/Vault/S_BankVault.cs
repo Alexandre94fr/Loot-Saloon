@@ -64,7 +64,7 @@ public class S_BankVault : S_Interactable
         SpawnLoot();
     }
 
-    public override void Interact(S_PlayerInteract p_playerInteract)
+    public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         if (!isOpen && (isAvailable || (_currentPlayer == p_playerInteract && isOpening == true)))
         {

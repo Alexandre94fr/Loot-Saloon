@@ -20,9 +20,9 @@ public class S_LootInstantiator : MonoBehaviour
         SpawnVaults();
     }
 
-    public int GetLootPrice(int index)
+    public int GetLootPrice(int p_index)
     {
-        SO_LootProperties properties = GetLootProperties(index);
+        SO_LootProperties properties = GetLootProperties(p_index);
         S_Loot loot = properties.PB_prefab.GetComponent<S_Loot>();
         return loot.properties.moneyValue;
     }
@@ -71,8 +71,8 @@ public class S_LootInstantiator : MonoBehaviour
 
     }
 
-    public void UpdateQuota(S_BankVault vault)
+    public void UpdateQuota(S_BankVault p_vault)
     {
-        OnVaultFilled.Invoke(vault);
+        OnVaultFilled.Invoke(p_vault);
     }
 }

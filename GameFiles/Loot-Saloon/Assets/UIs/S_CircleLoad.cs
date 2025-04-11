@@ -15,10 +15,10 @@ public class S_CircleLoad : MonoBehaviour
         OnCircleChange += SetLoader;
         SetLoader(0);
     }
-    public void SetLoader(float percentage)
+    public void SetLoader(float p_percentage)
     {
-        percentage = Mathf.Clamp01(percentage);
+        p_percentage = Mathf.Clamp01(p_percentage);
 
-       _image.fillAmount = percentage;
+       _image.fillAmount = p_percentage;
     }
 }
