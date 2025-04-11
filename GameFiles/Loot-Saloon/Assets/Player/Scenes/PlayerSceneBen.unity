@@ -687,6 +687,7 @@ MonoBehaviour:
   _playerCanvas: {fileID: 981557888}
   _countdownText: {fileID: 1567127743}
   _respawningCountdownImage: {fileID: 173821325}
+  _finishMenuImage: {fileID: 0}
 --- !u!1 &477981693
 GameObject:
   m_ObjectHideFlags: 0
@@ -854,8 +855,10 @@ MonoBehaviour:
   _onPickUp:
     m_PersistentCalls:
       m_Calls: []
-  pickableIgnoresColliders: []
+  pickableIgnoresColliders:
+  - {fileID: 987161682}
   _throwForce: 4
+  _throwAngle: {x: 0, y: 0.75, z: 1}
   objectLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -2287,6 +2290,10 @@ PrefabInstance:
     - target: {fileID: 3983363614776680269, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7483233458419870956, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: _onPickUpRotateOffset.y
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 8267085892196296300, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_Name

@@ -4,11 +4,14 @@ using UnityEngine;
 public abstract class S_Pickable : S_Interactable
 {
     [SerializeField] private Vector3 _onPickUpOffset = Vector3.forward;
+    [SerializeField] private Vector3 _onPickUpRotateOffset = Vector3.zero;
+    public bool parentIsPlayerInteract = false;
+
     [Range(0f, 20f)] public float weight = 0f;
 
     private List<Collider> _ignoredColliders = new();
 
-    public override void Interact(S_PlayerInteract p_playerInteract, Transform p_cameraTransform)
+    public override void Interact(S_PlayerInteract p_playerInteract, Transform parent)
     {
         if (!interactable)
             return;
@@ -16,14 +19,14 @@ public abstract class S_Pickable : S_Interactable
         
         _body.isKinematic = true;
 
-        _transform.SetParent(p_cameraTransform, false);
+        _transform.SetParent(parent, false);
         _transform.localPosition = _onPickUpOffset;
-        _transform.rotation = Quaternion.Euler(p_cameraTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
-
+        _transform.rotation = Quaternion.Euler(parent.rotation.eulerAngles + _onPickUpRotateOffset);
 
         foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
         {
-            Physics.IgnoreCollision(colliderToIgnore, _collider, true);
+            foreach (Collider collider in _colliders)
+                Physics.IgnoreCollision(colliderToIgnore, collider, true);
             _ignoredColliders.Add(colliderToIgnore);
         }
     }
@@ -36,7 +39,10 @@ public abstract class S_Pickable : S_Interactable
         _transform.SetParent(null, true);
 
         foreach (Collider colliderToIgnore in _ignoredColliders)
-            Physics.IgnoreCollision(colliderToIgnore, _collider, false);
+        {
+            foreach (Collider collider in _colliders)
+                Physics.IgnoreCollision(colliderToIgnore, collider, false);
+        }
         _ignoredColliders.Clear();
     }
 }
