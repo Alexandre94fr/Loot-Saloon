@@ -1,20 +1,23 @@
-using System;
+#region
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
+#endregion
 
-public class S_PlayerController : MonoBehaviour
+public class S_PlayerController : NetworkBehaviour
 {
     private Transform _playerTransform;
     [SerializeField] private Animator _armsAnimator;
     [SerializeField] private Transform _respawnPoint;
     [SerializeField] private GameObject _armsHandler;
-    
+
     private Vector3 _playerDirection;
     public Vector3 boxExtents = new Vector3(0.4f, 0.05f, 0.4f);
-    
+
     public LayerMask groundLayer;
-    
+
     [SerializeField] private float _walkSpeed = 2f;
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private float _sprintSpeed = 4f;
@@ -23,13 +26,26 @@ public class S_PlayerController : MonoBehaviour
     private bool _isSprinting = false;
     private float _speedMult = 1f;
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
-        _playerTransform = GameObject.Find("PlayerCharacter").transform;
-        HandleInputsEvents();
-        S_LifeManager.OnDie += Respawn;
-        S_Extract.OnExtract += DisableAllMeshOfPlayer;
-        S_Extract.OnExtract += DropInputsEvents;
+        _playerTransform = transform.parent.transform;
+        if (_playerTransform.parent.GetComponent<NetworkObject>().IsOwner)
+        {
+            HandleInputsEvents();
+            S_LifeManager.OnDie += Respawn;
+            S_Extract.OnExtract += DisableAllMeshOfPlayer;
+            S_Extract.OnExtract += DropInputsEvents;
+        }
+        else
+        {
+            //Client Side
+            GameObject camerObject = _playerTransform.GetComponentInChildren<Camera>().gameObject;
+            camerObject.GetComponent<Camera>().enabled = false;
+            camerObject.GetComponent<S_PlayerCamera>().enabled = false;
+            camerObject.GetComponent<AudioListener>().enabled = false;
+            camerObject.GetComponent<UniversalAdditionalCameraData>().enabled = false;
+            _playerTransform.GetComponentInChildren<PlayerInput>().gameObject.SetActive(false);
+        }
     }
 
     private bool Grounded()
@@ -59,7 +75,7 @@ public class S_PlayerController : MonoBehaviour
     private void Move()
     {
         _playerTransform.position += (transform.right * _playerDirection.x + transform.forward * _playerDirection.z)
-                                      * Time.deltaTime * _currentSpeed;
+                                     * Time.deltaTime * _currentSpeed;
     }
 
     private void Sprint(bool sprint)
@@ -82,7 +98,7 @@ public class S_PlayerController : MonoBehaviour
             _armsAnimator.SetBool("Walking", false);
         }
     }
-    
+
     public void OnObjectPickedUp(S_Pickable p_pickable)
     {
         // TODO change 20f to the actual player strength
@@ -96,6 +112,7 @@ public class S_PlayerController : MonoBehaviour
         DisableAllMeshOfPlayer();
         StartCoroutine(RespawnCoroutine());
     }
+
     IEnumerator RespawnCoroutine()
     {
         yield return new WaitForSeconds(5);
@@ -124,9 +141,8 @@ public class S_PlayerController : MonoBehaviour
         _playerTransform.GetComponent<MeshRenderer>().enabled = false;
         _armsHandler.SetActive(false);
         _armsAnimator.enabled = false;
-
     }
-    
+
     private void EnableAllMeshOfPlayer()
     {
         _playerTransform.GetComponent<MeshRenderer>().enabled = true;
