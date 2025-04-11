@@ -8,6 +8,8 @@ public abstract class S_Pickable : S_Interactable
 
     private List<Collider> _ignoredColliders = new();
 
+    public override void StopInteract(S_PlayerInteract p_playerInteract) {}
+
     public override void Interact(S_PlayerInteract p_playerInteract)
     {
         if (!interactable)
