@@ -10,8 +10,9 @@ public class S_PlayerInteract : MonoBehaviour
     private Transform _transform;
     private Transform _cameraTransform;
     private S_Pickable _pickableHeld = null;
+    private S_Interactable _currentInteraction = null;
 
-    [SerializeField] private UnityEvent<S_Pickable> _onPickUp = new();
+    [SerializeField] private UnityEvent<S_Pickable> _OnPickUp = new();
 
     [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
     public List<Collider> pickableIgnoresColliders = new();
@@ -32,6 +33,7 @@ public class S_PlayerInteract : MonoBehaviour
     private void Start()
     {
         S_PlayerInputsReciever.OnInteract += Interact;
+        S_PlayerInputsReciever.OnStopInteract += StopInteract;
         S_PlayerInputsReciever.OnThrow += Throw;
         S_LifeManager.OnDie += PutDownPickable;
     }
@@ -48,12 +50,22 @@ public class S_PlayerInteract : MonoBehaviour
         }
     }
 
+    private void StopInteract()
+    {
+        if (_currentInteraction == null)
+            return;
+        _currentInteraction.StopInteract(this);
+        _currentInteraction = null;
+    }
+
     private void InteractWith(S_Interactable p_interactable)
     {
         if (p_interactable == null)
             return;
         
         Transform interactParent = _transform;
+
+        _currentInteraction = p_interactable;
 
         if (p_interactable is S_Pickable pickable)
         {
@@ -65,12 +77,22 @@ public class S_PlayerInteract : MonoBehaviour
         }
 
         p_interactable.Interact(this, interactParent);
+        S_PlayerInputsReciever.OnLook += CheckLookInteraction;
+    }
+
+    private void CheckLookInteraction(Vector2 _)
+    {
+        if (CheckObjectRaycast() == null)
+        {
+            StopInteract();
+            S_PlayerInputsReciever.OnLook -= CheckLookInteraction;
+        }
     }
 
     private void PickUp(S_Pickable p_pickable)
     {
         _pickableHeld = p_pickable;
-        _onPickUp.Invoke(p_pickable);
+        _OnPickUp.Invoke(p_pickable);
     }
 
     private void PutDownPickable()
@@ -78,14 +100,14 @@ public class S_PlayerInteract : MonoBehaviour
         if (_pickableHeld == null) return;
         _pickableHeld.PutDown();
         _pickableHeld = null;
-        _onPickUp.Invoke(null);
+        _OnPickUp.Invoke(null);
     }
 
-    private S_Pickable CheckObjectRaycast()
+    private S_Interactable CheckObjectRaycast()
     {
         if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
-            return hit.collider.GetComponent<S_Pickable>();
+            return hit.collider.GetComponent<S_Interactable>();
         }
 
         return null;
