@@ -80,6 +80,8 @@ public class S_PlayerInteract : MonoBehaviour
     private void PutDownPickable()
     {
         if (_pickableHeld == null) return;
+        if (_pickableHeld is S_Weapon) return;
+
         _pickableHeld.PutDown();
         _pickableHeld = null;
         OnPickUp.Invoke(null);
@@ -87,7 +89,6 @@ public class S_PlayerInteract : MonoBehaviour
 
     private S_Pickable CheckObjectRaycast()
     {
-        Debug.DrawRay(_cameraTransform.position, _cameraTransform.forward * 2f, Color.red, 1f);
         if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
             return hit.collider.GetComponent<S_Pickable>();

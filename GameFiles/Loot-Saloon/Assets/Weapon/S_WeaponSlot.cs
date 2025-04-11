@@ -37,18 +37,9 @@ public class S_WeaponSlot : MonoBehaviour
 
     public void SetWeaponSlot(S_Weapon weapon)
     {
-        if (weapon == null)
-        {
-            DropWeapon();
-            return;
-        }
 
-        //DropWeapon();
-
-        if (weaponObject != null)
-        {
-            DropWeapon();
-        }
+        //if (weaponObject != null)
+        //    DropWeapon(weaponObject.GetComponent<S_Weapon>());
 
 
         SO_WeaponProperties properties = weapon.properties;
@@ -81,6 +72,9 @@ public class S_WeaponSlot : MonoBehaviour
         weaponObject = newWeaponObject;
         weaponObject.SetActive(true);
 
+        weaponObject.transform.SetParent(Camera.main.transform);
+        weaponObject.transform.position = new Vector3(0.3f, 0.2f, 0.3f);
+
     }
 
     public void DisableWeapon()
@@ -90,11 +84,11 @@ public class S_WeaponSlot : MonoBehaviour
             weaponObject.SetActive(false);
     }
 
-    public void DropWeapon()
+    public void DropWeapon(S_Weapon weapon)
     {
-        print(heldWeapon.name);
-        if (weaponObject == null)
-            return;
+        print("hey");
+        //if (weaponObject == null)
+        //    return;
 
         weaponObject.transform.SetParent(null);
         weaponObject.transform.position = _camera.transform.position + _camera.transform.forward * 1.5f;
@@ -108,12 +102,17 @@ public class S_WeaponSlot : MonoBehaviour
         weaponObject = null;
         heldWeapon = null;
         weaponIsActive = false;
+
+        weaponName = "";
+        damage = 0;
+        nbBullet = 0;
+        nbBulletMax = 0;
+        cooldown = 0;
     }
 
 
     public void Shoot()
     {
-        print("SHOOT");
         if (!weaponIsActive || Time.time - _lastShotTime < cooldown || nbBullet <= 0)
             return;
 
