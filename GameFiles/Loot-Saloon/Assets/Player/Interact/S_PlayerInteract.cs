@@ -90,7 +90,7 @@ public class S_PlayerInteract : MonoBehaviour
 
     void Update()
     {
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
             MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
             if (renderer != null)
