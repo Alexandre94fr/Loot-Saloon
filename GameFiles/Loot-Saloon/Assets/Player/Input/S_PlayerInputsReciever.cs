@@ -6,11 +6,20 @@ public class S_PlayerInputsReciever : MonoBehaviour
 {
     public static event Action OnJump;
     public static event Action<Vector3> OnMove;
+    public static event Action<bool> OnLockMovement;
     public static event Action<Vector2> OnLook;
     public static event Action<bool> OnSprint;
     public static event Action OnInteract;
+    public static event Action OnStopInteract;
     public static event Action<Vector2> OnScroll;
     public static event Action OnThrow;
+
+    private bool _canMove = true;
+
+    private void Awake()
+    {
+        OnLockMovement += (bool canMove) => _canMove = canMove;
+    }
 
     public void JumpInput(InputAction.CallbackContext context)
     {
@@ -22,6 +31,9 @@ public class S_PlayerInputsReciever : MonoBehaviour
 
     public void MoveInput(InputAction.CallbackContext context)
     {
+        if (!_canMove)
+            return;
+
         OnMove?.Invoke(context.ReadValue<Vector2>());
     }
 
@@ -44,6 +56,10 @@ public class S_PlayerInputsReciever : MonoBehaviour
 
     public void Interact(InputAction.CallbackContext context)
     {
+
+        if (context.canceled)
+            OnStopInteract?.Invoke();
+
         if (!context.performed)
             return;
         

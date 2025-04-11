@@ -11,6 +11,8 @@ public abstract class S_Pickable : S_Interactable
     private List<Collider> _ignoredColliders = new();
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform parent)
+    public override void StopInteract(S_PlayerInteract p_playerInteract) {}
+
     {
         if (!interactable)
             return;
