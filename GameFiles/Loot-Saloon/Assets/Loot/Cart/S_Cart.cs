@@ -1,3 +1,4 @@
+using Steamworks;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,9 +6,15 @@ public class S_Cart : S_Pickable
 {
     public int total {get; private set;} = 0;
 
+    [SerializeField] private List<S_PlayerInteract> players;
     private HashSet<S_Loot> _inCart = new();
 
     [SerializeField] private GameObject slot;
+
+    public bool KnowPlayer(S_PlayerInteract player)
+    {
+        return players.Contains(player);
+    }
 
     private void OnTriggerEnter(Collider p_collider)
     {
@@ -18,6 +25,7 @@ public class S_Cart : S_Pickable
             print("total cart: " + total);
 
             loot.transform.SetParent(slot.transform, true);
+            loot.SetCart(this);
         }
     }
 
@@ -31,6 +39,8 @@ public class S_Cart : S_Pickable
 
             if (loot.transform.parent == _transform)
                 loot.transform.SetParent(null, true);
+
+            loot.SetCart(null);
         }
     }
 }
