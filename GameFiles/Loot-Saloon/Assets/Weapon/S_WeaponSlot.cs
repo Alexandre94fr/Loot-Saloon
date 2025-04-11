@@ -42,8 +42,8 @@ public class S_WeaponSlot : MonoBehaviour
     public void SetWeaponSlot(S_Weapon weapon)
     {
 
-        //if (weaponObject != null)
-        //    DropWeapon(weaponObject.GetComponent<S_Weapon>());
+        if (weaponObject != null)
+            DropWeapon(weaponObject.GetComponent<S_Weapon>());
 
 
         SO_WeaponProperties properties = weapon.properties;
@@ -76,8 +76,8 @@ public class S_WeaponSlot : MonoBehaviour
         weaponObject = newWeaponObject;
         weaponObject.SetActive(true);
 
-        weaponObject.transform.SetParent(Camera.main.transform);
-        weaponObject.transform.position = new Vector3(0.3f, 0.2f, 0.3f);
+        //weaponObject.transform.SetParent(Camera.main.transform);
+        //weaponObject.transform.position = new Vector3(0.3f, 0.2f, 0.3f);
 
     }
 
@@ -90,7 +90,6 @@ public class S_WeaponSlot : MonoBehaviour
 
     public void DropWeapon(S_Weapon weapon)
     {
-        print("hey");
         //if (weaponObject == null)
         //    return;
 

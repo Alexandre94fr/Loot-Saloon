@@ -67,9 +67,9 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void PickUp(S_Pickable p_pickable)
     {
-        if (p_pickable is S_Weapon)
+        if (p_pickable is S_Weapon weapon)
         {
-            OnWeaponPickUp.Invoke(p_pickable.GetComponent<S_Weapon>());
+            OnWeaponPickUp.Invoke(weapon);
             return;
         }
 
