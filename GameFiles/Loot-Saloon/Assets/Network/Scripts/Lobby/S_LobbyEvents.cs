@@ -1,8 +1,18 @@
+#region
 using Unity.Services.Lobbies.Models;
+#endregion
 
 public static class S_LobbyEvents
 {
-    public delegate void LobbyUpdated(Lobby p_lobby);
+    public delegate void LobbyReady();
 
-    public static LobbyUpdated onLobbyUpdated;
+    public delegate void LobbyUpdated();
+
+    public delegate void LobbyUpdatedWithParam(Lobby p_lobby);
+
+    public static LobbyUpdatedWithParam OnLobbyUpdatedWithParam;
+
+    public static LobbyUpdated OnLobbyUpdated;
+
+    public static LobbyReady OnLobbyReady;
 }
