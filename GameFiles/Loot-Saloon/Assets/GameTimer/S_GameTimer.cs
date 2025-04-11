@@ -8,12 +8,13 @@ public class S_GameTimer : MonoBehaviour
     public static Action OnStart;
     public static Func<bool> IsRunning;
     public static Func<float> GetTimer;
+    public static Func<float> GetCountdownTimer;
     public static Action OnPause;
     public static Action OnReset;
 
     private float _timer;
     private bool _isRunning = false;
-
+    private float _gameMaxTime = 20 * 60;
     private void Awake()
     {
         OnStart += () => StartCoroutine(StartTimer());
@@ -21,6 +22,7 @@ public class S_GameTimer : MonoBehaviour
         OnPause += () => StopTimer();
         OnReset += () => ResetTimer();
         GetTimer += () => { return _timer; };
+        GetCountdownTimer += () => { return _gameMaxTime - _timer; };
     }
 
     private IEnumerator StartTimer() 
