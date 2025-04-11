@@ -1,3 +1,5 @@
+using System.Collections;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 public class S_WeaponSlot : MonoBehaviour
@@ -18,6 +20,8 @@ public class S_WeaponSlot : MonoBehaviour
     private float _lastShotTime;
 
     public GameObject weaponObject;
+
+    [SerializeField] [Range(1f, 10f)] protected float _angleSpread = 5;
 
     private void Start()
     {
@@ -119,7 +123,15 @@ public class S_WeaponSlot : MonoBehaviour
         _lastShotTime = Time.time;
 
         Vector3 rayOrigin = _camera.ViewportToWorldPoint(new Vector2(0.5f, 0.5f));
-        if (Physics.Raycast(rayOrigin, _camera.transform.forward, out RaycastHit hit))
+
+        float xAngle = S_Utils.RandomFloat(-_angleSpread, _angleSpread);
+        float yAngle = S_Utils.RandomFloat(-_angleSpread, _angleSpread);
+
+        Vector3 raycastDirection = Quaternion.Euler(xAngle, yAngle, 0) * _camera.transform.forward;
+
+        StartCoroutine(DebugShoot(rayOrigin, raycastDirection, 2f));
+
+        if (Physics.Raycast(rayOrigin, raycastDirection, out RaycastHit hit))
         {
             if (hit.transform.TryGetComponent(out TempTarget target)) // temp condition for testing
             {
@@ -157,5 +169,25 @@ public class S_WeaponSlot : MonoBehaviour
     private void OnDestroy()
     {
         S_PlayerInputsReciever.OnInteract -= Shoot;
+    }
+
+
+
+
+    private IEnumerator DebugShoot(Vector3 origin, Vector3 direction, float duration)
+    {
+        if (!Physics.Raycast(origin, direction, out RaycastHit hit))
+            yield break;
+
+        Vector3 end = hit.point;
+
+        float t = 0;
+
+        while (t < duration)
+        {
+            Debug.DrawLine(origin, end);
+            t += Time.deltaTime;
+            yield return null;
+        }
     }
 }
