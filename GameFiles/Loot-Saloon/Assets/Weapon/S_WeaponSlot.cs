@@ -39,14 +39,19 @@ public class S_WeaponSlot : MonoBehaviour
         TestInstantiateWeapon();
     }
 
-    public void SetWeaponSlot(S_Weapon weapon)
+    public void SetWeaponSlot(S_Weapon newWeapon)
     {
+        if (newWeapon == null)
+            return;
 
+        // Drop the currently held weapon, if any
         if (weaponObject != null)
+        {
             DropWeapon(weaponObject.GetComponent<S_Weapon>());
+        }
 
-
-        SO_WeaponProperties properties = weapon.properties;
+        // Update with the new weapon's properties
+        SO_WeaponProperties properties = newWeapon.properties;
         heldWeapon = properties;
         weaponName = properties.weaponName;
         damage = properties.damage;
@@ -54,8 +59,16 @@ public class S_WeaponSlot : MonoBehaviour
         nbBulletMax = properties.nbBulletMax;
         cooldown = properties.cooldown;
 
-        EnableWeapon(weapon.gameObject);
+        //// Mark it as held and parent it
+        //newWeapon.isHeld = true;
+        newWeapon.transform.SetParent(this.transform);
+        newWeapon.transform.localPosition = Vector3.zero;
+        newWeapon.transform.localRotation = Quaternion.identity;
+
+        EnableWeapon(newWeapon.gameObject);
+
     }
+
 
     public void OnGenericPickUp(S_Pickable pickable)
     {
@@ -76,9 +89,6 @@ public class S_WeaponSlot : MonoBehaviour
         weaponObject = newWeaponObject;
         weaponObject.SetActive(true);
 
-        //weaponObject.transform.SetParent(Camera.main.transform);
-        //weaponObject.transform.position = new Vector3(0.3f, 0.2f, 0.3f);
-
     }
 
     public void DisableWeapon()
@@ -90,8 +100,7 @@ public class S_WeaponSlot : MonoBehaviour
 
     public void DropWeapon(S_Weapon weapon)
     {
-        //if (weaponObject == null)
-        //    return;
+        weapon.isHeld = false;
 
         weaponObject.transform.SetParent(null);
         weaponObject.transform.position = _camera.transform.position + _camera.transform.forward * 1.5f;
@@ -150,18 +159,20 @@ public class S_WeaponSlot : MonoBehaviour
     public Transform testTransform;
     public Transform testTransform2;
     public SO_WeaponProperties _weaponProperties;
+    public SO_WeaponProperties _weaponProperties2;
 
     void TestInstantiateWeapon()
     {
         SO_WeaponProperties properties = _weaponProperties;
+        SO_WeaponProperties properties2 = _weaponProperties2;
         GameObject weaponObject1 = Instantiate(properties.prefab, testTransform.position, Quaternion.identity);
-        GameObject weaponObject2 = Instantiate(properties.prefab, testTransform2.position, Quaternion.identity);
+        GameObject weaponObject2 = Instantiate(properties2.prefab, testTransform2.position, Quaternion.identity);
 
         S_Weapon weapon1 = weaponObject1.GetComponent<S_Weapon>();
         weapon1.properties = Instantiate(properties);
 
         S_Weapon weapon2 = weaponObject2.GetComponent<S_Weapon>();
-        weapon2.properties = Instantiate(properties);
+        weapon2.properties = Instantiate(properties2);
 
     }
 

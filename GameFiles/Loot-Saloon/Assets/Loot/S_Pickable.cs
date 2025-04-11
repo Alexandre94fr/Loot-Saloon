@@ -16,7 +16,13 @@ public abstract class S_Pickable : S_Interactable
         
         _body.isKinematic = true;
 
-        _transform.SetParent(p_playerInteract.transform, false);
+        if (!(this is S_Weapon))
+        {
+            
+            _transform.SetParent(p_playerInteract.transform, false);
+        }
+        
+
         _transform.localPosition = _onPickUpOffset;
         _transform.rotation = Quaternion.Euler(p_playerInteract.transform.rotation.eulerAngles + new Vector3(0, 180, 0));
 

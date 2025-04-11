@@ -43,10 +43,8 @@ public class S_PlayerInteract : MonoBehaviour
         {
             PutDownPickable();
         }
-        else
-        {
             InteractWith(CheckObjectRaycast());
-        }
+        
     }
 
     private void InteractWith(S_Interactable p_interactable)
