@@ -27,4 +27,5 @@ public class S_LifeManager : MonoBehaviour
         }
     }
     
+    
 }

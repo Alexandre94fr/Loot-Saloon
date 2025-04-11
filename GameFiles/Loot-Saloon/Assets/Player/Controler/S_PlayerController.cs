@@ -28,6 +28,8 @@ public class S_PlayerController : MonoBehaviour
         _playerTransform = GameObject.Find("PlayerCharacter").transform;
         HandleInputsEvents();
         S_LifeManager.OnDie += Respawn;
+        S_Extract.OnExtract += DisableAllMeshOfPlayer;
+        S_Extract.OnExtract += DropInputsEvents;
     }
 
     private bool Grounded()
