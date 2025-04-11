@@ -1277,7 +1277,8 @@ MonoBehaviour:
   _onPickUp:
     m_PersistentCalls:
       m_Calls: []
-  pickableIgnoresColliders: []
+  pickableIgnoresColliders:
+  - {fileID: 987161682}
   _throwForce: 10
   _throwAngle: {x: 0, y: 0.75, z: 1}
   objectLayer:
