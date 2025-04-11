@@ -13,7 +13,7 @@ public abstract class S_Interactable : MonoBehaviour
     protected Rigidbody _body;
     protected Transform _transform;
 
-    public abstract void Interact(S_PlayerInteract p_playerInteract);
+    public abstract void Interact(S_PlayerInteract p_playerInteract, Transform p_cameraTransform);
 
     protected virtual void Awake()
     {

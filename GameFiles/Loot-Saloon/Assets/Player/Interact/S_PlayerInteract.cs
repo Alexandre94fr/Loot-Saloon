@@ -61,7 +61,7 @@ public class S_PlayerInteract : MonoBehaviour
             PickUp(pickable);
         }
 
-        p_interactable.Interact(this);
+        p_interactable.Interact(this, _cameraTransform);
     }
 
     private void PickUp(S_Pickable p_pickable)

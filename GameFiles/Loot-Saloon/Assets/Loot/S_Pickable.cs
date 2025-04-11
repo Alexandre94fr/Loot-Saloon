@@ -8,7 +8,7 @@ public abstract class S_Pickable : S_Interactable
 
     private List<Collider> _ignoredColliders = new();
 
-    public override void Interact(S_PlayerInteract p_playerInteract)
+    public override void Interact(S_PlayerInteract p_playerInteract, Transform p_cameraTransform)
     {
         if (!interactable)
             return;
@@ -16,9 +16,9 @@ public abstract class S_Pickable : S_Interactable
         
         _body.isKinematic = true;
 
-        _transform.SetParent(p_playerInteract.transform, false);
+        _transform.SetParent(p_cameraTransform, false);
         _transform.localPosition = _onPickUpOffset;
-        _transform.rotation = Quaternion.Euler(p_playerInteract.transform.rotation.eulerAngles + new Vector3(0, 180, 0));
+        _transform.rotation = Quaternion.Euler(p_cameraTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
 
 
         foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
