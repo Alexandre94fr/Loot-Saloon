@@ -90,7 +90,7 @@ public class S_PlayerInteract : MonoBehaviour
 
     void Update()
     {
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
             MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
             if (renderer != null)
@@ -130,7 +130,7 @@ public class S_PlayerInteract : MonoBehaviour
 
         // since we rotate the object by 180 when picking it up,
         // rotate it back when throwing it
-        pickableTransform.rotation = Quaternion.Euler(pickableTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
+        // pickableTransform.rotation = Quaternion.Euler(pickableTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
         pickable.GetComponent<Rigidbody>().AddForce(pickableTransform.rotation * _throwAngle * _throwForce, ForceMode.Impulse);
     }
 }
