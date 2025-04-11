@@ -7,12 +7,18 @@ using UnityEngine.UI;
 public class S_UIManager : MonoBehaviour
 {
     [SerializeField] private Canvas _playerCanvas;
+    
     [SerializeField] private TextMeshProUGUI _countdownText;
     [SerializeField] private Image _respawningCountdownImage;
+    
+    [SerializeField] private Image _finishMenuImage;
+    
+    
 
     private void Awake()
     {
         S_LifeManager.OnDie += StartRespawnCountdown;
+        S_Extract.OnExtract += FinishMenu;
     }
 
     IEnumerator RespawnCountdown()
@@ -30,5 +36,10 @@ public class S_UIManager : MonoBehaviour
     {
         _respawningCountdownImage.gameObject.SetActive(true); 
         StartCoroutine(RespawnCountdown());
+    }
+
+    private void FinishMenu()
+    {
+        _finishMenuImage.gameObject.SetActive(true);
     }
 }
