@@ -1305,7 +1305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36db5b57077e6f147a334f7ceeb2d927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _onPickUp:
+  _OnPickUp:
     m_PersistentCalls:
       m_Calls: []
   pickableIgnoresColliders: []
@@ -3358,6 +3358,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 7483233458419870956, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: players.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7483233458419870956, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: 'players.Array.data[0]'
+      value: 
+      objectReference: {fileID: 762561209}
     - target: {fileID: 8267085892196296300, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_Name
       value: PB_Cart

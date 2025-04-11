@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public abstract class S_Pickable : S_Interactable
@@ -6,18 +8,67 @@ public abstract class S_Pickable : S_Interactable
     [SerializeField] private Vector3 _onPickUpOffset = Vector3.forward;
     public bool parentIsPlayerInteract = false;
 
+    [SerializeField] private float _pickUpTime = 2f;
+    private bool _isPickUp = false;
     [Range(0f, 20f)] public float weight = 0f;
 
     private List<Collider> _ignoredColliders = new();
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform parent)
-    public override void StopInteract(S_PlayerInteract p_playerInteract) {}
 
+    public S_Cart cart { get; private set; }
+
+    public void SetCart(S_Cart cart)
+    {
+        this.cart = cart;
+    }
+    public bool IsEasyToPickUp(S_PlayerInteract player)
+    {
+        if (cart == null || cart.KnowPlayer(player))
+            return true;
+            
+        return false;
+    }
+
+    public override void StopInteract(S_PlayerInteract p_playerInteract) 
+    {
+        _isPickUp = false;
+        S_CircleLoad.OnCircleChange(0);
+    }
+
+    public override void Interact(S_PlayerInteract p_playerInteract)
+    {
+        if (IsEasyToPickUp(p_playerInteract))
+        {
+            PickUp(p_playerInteract);
+            return;
+        }
+        StartCoroutine(InteractCoroutine(p_playerInteract));
+    }
+
+    private IEnumerator InteractCoroutine(S_PlayerInteract p_playerInteract)
+    {
+        float timer = 0f;
+        _isPickUp = true;
+
+        while (timer < _pickUpTime)
+        {
+            if (!_isPickUp)
+                yield break;
+
+            S_CircleLoad.OnCircleChange(timer / _pickUpTime);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        PickUp(p_playerInteract);
+    }
+
+    private void PickUp(S_PlayerInteract p_playerInteract)
     {
         if (!interactable)
             return;
         interactable = false;
-        
+
         _body.isKinematic = true;
 
         _transform.SetParent(parent, false);
