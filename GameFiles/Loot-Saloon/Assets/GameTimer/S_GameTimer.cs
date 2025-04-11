@@ -11,6 +11,7 @@ public class S_GameTimer : MonoBehaviour
     public static Func<float> GetCountdownTimer;
     public static Action OnPause;
     public static Action OnReset;
+    public static Action OnEnd;
 
     private float _timer;
     private bool _isRunning = false;
@@ -35,9 +36,12 @@ public class S_GameTimer : MonoBehaviour
         while (_isRunning) 
         {
             _timer += Time.deltaTime;
+            if (_gameMaxTime - _timer <= 0.0f)
+            {
+                OnEnd?.Invoke();
+            }
             yield return null;
         }
-
     }
 
     private void StopTimer()
