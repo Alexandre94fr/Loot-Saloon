@@ -52,6 +52,8 @@ public class S_PlayerInteract : MonoBehaviour
     {
         if (p_interactable == null)
             return;
+        
+        Transform interactParent = _transform;
 
         if (p_interactable is S_Pickable pickable)
         {
@@ -59,9 +61,10 @@ public class S_PlayerInteract : MonoBehaviour
                 return;
 
             PickUp(pickable);
+            interactParent = pickable.parentIsPlayerInteract ? _transform : _cameraTransform;
         }
 
-        p_interactable.Interact(this);
+        p_interactable.Interact(this, interactParent);
     }
 
     private void PickUp(S_Pickable p_pickable)

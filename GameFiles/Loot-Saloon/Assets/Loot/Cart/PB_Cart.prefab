@@ -1166,8 +1166,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactName: Cart
   interactInstantly: 0
-  _collider: {fileID: 4012077584977056985}
-  _onPickUpOffset: {x: 0, y: -0.6, z: 2}
+  _onPickUpOffset: {x: 0, y: -0.75, z: 1.75}
+  _onPickUpRotateOffset: {x: 0, y: 0, z: 0}
+  parentIsPlayerInteract: 1
   weight: 0
   slot: {fileID: 6901994336261196213}
   OnLootAdded:
