@@ -1,11 +1,11 @@
 using System.Collections;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 public class S_WeaponSlot : MonoBehaviour
 {
     Camera _camera;
 
+    public Transform weaponParent;
     public bool weaponIsActive;
     public SO_WeaponProperties heldWeapon;
 
@@ -21,7 +21,7 @@ public class S_WeaponSlot : MonoBehaviour
 
     public GameObject weaponObject;
 
-    [SerializeField] [Range(1f, 10f)] protected float _angleSpread = 5;
+    [SerializeField][Range(1f, 10f)] protected float _angleSpread = 5;
 
     private void Start()
     {
@@ -61,7 +61,7 @@ public class S_WeaponSlot : MonoBehaviour
 
         //// Mark it as held and parent it
         //newWeapon.isHeld = true;
-        newWeapon.transform.SetParent(this.transform);
+        newWeapon.transform.SetParent(weaponParent);
         newWeapon.transform.localPosition = Vector3.zero;
         newWeapon.transform.localRotation = Quaternion.identity;
 

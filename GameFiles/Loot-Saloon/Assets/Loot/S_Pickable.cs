@@ -18,15 +18,11 @@ public abstract class S_Pickable : S_Interactable
 
         if (!(this is S_Weapon))
         {
-            
             _transform.SetParent(p_playerInteract.transform, false);
+            _transform.localPosition = _onPickUpOffset;
+            _transform.rotation = Quaternion.Euler(p_playerInteract.transform.rotation.eulerAngles + new Vector3(0, 180, 0));
         }
         
-
-        _transform.localPosition = _onPickUpOffset;
-        _transform.rotation = Quaternion.Euler(p_playerInteract.transform.rotation.eulerAngles + new Vector3(0, 180, 0));
-
-
         foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
         {
             Physics.IgnoreCollision(colliderToIgnore, _collider, true);

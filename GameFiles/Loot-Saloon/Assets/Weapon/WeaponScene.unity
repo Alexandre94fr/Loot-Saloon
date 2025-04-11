@@ -1249,7 +1249,6 @@ Transform:
   - {fileID: 849104978}
   - {fileID: 1698319699}
   - {fileID: 537206296}
-  - {fileID: 1522232216}
   m_Father: {fileID: 732446820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1184008404
@@ -1734,12 +1733,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1522232215}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.4, y: 0.2, z: 0.4}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 10, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1184008403}
+  m_Father: {fileID: 2065146819}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1522232217
 MonoBehaviour:
@@ -1753,6 +1752,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68e6c489aa85fa44c90bd5ea1c03ed8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponParent: {fileID: 1522232216}
   weaponIsActive: 0
   heldWeapon: {fileID: 0}
   interact: {fileID: 1698319701}
@@ -2158,7 +2158,8 @@ Transform:
   m_LocalPosition: {x: 0.4, y: 0.2, z: 0.4}
   m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1522232216}
   m_Father: {fileID: 100392290}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2065146820
