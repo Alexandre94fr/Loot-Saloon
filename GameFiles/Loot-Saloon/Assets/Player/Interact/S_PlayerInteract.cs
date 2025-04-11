@@ -2,41 +2,39 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
-[RequireComponent(typeof (SphereCollider))]
+[RequireComponent(typeof(SphereCollider))]
 public class S_PlayerInteract : MonoBehaviour
 {
     // [SerializeField] private GameObject _interactPanel;
 
     private Transform _transform;
+    private Transform _cameraTransform;
     private S_Pickable _pickableHeld = null;
-
-    private List<S_Interactable> _interactables = new();
-    private int _interactableIndex = -1;
 
     public UnityEvent<S_Pickable> OnPickUp = new();
 
     public UnityEvent<S_Weapon> OnWeaponPickUp = new();
+    [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
+    public List<Collider> pickableIgnoresColliders = new();
+
+    [SerializeField] [Range(0, 20)] private float _throwForce = 10;
+    [SerializeField] private Vector3 _throwAngle = new Vector3(0, 0.75f, 1);
+
+    public LayerMask objectLayer;
+
+    private Material _lastRenderer;
 
     private void Awake()
     {
         _transform = transform;
+        _cameraTransform = Camera.main.transform;
     }
 
     private void Start()
     {
         S_PlayerInputsReciever.OnInteract += Interact;
-        S_PlayerInputsReciever.OnScroll   += Scroll;
-    }
-
-    private void Scroll(Vector2 p_value)
-    {
-        if (_interactableIndex == -1)
-            return;
-
-        int direction = p_value.y == 0 ? 0 : (int) Mathf.Sign(p_value.y);
-        print($"scroll direction: {direction}");
-        S_Utils.ScrollIndex(ref _interactableIndex, _interactables.Count, direction);
-        print($"can interact with {_interactables[_interactableIndex]}");
+        S_PlayerInputsReciever.OnThrow += Throw;
+        S_LifeManager.OnDie += PutDownPickable;
     }
 
     private void Interact()
@@ -47,24 +45,24 @@ public class S_PlayerInteract : MonoBehaviour
         }
         else
         {
-            if (_interactableIndex != -1)
-                InteractWith(_interactables[_interactableIndex]);
+            InteractWith(CheckObjectRaycast());
         }
     }
 
     private void InteractWith(S_Interactable p_interactable)
     {
+        if (p_interactable == null)
+            return;
+
         if (p_interactable is S_Pickable pickable)
         {
             if (_pickableHeld != null)
                 return;
-            
+
             PickUp(pickable);
         }
 
-        _interactables.Remove(p_interactable);
-        SetCorrectIndex();
-        p_interactable.Interact(_transform);
+        p_interactable.Interact(this);
     }
 
     private void PickUp(S_Pickable p_pickable)
@@ -81,51 +79,65 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void PutDownPickable()
     {
+        if (_pickableHeld == null) return;
         _pickableHeld.PutDown();
         _pickableHeld = null;
         OnPickUp.Invoke(null);
     }
 
-    private void OnTriggerEnter(Collider p_collider)
+    private S_Pickable CheckObjectRaycast()
     {
-        foreach (S_Interactable interactable in p_collider.GetComponents<S_Interactable>())
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
-            if (interactable.interactInstantly)
-                InteractWith(interactable);
-            else
-                _interactables.Add(interactable);
+            return hit.collider.GetComponent<S_Pickable>();
         }
 
-        SetCorrectIndex();
+        return null;
     }
 
-    private void OnTriggerExit(Collider p_collider)
+    void Update()
     {
-        foreach (S_Interactable interactable in p_collider.GetComponents<S_Interactable>())
-            _interactables.Remove(interactable);
-
-        SetCorrectIndex();
-    }
-
-    private void SetCorrectIndex()
-    {
-        int old = _interactableIndex;
-
-        if (_interactableIndex == -1)
-            _interactableIndex = _interactables.Count != 0 ? 0 : -1;
-        else
-            _interactableIndex = _interactables.Count == 0 ? -1 : _interactableIndex;
-        
-        if (_interactableIndex != -1)
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
         {
-            if (_interactableIndex != old)
+            MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
+            if (renderer != null)
             {
-                //print($"can interact with {_interactables[_interactableIndex]}");
+                Material[] materials = renderer.materials; 
+
+                if (materials.Length > 1)
+                {
+                    if (materials[1].HasProperty("_Scale")) 
+                    {
+                        materials[1].SetFloat("_Scale", 1.05f);
+                        if (_lastRenderer != null && materials[1] != _lastRenderer)
+                        {
+                            _lastRenderer.SetFloat("_Scale", 1f);
+                        }
+                        _lastRenderer = materials[1];
+                    }
+                }
             }
         }
-        else
+        else if (_lastRenderer != null)
         {
-            //print("can't interact wit anything");
+            _lastRenderer.SetFloat("_Scale", 1f);
+            _lastRenderer = null;
         }
+    }
+
+    private void Throw()
+    {
+        if (_pickableHeld == null)
+            return;
+        
+        S_Pickable pickable = _pickableHeld;
+        PutDownPickable();
+
+        Transform pickableTransform = pickable.transform;
+
+        // since we rotate the object by 180 when picking it up,
+        // rotate it back when throwing it
+        pickableTransform.rotation = Quaternion.Euler(pickableTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
+        pickable.GetComponent<Rigidbody>().AddForce(pickableTransform.rotation * _throwAngle * _throwForce, ForceMode.Impulse);
     }
 }

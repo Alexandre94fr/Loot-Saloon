@@ -60,9 +60,9 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Shoot",
+                    "name": "Throw",
                     "type": "Button",
-                    "id": "ccb4f6f4-5ba3-4688-92f2-8dd501ceb958",
+                    "id": "d9a03079-db4d-4141-b287-68412dc1923d",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -182,12 +182,12 @@
                 },
                 {
                     "name": "",
-                    "id": "b5dbf3aa-c46c-46f2-9b4d-47d7d766ce5e",
-                    "path": "<Mouse>/leftButton",
+                    "id": "c1070637-366e-4304-8376-e99bb36779c3",
+                    "path": "<Keyboard>/g",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Shoot",
+                    "action": "Throw",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
