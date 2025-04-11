@@ -1,3 +1,4 @@
+#region
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,15 +7,17 @@ using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+#endregion
 
 public class S_LobbyManager : MonoBehaviour
 {
+    public static S_LobbyManager instance;
+
     private Lobby _lobby;
     private Coroutine _heartbeatCoroutine;
     private Coroutine _refreshLobbyCoroutine;
-    public static S_LobbyManager instance;
 
-    private void Start()
+    private void Awake()
     {
         if (instance == null)
         {
@@ -32,34 +35,27 @@ public class S_LobbyManager : MonoBehaviour
         return _lobby?.LobbyCode;
     }
 
-    private void OnDisable()
+    public void OnApplicationQuit()
     {
-        if (_heartbeatCoroutine != null)
-        {
-            StopCoroutine(_heartbeatCoroutine);
-            _heartbeatCoroutine = null;
-        }
-
-        if (_refreshLobbyCoroutine != null)
-        {
-            StopCoroutine(_refreshLobbyCoroutine);
-            _refreshLobbyCoroutine = null;
-        }
+        if (_lobby != null && _lobby.HostId == AuthenticationService.Instance.PlayerId)
+            LobbyService.Instance.DeleteLobbyAsync(_lobby.Id);
     }
 
-    public async Task<bool> CreateLobbyAsync(int p_maxPlayer, bool p_isPrivate, Dictionary<string, string> p_data)
+
+    public async Task<bool> CreateLobbyAsync(int p_maxPlayer, bool p_isPrivate, Dictionary<string, string> p_data, Dictionary<string, string> p_lobbyData)
     {
         Dictionary<string, PlayerDataObject> playerData = SerializePlayerData(p_data);
         Player player = new Player(AuthenticationService.Instance.PlayerId, null, playerData);
+
         CreateLobbyOptions lobbyOption = new CreateLobbyOptions
         {
+            Data = SerializeLobbyData(p_lobbyData),
             IsPrivate = p_isPrivate,
-            Player = player,
+            Player = player
         };
 
         try
         {
-            Debug.Log(AuthenticationService.Instance.PlayerName);
             _lobby = await LobbyService.Instance.CreateLobbyAsync($"{PlayerPrefs.GetString("PlayerName")}'s Lobby", p_maxPlayer, lobbyOption);
         }
         catch (Exception)
@@ -67,7 +63,6 @@ public class S_LobbyManager : MonoBehaviour
             return false;
         }
 
-        Debug.Log($"Lobby created with maxPlayer: {_lobby.MaxPlayers} and isPrivate: {_lobby.IsPrivate}");
         _heartbeatCoroutine = StartCoroutine(HearthbeatLobbyCoroutine(_lobby.Id, 6f));
         _refreshLobbyCoroutine = StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
         return true;
@@ -84,30 +79,38 @@ public class S_LobbyManager : MonoBehaviour
 
     private IEnumerator RefreshLobbyCoroutine(string p_id, float p_waitTimeSeconds)
     {
-        while (_lobby != null)
+        while (true)
         {
             Task<Lobby> task = LobbyService.Instance.GetLobbyAsync(p_id);
             yield return new WaitUntil(() => task.IsCompleted);
-
-            if (task.Result != null && task.Result.LastUpdated > _lobby.LastUpdated)
+            Lobby newLobby = task.Result;
+            if (newLobby.LastUpdated > _lobby.LastUpdated)
             {
-                _lobby = task.Result;
-                S_LobbyEvents.onLobbyUpdated?.Invoke(_lobby);
+                _lobby = newLobby;
+                S_LobbyEvents.OnLobbyUpdatedWithParam(_lobby);
             }
+
 
             yield return new WaitForSecondsRealtime(p_waitTimeSeconds);
         }
     }
 
-    private Dictionary<string, PlayerDataObject> SerializePlayerData(Dictionary<string, string> data)
+    private Dictionary<string, PlayerDataObject> SerializePlayerData(Dictionary<string, string> p_data)
     {
         Dictionary<string, PlayerDataObject> playerData = new Dictionary<string, PlayerDataObject>();
-        foreach (var item in data)
-        {
-            playerData.Add(item.Key, new PlayerDataObject(visibility: PlayerDataObject.VisibilityOptions.Member, value: item.Value));
-        }
+        foreach (KeyValuePair<string, string> item in p_data)
+            playerData.Add(item.Key, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, item.Value));
 
         return playerData;
+    }
+
+    private Dictionary<string, DataObject> SerializeLobbyData(Dictionary<string, string> p_lobbyData)
+    {
+        Dictionary<string, DataObject> lobbyData = new Dictionary<string, DataObject>();
+        foreach (KeyValuePair<string, string> item in p_lobbyData)
+            lobbyData.Add(item.Key, new DataObject(DataObject.VisibilityOptions.Member, item.Value));
+
+        return lobbyData;
     }
 
     public async Task<bool> JoinLobby(string p_code, Dictionary<string, string> p_playerData)
@@ -116,7 +119,6 @@ public class S_LobbyManager : MonoBehaviour
         {
             Player = new Player(AuthenticationService.Instance.PlayerId, null, SerializePlayerData(p_playerData))
         };
-
 
         try
         {
@@ -130,13 +132,13 @@ public class S_LobbyManager : MonoBehaviour
         StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
         return true;
     }
+
     public async Task<bool> JoinLobbyById(string p_id, Dictionary<string, string> p_playerData)
     {
-        JoinLobbyByIdOptions options = new JoinLobbyByIdOptions
-        {
-            Player = new Player(AuthenticationService.Instance.PlayerId, null, SerializePlayerData(p_playerData))
-        };
+        JoinLobbyByIdOptions options = new JoinLobbyByIdOptions();
+        Player player = new Player(AuthenticationService.Instance.PlayerId, null, SerializePlayerData(p_playerData));
 
+        options.Player = player;
 
         try
         {
@@ -150,23 +152,66 @@ public class S_LobbyManager : MonoBehaviour
         StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
         return true;
     }
-    public void OnApplicationQuit()
-    {
-        if (_lobby != null && _lobby.HostId == AuthenticationService.Instance.PlayerId)
-        {
-            LobbyService.Instance.DeleteLobbyAsync(_lobby.Id);
-        }
-    }
 
     public List<Dictionary<string, PlayerDataObject>> GetPlayerData()
     {
         List<Dictionary<string, PlayerDataObject>> data = new List<Dictionary<string, PlayerDataObject>>();
         foreach (Player player in _lobby.Players)
-        {
             data.Add(player.Data);
-        }
 
         return data;
+    }
+
+    public async Task<bool> UpdatePlayerData(string p_id, Dictionary<string, string> p_data, string p_allocationId = default, string p_connectionData = default)
+    {
+        Dictionary<string, PlayerDataObject> playerData = SerializePlayerData(p_data);
+
+        UpdatePlayerOptions options = new UpdatePlayerOptions
+        {
+            Data = playerData,
+            AllocationId = p_allocationId,
+            ConnectionInfo = p_connectionData
+        };
+        try
+        {
+            await LobbyService.Instance.UpdatePlayerAsync(_lobby.Id, p_id, options);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        S_LobbyEvents.OnLobbyUpdatedWithParam(_lobby);
+        return true;
+    }
+
+    public async Task<bool> UpdateLobbyData(Dictionary<string, string> p_data)
+    {
+        Dictionary<string, DataObject> lobbyData = SerializeLobbyData(p_data);
+        UpdateLobbyOptions options = new UpdateLobbyOptions
+        {
+            Data = lobbyData
+        };
+
+        try
+        {
+            _lobby = await LobbyService.Instance.UpdateLobbyAsync(_lobby.Id, options);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        S_LobbyEvents.OnLobbyUpdatedWithParam(_lobby);
+        return true;
+    }
+
+    public string GetHostId()
+    {
+        if (_lobby != null)
+            return _lobby.HostId;
+
+        return string.Empty;
     }
 
     public async Task<QueryResponse> QueryLobbiesAsync()
@@ -178,17 +223,13 @@ public class S_LobbyManager : MonoBehaviour
                 Filters = new List<QueryFilter>
                 {
                     new QueryFilter(
-                        field: QueryFilter.FieldOptions.AvailableSlots,
+                        QueryFilter.FieldOptions.AvailableSlots,
                         op: QueryFilter.OpOptions.GT,
                         value: "0"),
                     new QueryFilter(
-                        field:QueryFilter.FieldOptions.IsLocked,
+                        QueryFilter.FieldOptions.IsLocked,
                         op: QueryFilter.OpOptions.EQ,
-                        value:"0"),
-                    new QueryFilter(
-                        field:QueryFilter.FieldOptions.AvailableSlots,
-                        op: QueryFilter.OpOptions.LT,
-                        value:"0")
+                        value: "0")
                 },
                 Order = new List<QueryOrder>
                 {

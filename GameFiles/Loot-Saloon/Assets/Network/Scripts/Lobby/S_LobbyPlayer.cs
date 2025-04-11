@@ -11,5 +11,14 @@ public class S_LobbyPlayer : MonoBehaviour
         _data = p_data;
         _playerName.text = _data.GamerTag;
         gameObject.SetActive(true);
+
+        if(_data.IsReady)
+        {
+            _playerName.color = Color.green;
+        }
+        else
+        {
+            _playerName.color = Color.red;
+        }
     }
 }

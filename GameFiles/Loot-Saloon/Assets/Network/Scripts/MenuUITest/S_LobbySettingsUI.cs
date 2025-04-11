@@ -1,21 +1,18 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class S_LobbySettingsUI : MonoBehaviour
 {
-
     public Slider maxPlayersSlider;
     public TextMeshProUGUI maxPlayersText;
     public Toggle privateToggle;
-    private S_LobbySettings _lobbySettings = new S_LobbySettings();
+    private S_LobbySettings _lobbySettings = new();
 
     private void Start()
     {
         maxPlayersSlider.onValueChanged.AddListener(OnMaxPlayersSliderChanged);
         privateToggle.onValueChanged.AddListener(OnPrivateToggleChanged);
-
     }
 
     private void OnPrivateToggleChanged(bool p_value)
@@ -26,7 +23,7 @@ public class S_LobbySettingsUI : MonoBehaviour
 
     private void OnMaxPlayersSliderChanged(float p_value)
     {
-        int maxPlayers = Mathf.RoundToInt(p_value);
+        var maxPlayers = Mathf.RoundToInt(p_value);
         if (maxPlayers % 2 != 0)
             maxPlayers--;
         maxPlayersSlider.value = maxPlayers;
