@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1790806835177131458}
   - component: {fileID: -3846910836060819557}
   - component: {fileID: 8594431900264190085}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PB_Revolver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -130,7 +130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactName: Revolver
   interactInstantly: 0
-  _trigger: {fileID: 8594431900264190085}
+  _collider: {fileID: 0}
   _onPickUpOffset: {x: 0, y: 0, z: 1}
   weight: 0
   properties: {fileID: 0}

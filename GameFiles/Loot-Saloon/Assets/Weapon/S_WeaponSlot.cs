@@ -43,7 +43,13 @@ public class S_WeaponSlot : MonoBehaviour
             return;
         }
 
-        DropWeapon();
+        //DropWeapon();
+
+        if (weaponObject != null)
+        {
+            DropWeapon();
+        }
+
 
         SO_WeaponProperties properties = weapon.properties;
         heldWeapon = properties;
@@ -86,6 +92,7 @@ public class S_WeaponSlot : MonoBehaviour
 
     public void DropWeapon()
     {
+        print(heldWeapon.name);
         if (weaponObject == null)
             return;
 
@@ -106,6 +113,7 @@ public class S_WeaponSlot : MonoBehaviour
 
     public void Shoot()
     {
+        print("SHOOT");
         if (!weaponIsActive || Time.time - _lastShotTime < cooldown || nbBullet <= 0)
             return;
 

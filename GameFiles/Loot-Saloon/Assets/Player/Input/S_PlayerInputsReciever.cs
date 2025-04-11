@@ -11,6 +11,7 @@ public class S_PlayerInputsReciever : MonoBehaviour
     public static event Action OnInteract;
     public static event Action<Vector2> OnScroll;
     public static event Action OnThrow;
+    public static event Action OnShoot;
 
     public void JumpInput(InputAction.CallbackContext context)
     {
@@ -64,5 +65,13 @@ public class S_PlayerInputsReciever : MonoBehaviour
             return;
         
         OnThrow?.Invoke();
+    }
+
+    public void Shoot(InputAction.CallbackContext context)
+    {
+        if (!context.started)
+            return;
+
+        OnShoot?.Invoke();
     }
 }
