@@ -16,6 +16,8 @@ public class S_LobbyManager : MonoBehaviour
     private Lobby _lobby;
     private Coroutine _heartbeatCoroutine;
     private Coroutine _refreshLobbyCoroutine;
+    
+    
 
     private void Awake()
     {
@@ -249,4 +251,37 @@ public class S_LobbyManager : MonoBehaviour
             return null;
         }
     }
+
+    public async Task LeaveLobbyAsync()
+    {
+        try
+        {
+            string playerId = AuthenticationService.Instance.PlayerId;
+
+            // Si tu es le host, tu peux supprimer le lobby
+            if (playerId == GetHostId())
+            {
+                await LobbyService.Instance.DeleteLobbyAsync(GetLobbyId());
+                Debug.Log("Lobby supprimé (host).");
+            }
+            else
+            {
+                await LobbyService.Instance.RemovePlayerAsync(GetLobbyId(), playerId);
+                Debug.Log("Joueur retiré du lobby.");
+            }
+
+            _lobby = null;
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogError($"Erreur lors de la sortie du lobby : {e}");
+        }
+    }
+    
+    public string GetLobbyId()
+    {
+        return _lobby?.Id ?? string.Empty;
+    }
+    
+
 }

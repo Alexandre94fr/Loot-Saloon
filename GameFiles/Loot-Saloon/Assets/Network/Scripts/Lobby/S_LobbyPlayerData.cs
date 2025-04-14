@@ -7,10 +7,23 @@ public class S_LobbyPlayerData
     private string _id;
     private string _gamerTag;
     private bool _isReady;
+    private GameObject _prefabInstance;
+    private bool _kickPlayer;
 
+    public bool KickPlayer
+    {
+        get => _kickPlayer;
+        set => _kickPlayer = value;
+    }
+    
     public string Id => _id;
     public string GamerTag => _gamerTag;
 
+    public GameObject PrefabInstance
+    {
+        get => _prefabInstance;
+        set => _prefabInstance = value;
+    }
     public bool IsReady
     {
         get => _isReady;

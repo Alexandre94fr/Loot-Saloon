@@ -1,7 +1,10 @@
 #region
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
+using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,6 +16,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public string gameSceneName;
 
     private List<S_LobbyPlayerData> _lobbyPlayerDatas = new List<S_LobbyPlayerData>();
+    private List<S_LobbyPlayerData> _previousLobbyPlayerDatas = new List<S_LobbyPlayerData>();
     private S_LobbySettings _lobbySettings = new S_LobbySettings();
 
     private S_LobbyPlayerData _localLobbyPlayerData;
@@ -59,7 +63,7 @@ public class S_GameLobbyManager : MonoBehaviour
             playerData.Serialize(),
             _lobbyData.Serialize()
         );
-
+        
         return succeeded;
     }
 
@@ -86,11 +90,14 @@ public class S_GameLobbyManager : MonoBehaviour
         List<Dictionary<string, PlayerDataObject>> playerData = S_LobbyManager.instance.GetPlayerData();
         _lobbyPlayerDatas.Clear();
         int nbPlayerReady = 0;
+        List<string> currentPlayerIds = new List<string>();
+
         foreach (Dictionary<string, PlayerDataObject> data in playerData)
         {
             S_LobbyPlayerData lobbyPlayerData = new S_LobbyPlayerData();
             lobbyPlayerData.Initialize(data);
 
+            currentPlayerIds.Add(lobbyPlayerData.Id);
 
             if (lobbyPlayerData.IsReady)
             {
@@ -102,8 +109,26 @@ public class S_GameLobbyManager : MonoBehaviour
                 _localLobbyPlayerData = lobbyPlayerData;
             }
 
+            if (lobbyPlayerData.KickPlayer && !IsHost)
+            {
+                LeaveLobby();
+            }
+
             _lobbyPlayerDatas.Add(lobbyPlayerData);
         }
+        
+        
+        
+        foreach (S_LobbyPlayerData previousPlayer in _previousLobbyPlayerDatas)
+        {
+            if (!currentPlayerIds.Contains(previousPlayer.Id))
+            {
+                previousPlayer.PrefabInstance.SetActive(false);
+                Debug.Log($"Player disconnected: {previousPlayer.GamerTag} (ID: {previousPlayer.Id})");
+            }
+        }
+        
+        _previousLobbyPlayerDatas = new List<S_LobbyPlayerData>(_lobbyPlayerDatas);
 
         _lobbyData = new S_LobbyData();
         _lobbyData.Initialize(p_lobby.Data);
@@ -122,8 +147,22 @@ public class S_GameLobbyManager : MonoBehaviour
             await JoinRelayServer(_lobbyData.RelayJoinCode);
             await SceneManager.LoadSceneAsync(gameSceneName);
         }
+        
     }
+    
+    
 
+    public async void LeaveLobby()
+    {
+        await S_LobbyManager.instance.LeaveLobbyAsync();
+        _lobbyPlayerDatas.Clear();
+        _previousLobbyPlayerDatas.Clear();
+
+        SceneManager.LoadScene("MainMenuTestNetwork");
+
+        Debug.Log("Lobby quitté.");
+    }
+    
 
     public string GetLobbyCode()
     {
@@ -169,4 +208,6 @@ public class S_GameLobbyManager : MonoBehaviour
         await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize(), allocationId, connectionData);
         return true;
     }
+
+
 }

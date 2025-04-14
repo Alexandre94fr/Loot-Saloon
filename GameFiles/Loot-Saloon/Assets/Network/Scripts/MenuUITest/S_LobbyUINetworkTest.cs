@@ -8,6 +8,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     public Text lobbyIdText;
     public Button startGameButton;
     public Button readyButton;
+    public Button LeaveButton;
 
 
     private void OnEnable()
@@ -21,7 +22,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
                 S_LobbyEvents.OnLobbyReady += OnLobbyReady;
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
-
+            LeaveButton.onClick.AddListener(OnLeavePressed);
             readyButton.onClick.AddListener(OnReadyPressed);
         }
     }
@@ -47,5 +48,10 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     {
         var succeeded = await S_GameLobbyManager.instance.SetPlayerReady();
         if (succeeded) readyButton.interactable = false;
+    }
+    
+    private async void OnLeavePressed()
+    {
+        S_GameLobbyManager.instance.LeaveLobby();
     }
 }
