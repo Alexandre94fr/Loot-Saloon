@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class S_GameLobbyManager : MonoBehaviour
 {
     public static S_GameLobbyManager instance;
-    public string gameSceneName;
+    [SerializeField] private string gameSceneName;
 
     private List<S_LobbyPlayerData> _lobbyPlayerDatas = new List<S_LobbyPlayerData>();
     private S_LobbySettings _lobbySettings = new S_LobbySettings();

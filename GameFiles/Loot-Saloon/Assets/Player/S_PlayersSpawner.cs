@@ -1,10 +1,13 @@
 #region
+
+using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using Unity.VisualScripting;
 using UnityEngine;
 #endregion
 
-public class S_PlayersSpawner : MonoBehaviour
+public class S_PlayersSpawner : NetworkBehaviour
 {
     [SerializeField] private Transform _redTeam;
     [SerializeField] private Transform _blueTeam;
@@ -12,6 +15,9 @@ public class S_PlayersSpawner : MonoBehaviour
     [SerializeField] private float _spawnDistance = 5f;
     [SerializeField] private float _SpawnRadius = 10f;
     [SerializeField] private E_PlayerTeam _playerTeam;
+    
+    [SerializeField] private Material _redTeamMaterial;
+    [SerializeField] private Material _blueTeamMaterial;
     public static S_PlayersSpawner Instance { get; private set; }
 
     private int _bluePlayer = 0;
@@ -43,21 +49,34 @@ public class S_PlayersSpawner : MonoBehaviour
             _bluePlayer++;
             nbPlayer = _bluePlayer;
             fixedZ = _blueTeam.position.z;
+            p_player.GetComponentInChildren<MeshRenderer>().material = _blueTeamMaterial;
         }
         else
         {
             _redPlayer++;
             nbPlayer = _redPlayer;
             fixedZ = _redTeam.position.z;
+            p_player.GetComponentInChildren<MeshRenderer>().material = _redTeamMaterial;
         }
-
-        NetworkObject networkObject = p_player.TryGetComponent(out NetworkObject netObj) ? netObj : null;
-
         Vector3 pos = new Vector3(startX + nbPlayer * _spawnDistance, p_origin.position.y, fixedZ);
-        NetworkTransform playerNetworkTransform = p_player.GetComponentInChildren<NetworkTransform>();
-        playerNetworkTransform.Teleport(pos, Quaternion.Euler(Vector3.right), transform.localScale);
+        
+        StartCoroutine(TPPlayer(p_player, pos));
+        
 
-        Debug.Log($"Spawn player {p_player.name} at {playerNetworkTransform.transform.position}");
+    }
+
+    IEnumerator TPPlayer(GameObject p_player, Vector3 pos)
+    {
+        yield return new WaitForSeconds(2);
+        if (p_player.GetComponentInChildren<NetworkTransform>() != null)
+        {
+            
+            p_player.GetComponentInChildren<NetworkTransform>().Teleport(pos, Quaternion.identity, Vector3.one);
+        }
+        else
+        {
+            Debug.LogWarning("NetworkTransform non trouvé sur le joueur.");
+        }
     }
 
     public void RandomSpawnInRadius(GameObject p_player, Transform p_origin)

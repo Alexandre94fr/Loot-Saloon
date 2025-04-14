@@ -135,6 +135,14 @@ PrefabInstance:
       propertyPath: _blueTeam
       value: 
       objectReference: {fileID: 766803919}
+    - target: {fileID: 4217255255696607859, guid: 6c1f7a87803018b4292680a66ffcd6f7, type: 3}
+      propertyPath: _redTeamMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 41be496fc3417d341914c6af78a65785, type: 2}
+    - target: {fileID: 4217255255696607859, guid: 6c1f7a87803018b4292680a66ffcd6f7, type: 3}
+      propertyPath: _blueTeamMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 537a50662d4bebe49b6f244586c181d3, type: 2}
     - target: {fileID: 6484210324690273260, guid: 6c1f7a87803018b4292680a66ffcd6f7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.0319918
