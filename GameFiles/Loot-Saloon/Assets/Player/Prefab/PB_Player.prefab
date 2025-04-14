@@ -167,6 +167,7 @@ GameObject:
   - component: {fileID: 6579715726715751187}
   - component: {fileID: 6531663564648054835}
   - component: {fileID: 71194357078824127}
+  - component: {fileID: 7496308992574988215}
   m_Layer: 0
   m_Name: PlayerCharacter
   m_TagString: Player
@@ -351,6 +352,19 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
+--- !u!114 &7496308992574988215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663480751592754377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04a9e44a8792c024bbc5ee89dde7d984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LifeManager: {fileID: 505570556356067103}
 --- !u!1 &1941622484713472824
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,7 +546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36db5b57077e6f147a334f7ceeb2d927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _OnPickUp:
+  _onPickUp:
     m_PersistentCalls:
       m_Calls: []
   pickableIgnoresColliders:
