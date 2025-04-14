@@ -94,6 +94,12 @@ public class S_LobbyManager : MonoBehaviour
                 yield break;
             }
 
+            if (_lobby == null)
+            {
+                Debug.LogError("Lobby reference is null. Stopping refresh.");
+                yield break;
+            }
+
             Lobby newLobby = task.Result;
             if (newLobby.LastUpdated > _lobby.LastUpdated)
             {
