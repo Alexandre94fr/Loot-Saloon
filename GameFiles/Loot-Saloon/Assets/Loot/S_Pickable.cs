@@ -18,13 +18,11 @@ public abstract class S_Pickable : S_Interactable
     private List<Collider> _ignoredColliders = new();
 
 
-    public override void Interact(S_PlayerInteract p_playerInteract, Transform p_transform)
-
     public S_Cart cart { get; private set; }
 
-    public void SetCart(S_Cart cart)
+    public void SetCart(S_Cart p_cart)
     {
-        this.cart = cart;
+        this.cart = p_cart;
     }
     public bool IsEasyToPickUp(S_PlayerInteract p_player)
     {
@@ -76,7 +74,7 @@ public abstract class S_Pickable : S_Interactable
 
         _body.isKinematic = true;
 
-        Transform handTransform = p_transform;
+        Transform handTransform = p_parent;
         _transform.SetParent(p_parent, false);
         _transform.localPosition = _onPickUpOffset;
 

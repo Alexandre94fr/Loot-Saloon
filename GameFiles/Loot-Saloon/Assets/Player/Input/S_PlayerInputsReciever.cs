@@ -22,7 +22,7 @@ public class S_PlayerInputsReciever : MonoBehaviour
         OnLockMovement += (bool canMove) => _canMove = canMove;
     }
 
-    public void JumpInput(InputAction.CallbackContext context)
+    public void JumpInput(InputAction.CallbackContext p_context)
     {
         if (p_context.performed)
         {
@@ -38,7 +38,7 @@ public class S_PlayerInputsReciever : MonoBehaviour
             return;
         }
 
-        OnMove?.Invoke(context.ReadValue<Vector2>());
+        OnMove?.Invoke(p_context.ReadValue<Vector2>());
     }
 
     public void LookInput(InputAction.CallbackContext p_context)
@@ -60,13 +60,13 @@ public class S_PlayerInputsReciever : MonoBehaviour
 
     public void Interact(InputAction.CallbackContext p_context)
     {
-        if (context.canceled)
+        if (p_context.canceled)
         {
             OnStopInteract?.Invoke();
             OnLockMovement?.Invoke(true);
         }
 
-        if (!context.performed)
+        if (!p_context.performed)
             return;
         
         OnInteract?.Invoke();
