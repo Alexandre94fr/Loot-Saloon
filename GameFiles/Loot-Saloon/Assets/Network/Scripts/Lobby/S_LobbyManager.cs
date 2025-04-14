@@ -7,6 +7,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 #endregion
 
 public class S_LobbyManager : MonoBehaviour
@@ -16,6 +17,7 @@ public class S_LobbyManager : MonoBehaviour
     private Lobby _lobby;
     private Coroutine _heartbeatCoroutine;
     private Coroutine _refreshLobbyCoroutine;
+
 
     private void Awake()
     {
@@ -84,13 +86,26 @@ public class S_LobbyManager : MonoBehaviour
         {
             Task<Lobby> task = LobbyService.Instance.GetLobbyAsync(p_id);
             yield return new WaitUntil(() => task.IsCompleted);
+
+            if (task.IsFaulted || task.Result == null)
+            {
+                Debug.LogError("Lobby not found or host disconnected. Stopping refresh.");
+                SceneManager.LoadSceneAsync("MainMenu");
+                yield break;
+            }
+
+            if (_lobby == null)
+            {
+                Debug.LogError("Lobby reference is null. Stopping refresh.");
+                yield break;
+            }
+
             Lobby newLobby = task.Result;
             if (newLobby.LastUpdated > _lobby.LastUpdated)
             {
                 _lobby = newLobby;
                 S_LobbyEvents.OnLobbyUpdatedWithParam(_lobby);
             }
-
 
             yield return new WaitForSecondsRealtime(p_waitTimeSeconds);
         }
@@ -186,7 +201,7 @@ public class S_LobbyManager : MonoBehaviour
         return true;
     }
 
-    public async Task<bool> UpdateLobbyData(Dictionary<string, string> p_data)
+    public async Task<bool> UpdateLobbyData(string p_id, Dictionary<string, string> p_data)
     {
         Dictionary<string, DataObject> lobbyData = SerializeLobbyData(p_data);
         UpdateLobbyOptions options = new UpdateLobbyOptions
@@ -248,5 +263,53 @@ public class S_LobbyManager : MonoBehaviour
             Debug.LogError($"Failed to query lobbies: {ex.Message}");
             return null;
         }
+    }
+
+    public async Task LeaveLobbyAsync()
+    {
+        try
+        {
+            string playerId = AuthenticationService.Instance.PlayerId;
+
+            // Stop the refresh coroutine if it's running
+            if (_refreshLobbyCoroutine != null)
+            {
+                StopCoroutine(_refreshLobbyCoroutine);
+                _refreshLobbyCoroutine = null;
+            }
+
+            // If the player is the host, delete the lobby
+            if (playerId == GetHostId())
+            {
+                await LobbyService.Instance.DeleteLobbyAsync(GetLobbyId());
+                Debug.Log("Lobby deleted (host).");
+            }
+            else
+            {
+                // Otherwise, remove the player from the lobby
+                await LobbyService.Instance.RemovePlayerAsync(GetLobbyId(), playerId);
+                Debug.Log("Player removed from the lobby.");
+            }
+
+            _lobby = null;
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogError($"Error while leaving the lobby: {e}");
+        }
+        finally
+        {
+            // Ensure the coroutine is stopped on the client
+            if (_refreshLobbyCoroutine != null)
+            {
+                StopCoroutine(_refreshLobbyCoroutine);
+                _refreshLobbyCoroutine = null;
+            }
+        }
+    }
+
+    public string GetLobbyId()
+    {
+        return _lobby?.Id ?? string.Empty;
     }
 }

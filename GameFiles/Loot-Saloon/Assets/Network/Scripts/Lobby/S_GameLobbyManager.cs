@@ -13,12 +13,15 @@ public class S_GameLobbyManager : MonoBehaviour
     [SerializeField] private string gameSceneName;
 
     private List<S_LobbyPlayerData> _lobbyPlayerDatas = new List<S_LobbyPlayerData>();
+    private List<S_LobbyPlayerData> _previousLobbyPlayerDatas = new List<S_LobbyPlayerData>();
     private S_LobbySettings _lobbySettings = new S_LobbySettings();
 
     private S_LobbyPlayerData _localLobbyPlayerData;
 
     private S_LobbyData _lobbyData;
     [SerializeField] private bool _inGame;
+    private bool _wasDisconnected;
+    private string _previousRelayCode;
 
     public bool IsHost => _localLobbyPlayerData != null && _localLobbyPlayerData.Id == S_LobbyManager.instance.GetHostId();
 
@@ -89,11 +92,14 @@ public class S_GameLobbyManager : MonoBehaviour
         List<Dictionary<string, PlayerDataObject>> playerData = S_LobbyManager.instance.GetPlayerData();
         _lobbyPlayerDatas.Clear();
         int nbPlayerReady = 0;
+        List<string> currentPlayerIds = new List<string>();
+
         foreach (Dictionary<string, PlayerDataObject> data in playerData)
         {
             S_LobbyPlayerData lobbyPlayerData = new S_LobbyPlayerData();
             lobbyPlayerData.Initialize(data);
 
+            currentPlayerIds.Add(lobbyPlayerData.Id);
 
             if (lobbyPlayerData.IsReady)
             {
@@ -105,10 +111,31 @@ public class S_GameLobbyManager : MonoBehaviour
                 _localLobbyPlayerData = lobbyPlayerData;
             }
 
-
+            if (lobbyPlayerData.KickPlayer && !IsHost)
+            {
+                LeaveLobby();
+            }
+        }
+      
             _lobbyPlayerDatas.Add(lobbyPlayerData);
+
+        foreach (S_LobbyPlayerData previousPlayer in _previousLobbyPlayerDatas)
+        {
+            if (!currentPlayerIds.Contains(previousPlayer.Id))
+            {
+                if (previousPlayer.PrefabInstance != null && previousPlayer.PrefabInstance.gameObject != null) // Check if the GameObject is not null
+                {
+                    previousPlayer.PrefabInstance.SetActive(false);
+                    Debug.Log($"Player disconnected: {previousPlayer.GamerTag} (ID: {previousPlayer.Id})");
+                }
+                else
+                {
+                    Debug.LogWarning($"PrefabInstance for player {previousPlayer.GamerTag} (ID: {previousPlayer.Id}) is already destroyed or null.");
+                }
+            }
         }
 
+        _previousLobbyPlayerDatas = new List<S_LobbyPlayerData>(_lobbyPlayerDatas);
 
         _lobbyData = new S_LobbyData();
         _lobbyData.Initialize(p_lobby.Data);
@@ -127,9 +154,18 @@ public class S_GameLobbyManager : MonoBehaviour
 
         if (_lobbyData.RelayJoinCode != default && !_inGame && !IsHost)
         {
-            Debug.Log($"OnLobbyUpdated called by player: {_localLobbyPlayerData?.Id ?? "Unknown"}");
-            await JoinRelayServer(_lobbyData.RelayJoinCode);
-            await SceneManager.LoadSceneAsync(gameSceneName);
+            if (_wasDisconnected)
+            {
+                if (_lobbyData.RelayJoinCode != _previousRelayCode)
+                {
+                    await JoinRelayServer(_lobbyData.RelayJoinCode);
+                }
+            }
+            else
+            {
+                await JoinRelayServer(_lobbyData.RelayJoinCode);
+                SceneManager.LoadSceneAsync(gameSceneName);
+            }
         }
     }
 
@@ -166,8 +202,8 @@ public class S_GameLobbyManager : MonoBehaviour
         string joinRelayCode = await S_RelayManager.instance.CreateRelay(_lobbySettings.maxPlayers);
         _inGame = true;
         _lobbyData.RelayJoinCode = joinRelayCode;
-        await S_LobbyManager.instance.UpdateLobbyData(_lobbyData.Serialize());
-
+        _localLobbyPlayerData.IsReady = false;
+        await S_LobbyManager.instance.UpdateLobbyData(_localLobbyPlayerData.Id, _lobbyData.Serialize());
         string allocationId = S_RelayManager.instance.GetAllocationId();
         string connectionData = S_RelayManager.instance.GetConnectionData();
         await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize(), allocationId, connectionData);
@@ -181,10 +217,24 @@ public class S_GameLobbyManager : MonoBehaviour
         await S_RelayManager.instance.JoinRelay(p_lobbyDataRelayJoinCode);
         string allocationId = S_RelayManager.instance.GetAllocationId();
         string connectionData = S_RelayManager.instance.GetConnectionData();
+        _localLobbyPlayerData.IsReady = false;
         await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize(), allocationId, connectionData);
         return true;
     }
 
+    public async void LeaveLobby()
+    {
+        _inGame = false;
+        _wasDisconnected = true;
+        if (_wasDisconnected)
+        {
+            _previousRelayCode = _lobbyData.RelayJoinCode;
+        }
+
+        _localLobbyPlayerData.IsReady = false;
+        await S_LobbyManager.instance.UpdateLobbyData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
+    }
+    
     public async Task<E_PlayerTeam> GetPlayerTeam()
     {
         return _localLobbyPlayerData.Team;

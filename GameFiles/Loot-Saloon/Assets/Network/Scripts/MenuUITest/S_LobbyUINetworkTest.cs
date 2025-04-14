@@ -1,7 +1,8 @@
 #region
-
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 #endregion
 
@@ -10,6 +11,8 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     public Text lobbyIdText;
     public Button startGameButton;
     public Button readyButton;
+    public Button LeaveButton;
+
     public Button GoRedTeamButton;
     public Button GoBlueTeamButton;
 
@@ -26,6 +29,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
 
+            LeaveButton.onClick.AddListener(HandleHostDisconnection);
             readyButton.onClick.AddListener(OnReadyPressed);
             GoRedTeamButton.onClick.AddListener(OnRedBtnPressed);
             GoBlueTeamButton.onClick.AddListener(OnBlueBtnPressed);
@@ -72,5 +76,22 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     private async void OnRedBtnPressed()
     {
         var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.RED);
+    }
+
+    private async void HandleHostDisconnection()
+    {
+        try
+        {
+            await S_LobbyManager.instance.LeaveLobbyAsync();
+            Debug.Log("Player has left the lobby.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error while leaving the lobby: {ex.Message}");
+        }
+        finally
+        {
+            SceneManager.LoadSceneAsync("MainMenu");
+        }
     }
 }
