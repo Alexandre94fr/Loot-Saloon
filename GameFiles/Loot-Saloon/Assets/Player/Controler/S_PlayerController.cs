@@ -106,8 +106,7 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Move()
     {
-        _playerTransform.position += (transform.right * _playerDirection.x + transform.forward * _playerDirection.z)
-                                     * Time.deltaTime * _currentSpeed;
+        _playerTransform.position += (transform.right * _playerDirection.x + transform.forward * _playerDirection.z) * (Time.deltaTime * _currentSpeed);
     }
 
     private void Sprint(bool sprint)

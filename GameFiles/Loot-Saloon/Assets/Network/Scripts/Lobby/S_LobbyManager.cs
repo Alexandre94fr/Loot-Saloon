@@ -45,6 +45,7 @@ public class S_LobbyManager : MonoBehaviour
     public async Task<bool> CreateLobbyAsync(int p_maxPlayer, bool p_isPrivate, Dictionary<string, string> p_data, Dictionary<string, string> p_lobbyData)
     {
         Dictionary<string, PlayerDataObject> playerData = SerializePlayerData(p_data);
+
         Player player = new Player(AuthenticationService.Instance.PlayerId, null, playerData);
 
         CreateLobbyOptions lobbyOption = new CreateLobbyOptions

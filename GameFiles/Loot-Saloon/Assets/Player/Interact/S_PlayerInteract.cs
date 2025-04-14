@@ -1,6 +1,8 @@
-using UnityEngine;
+#region
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
+#endregion
 
 [RequireComponent(typeof(SphereCollider))]
 public class S_PlayerInteract : MonoBehaviour
@@ -43,10 +45,25 @@ public class S_PlayerInteract : MonoBehaviour
         if (_pickableHeld != null)
         {
             PutDownPickable();
+            return;
         }
-        else
+
+        if (_pickableHeld != null)
         {
-            InteractWith(CheckObjectRaycast());
+            foreach (var collider in _pickableHeld.GetComponents<Collider>())
+            {
+                collider.enabled = false;
+            }
+        }
+
+        InteractWith(CheckObjectRaycast());
+
+        if (_pickableHeld != null)
+        {
+            foreach (var collider in _pickableHeld.GetComponents<Collider>())
+            {
+                collider.enabled = true;
+            }
         }
     }
 
@@ -62,7 +79,7 @@ public class S_PlayerInteract : MonoBehaviour
     {
         if (p_interactable == null)
             return;
-        
+
         Transform interactParent = _transform;
 
         _currentInteraction = p_interactable;
@@ -120,17 +137,18 @@ public class S_PlayerInteract : MonoBehaviour
             MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
             if (renderer != null)
             {
-                Material[] materials = renderer.materials; 
+                Material[] materials = renderer.materials;
 
                 if (materials.Length > 1)
                 {
-                    if (materials[1].HasProperty("_Scale")) 
+                    if (materials[1].HasProperty("_Scale"))
                     {
                         materials[1].SetFloat("_Scale", 1.05f);
                         if (_lastRenderer != null && materials[1] != _lastRenderer)
                         {
                             _lastRenderer.SetFloat("_Scale", 1f);
                         }
+
                         _lastRenderer = materials[1];
                     }
                 }
@@ -147,7 +165,7 @@ public class S_PlayerInteract : MonoBehaviour
     {
         if (_pickableHeld == null)
             return;
-        
+
         S_Pickable pickable = _pickableHeld;
         PutDownPickable();
 
