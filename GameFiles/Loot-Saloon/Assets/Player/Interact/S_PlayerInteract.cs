@@ -19,7 +19,7 @@ public class S_PlayerInteract : MonoBehaviour
     public List<Collider> pickableIgnoresColliders = new();
 
     [SerializeField] [Range(0, 20)] private float _throwForce = 10;
-    [SerializeField] private Vector3 _throwAngle = new Vector3(0, 0.75f, 1);
+    [SerializeField] private float _throwAngle = 0f;
 
     public LayerMask objectLayer;
 
@@ -147,11 +147,11 @@ public class S_PlayerInteract : MonoBehaviour
         S_Pickable pickable = _pickableHeld;
         PutDownPickable();
 
-        Transform pickableTransform = pickable.transform;
+        Vector3 throwDirection = _cameraTransform.forward.normalized;
 
-        // since we rotate the object by 180 when picking it up,
-        // rotate it back when throwing it
-        // pickableTransform.rotation = Quaternion.Euler(pickableTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
-        pickable.GetComponent<Rigidbody>().AddForce(pickableTransform.rotation * _throwAngle * _throwForce, ForceMode.Impulse);
+        throwDirection = Quaternion.AngleAxis(_throwAngle, _cameraTransform.right) * throwDirection;
+
+        Rigidbody rb = pickable.GetComponent<Rigidbody>();
+        rb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
     }
 }
