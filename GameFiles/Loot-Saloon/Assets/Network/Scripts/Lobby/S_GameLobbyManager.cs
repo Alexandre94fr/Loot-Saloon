@@ -115,9 +115,9 @@ public class S_GameLobbyManager : MonoBehaviour
             {
                 LeaveLobby();
             }
-        }
-      
+
             _lobbyPlayerDatas.Add(lobbyPlayerData);
+        }
 
         foreach (S_LobbyPlayerData previousPlayer in _previousLobbyPlayerDatas)
         {
