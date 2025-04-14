@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class S_NetworkGameManager : MonoBehaviour
 {
+    [SerializeField] Transform Team1;
+    [SerializeField] Transform Team2;
+
     private void Start()
     {
         NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
@@ -19,6 +22,7 @@ public class S_NetworkGameManager : MonoBehaviour
             transport.SetHostRelayData(ip, (ushort)port, allocationId, key, connectionData, true);
             NetworkManager.Singleton.StartHost();
         }
+
         else
         {
             // Client setup
