@@ -1,4 +1,6 @@
+#region
 using UnityEngine;
+#endregion
 
 public class S_PlayerCamera : MonoBehaviour
 {
@@ -6,9 +8,10 @@ public class S_PlayerCamera : MonoBehaviour
     private float _sensitivity = 100f;
     private float _xRotation = 0f;
     private Transform _playerTransform;
+
     void Start()
     {
-        _playerTransform = GameObject.Find("PlayerCharacter").transform;
+        _playerTransform = transform.parent.transform;
         Cursor.lockState = CursorLockMode.Locked;
         S_PlayerInputsReciever.OnLook += GetLookInput;
     }

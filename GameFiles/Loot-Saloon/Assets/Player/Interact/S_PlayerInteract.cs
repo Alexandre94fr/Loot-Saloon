@@ -1,6 +1,8 @@
-using UnityEngine;
+#region
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
+#endregion
 
 [RequireComponent(typeof(SphereCollider))]
 public class S_PlayerInteract : MonoBehaviour
@@ -18,7 +20,7 @@ public class S_PlayerInteract : MonoBehaviour
     public List<Collider> pickableIgnoresColliders = new();
 
     [SerializeField] [Range(0, 20)] private float _throwForce = 10;
-    [SerializeField] private Vector3 _throwAngle = new Vector3(0, 0.75f, 1);
+    [SerializeField] private float _throwAngle = 0f;
 
     public LayerMask objectLayer;
 
@@ -42,9 +44,26 @@ public class S_PlayerInteract : MonoBehaviour
         if (_pickableHeld != null)
         {
             PutDownPickable();
+            return;
         }
-            InteractWith(CheckObjectRaycast());
-        
+
+        if (_pickableHeld != null)
+        {
+            foreach (var collider in _pickableHeld.GetComponents<Collider>())
+            {
+                collider.enabled = false;
+            }
+        }
+
+        InteractWith(CheckObjectRaycast());
+
+        if (_pickableHeld != null)
+        {
+            foreach (var collider in _pickableHeld.GetComponents<Collider>())
+            {
+                collider.enabled = true;
+            }
+        }
     }
 
     private void InteractWith(S_Interactable p_interactable)
@@ -52,15 +71,18 @@ public class S_PlayerInteract : MonoBehaviour
         if (p_interactable == null)
             return;
 
+        Transform interactParent = _transform;
+
         if (p_interactable is S_Pickable pickable)
         {
             if (_pickableHeld != null)
                 return;
 
             PickUp(pickable);
+            interactParent = pickable.parentIsPlayerInteract ? _transform : _cameraTransform;
         }
 
-        p_interactable.Interact(this);
+        p_interactable.Interact(this, interactParent);
     }
 
     private void PickUp(S_Pickable p_pickable)
@@ -97,22 +119,23 @@ public class S_PlayerInteract : MonoBehaviour
 
     void Update()
     {
-        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 1f, objectLayer))
+        if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
             MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
             if (renderer != null)
             {
-                Material[] materials = renderer.materials; 
+                Material[] materials = renderer.materials;
 
                 if (materials.Length > 1)
                 {
-                    if (materials[1].HasProperty("_Scale")) 
+                    if (materials[1].HasProperty("_Scale"))
                     {
                         materials[1].SetFloat("_Scale", 1.05f);
                         if (_lastRenderer != null && materials[1] != _lastRenderer)
                         {
                             _lastRenderer.SetFloat("_Scale", 1f);
                         }
+
                         _lastRenderer = materials[1];
                     }
                 }
@@ -129,15 +152,15 @@ public class S_PlayerInteract : MonoBehaviour
     {
         if (_pickableHeld == null)
             return;
-        
+
         S_Pickable pickable = _pickableHeld;
         PutDownPickable();
 
-        Transform pickableTransform = pickable.transform;
+        Vector3 throwDirection = _cameraTransform.forward.normalized;
 
-        // since we rotate the object by 180 when picking it up,
-        // rotate it back when throwing it
-        pickableTransform.rotation = Quaternion.Euler(pickableTransform.rotation.eulerAngles + new Vector3(0, 180, 0));
-        pickable.GetComponent<Rigidbody>().AddForce(pickableTransform.rotation * _throwAngle * _throwForce, ForceMode.Impulse);
+        throwDirection = Quaternion.AngleAxis(_throwAngle, _cameraTransform.right) * throwDirection;
+
+        Rigidbody rb = pickable.GetComponent<Rigidbody>();
+        rb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
     }
 }

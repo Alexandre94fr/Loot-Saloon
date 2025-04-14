@@ -5,6 +5,7 @@ public class S_LifeManager : MonoBehaviour
 {
     private S_PlayerAttributes _playerAttributes;
     public static event Action OnDie;
+    public static event Action TakeDamageEvent;
 
     private void Awake()
     {
@@ -14,6 +15,7 @@ public class S_LifeManager : MonoBehaviour
 
     public void TakeDamage(float damageToTake)
     {
+        TakeDamageEvent?.Invoke();
         _playerAttributes.Life -= damageToTake;
         print("test");
         CheckDie();
