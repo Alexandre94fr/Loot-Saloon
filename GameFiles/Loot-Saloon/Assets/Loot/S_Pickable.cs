@@ -58,7 +58,8 @@ public abstract class S_Pickable : S_Interactable
             if (!_isPickUp)
                 yield break;
 
-            S_CircleLoad.OnCircleChange(timer / _pickUpTime);
+            S_CircleLoad.OnCircleChange?.Invoke(timer / _pickUpTime);
+
             timer += Time.deltaTime;
             yield return null;
         }
