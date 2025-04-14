@@ -1,8 +1,6 @@
-
 #region
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 #endregion
 
@@ -24,15 +22,16 @@ public abstract class S_Pickable : S_Interactable
     {
         this.cart = p_cart;
     }
+
     public bool IsEasyToPickUp(S_PlayerInteract p_player)
     {
         if (cart == null || cart.KnowPlayer(p_player))
             return true;
-            
+
         return false;
     }
 
-    public override void StopInteract(S_PlayerInteract p_playerInteract) 
+    public override void StopInteract(S_PlayerInteract p_playerInteract)
     {
         _isPickUp = false;
         S_CircleLoad.OnCircleChange(0);
@@ -45,6 +44,7 @@ public abstract class S_Pickable : S_Interactable
             PickUp(p_playerInteract, p_parent);
             return;
         }
+
         StartCoroutine(InteractCoroutine(p_playerInteract, p_parent));
     }
 
@@ -62,6 +62,7 @@ public abstract class S_Pickable : S_Interactable
             timer += Time.deltaTime;
             yield return null;
         }
+
         PickUp(p_playerInteract, p_parent);
     }
 
@@ -75,7 +76,7 @@ public abstract class S_Pickable : S_Interactable
         _body.isKinematic = true;
 
         Transform handTransform = p_parent;
-        _transform.SetParent(p_parent, false);
+        // _transform.SetParent(p_parent, false);
         _transform.localPosition = _onPickUpOffset;
 
         StartCoroutine(FollowHandCoroutine(handTransform));
@@ -109,6 +110,7 @@ public abstract class S_Pickable : S_Interactable
             foreach (Collider collider in _colliders)
                 Physics.IgnoreCollision(colliderToIgnore, collider, false);
         }
+
         _ignoredColliders.Clear();
     }
 }

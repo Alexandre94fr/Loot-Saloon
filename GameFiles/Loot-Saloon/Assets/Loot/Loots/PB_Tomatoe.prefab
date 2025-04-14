@@ -109,6 +109,7 @@ MonoBehaviour:
   interactInstantly: 0
   _onPickUpOffset: {x: 0, y: 0, z: 1}
   parentIsPlayerInteract: 0
+  _pickUpTime: 2
   weight: 10
   properties: {fileID: 0}
 --- !u!135 &5806023821722710613

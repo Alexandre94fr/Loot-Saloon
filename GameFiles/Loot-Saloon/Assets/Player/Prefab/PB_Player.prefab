@@ -532,7 +532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36db5b57077e6f147a334f7ceeb2d927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _onPickUp:
+  _OnPickUp:
     m_PersistentCalls:
       m_Calls: []
   pickableIgnoresColliders:
@@ -1245,6 +1245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  _isSoloTestModeEnabled: 0
   _armsAnimator: {fileID: 2432516737232652957}
   _respawnPoint: {fileID: 0}
   _armsHandler: {fileID: 4347886814229625470}

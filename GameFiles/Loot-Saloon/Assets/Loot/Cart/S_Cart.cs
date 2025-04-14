@@ -1,12 +1,13 @@
-using Steamworks;
+#region
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+#endregion
 
 public class S_Cart : S_Pickable
 {
-    public int total {get; private set;} = 0;
+    public int total { get; private set; } = 0;
 
     [SerializeField] private List<S_PlayerInteract> players;
     private HashSet<S_Loot> _inCart = new();
@@ -26,8 +27,7 @@ public class S_Cart : S_Pickable
         {
             _inCart.Add(loot);
             total += loot.properties.moneyValue;
-
-            loot.transform.SetParent(slot.transform, true);
+            // loot.transform.SetParent(slot.transform, true);
             OnLootAdded.Invoke();
             loot.SetCart(this);
         }
@@ -42,7 +42,7 @@ public class S_Cart : S_Pickable
 
             if (loot.transform.parent == _transform)
                 loot.transform.SetParent(null, true);
-            
+
             OnLootRemoved.Invoke();
 
             loot.SetCart(null);
