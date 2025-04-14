@@ -12,6 +12,7 @@ public class S_PlayerInteract : MonoBehaviour
 
     private Transform _transform;
     private Transform _cameraTransform;
+    public Transform _armTransform;
     private S_Pickable _pickableHeld = null;
 
     public UnityEvent<S_Pickable> OnPickUp = new();
@@ -85,6 +86,9 @@ public class S_PlayerInteract : MonoBehaviour
 
             PickUp(pickable);
             interactParent = pickable.parentIsPlayerInteract ? _transform : _cameraTransform;
+
+            if (pickable is S_Weapon)
+                interactParent = pickable.parentIsPlayerInteract ? _transform : _armTransform;
         }
 
         p_interactable.Interact(this, interactParent);

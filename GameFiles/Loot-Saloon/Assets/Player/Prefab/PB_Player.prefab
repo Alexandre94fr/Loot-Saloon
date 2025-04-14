@@ -546,6 +546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36db5b57077e6f147a334f7ceeb2d927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _armTransform: {fileID: 8581447871744063596}
   OnPickUp:
     m_PersistentCalls:
       m_Calls: []
@@ -1169,6 +1170,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: d9a03079-db4d-4141-b287-68412dc1923d
     m_ActionName: 'InGame/Throw[/Keyboard/g]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4101736688233769516}
+        m_TargetAssemblyTypeName: S_PlayerInputsReciever, Assembly-CSharp
+        m_MethodName: Shoot
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 6bef50e3-560b-4581-91f1-148e1308d29e
+    m_ActionName: 'InGame/Shoot[/Mouse/leftButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: InGame
@@ -1739,7 +1756,7 @@ PrefabInstance:
     - target: {fileID: 6262941833970894555, guid: a086a4f4321258e4090e770baca7eb4d, type: 3}
       propertyPath: weaponParent
       value: 
-      objectReference: {fileID: 852305454986241953}
+      objectReference: {fileID: 999589151499278140}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

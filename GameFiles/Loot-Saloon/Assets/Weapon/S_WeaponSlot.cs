@@ -69,13 +69,10 @@ public class S_WeaponSlot : MonoBehaviour
             return;
         }
 
-        // Drop l'arme actuellement tenue
         if (weaponObject != null)
-        {
             DropWeapon(weaponObject.GetComponent<S_Weapon>());
-        }
 
-        // Mise à jour des propriétés de l'arme
+
         SO_WeaponProperties properties = newWeapon.properties;
         heldWeapon = properties;
         weaponName = properties.weaponName;
@@ -84,19 +81,8 @@ public class S_WeaponSlot : MonoBehaviour
         nbBulletMax = properties.nbBulletMax;
         cooldown = properties.cooldown;
 
-        // Reparentage via TrySetParent()
-        weaponNetworkObject.transform.SetParent(weaponParent);
-        //newWeapon.transform.localPosition = Vector3.zero;
-        newWeapon.transform.localPosition = new Vector3(1,1,1);
-        newWeapon.transform.localRotation = Quaternion.identity;
-
         EnableWeapon(newWeapon.gameObject);
-
-        Debug.Log("WEAPON PARENT IS " + weaponParent);
     }
-
-
-
 
     public void OnGenericPickUp(S_Pickable pickable)
     {
@@ -114,18 +100,19 @@ public class S_WeaponSlot : MonoBehaviour
     {
         weaponIsActive = true;
         weaponObject = newWeaponObject;
-        weaponObject.SetActive(true);
+        weaponObject.GetComponent<MeshRenderer>().enabled = true;
     }
 
     public void DisableWeapon()
     {
         weaponIsActive = false;
         if (weaponObject != null)
-            weaponObject.SetActive(false);
+            weaponObject.GetComponent<MeshRenderer>().enabled = false;
     }
 
     public void DropWeapon(S_Weapon weapon)
     {
+        weapon.PutDown();
         weapon.isHeld = false;
 
         weaponObject.transform.SetParent(null);
@@ -133,9 +120,7 @@ public class S_WeaponSlot : MonoBehaviour
         weaponObject.SetActive(true);
 
         if (weaponObject.TryGetComponent(out Rigidbody rb))
-        {
             rb.isKinematic = false;
-        }
 
         weaponObject = null;
         heldWeapon = null;
@@ -167,7 +152,8 @@ public class S_WeaponSlot : MonoBehaviour
 
         if (Physics.Raycast(rayOrigin, raycastDirection, out RaycastHit hit))
         {
-            if (hit.transform.TryGetComponent(out S_LifeManager target))
+            print("HIT " + hit.transform.name);
+            if (hit.transform.TryGetComponent(out S_PlayerCharacter target))
             {
                 OnHitServerRpc(target.GetComponent<NetworkObject>(), damage);
             }
@@ -194,8 +180,8 @@ public class S_WeaponSlot : MonoBehaviour
             };
 
             OnHitClientRpc(damage, clientRpcParams);
-            
-            
+
+
         }
     }
 
@@ -203,10 +189,9 @@ public class S_WeaponSlot : MonoBehaviour
     public void OnHitClientRpc(float damage, ClientRpcParams clientRpcParams = default)
     {
         lifeManager.TakeDamage(damage);
-        
+
         Debug.Log($"You took {damage} damage!");
     }
-
 
     public void Reload()
     {

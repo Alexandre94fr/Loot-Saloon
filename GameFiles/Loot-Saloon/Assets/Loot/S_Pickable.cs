@@ -75,15 +75,15 @@ public abstract class S_Pickable : S_Interactable
 
         _body.isKinematic = true;
 
+        Transform handTransform = p_parent;
         if (!(this is S_Weapon))
         {
-           Transform handTransform = p_parent;
-        // _transform.SetParent(p_parent, false);
-        _transform.localPosition = _onPickUpOffset;
+            //_transform.SetParent(p_parent, false);
+            _transform.localPosition = _onPickUpOffset;
+        }
 
         StartCoroutine(FollowHandCoroutine(handTransform));
-        }
-        
+
         foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
         {
             foreach (Collider collider in _colliders)
