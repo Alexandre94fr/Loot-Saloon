@@ -121,8 +121,15 @@ public class S_GameLobbyManager : MonoBehaviour
         {
             if (!currentPlayerIds.Contains(previousPlayer.Id))
             {
-                previousPlayer.PrefabInstance.SetActive(false);
-                Debug.Log($"Player disconnected: {previousPlayer.GamerTag} (ID: {previousPlayer.Id})");
+                if (previousPlayer.PrefabInstance != null && previousPlayer.PrefabInstance.gameObject != null) // Check if the GameObject is not null
+                {
+                    previousPlayer.PrefabInstance.SetActive(false);
+                    Debug.Log($"Player disconnected: {previousPlayer.GamerTag} (ID: {previousPlayer.Id})");
+                }
+                else
+                {
+                    Debug.LogWarning($"PrefabInstance for player {previousPlayer.GamerTag} (ID: {previousPlayer.Id}) is already destroyed or null.");
+                }
             }
         }
 
