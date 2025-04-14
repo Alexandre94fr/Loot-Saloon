@@ -1,13 +1,8 @@
 #region
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 #endregion
-
-public enum Team // It Exist somewere else Please change with the Adao's Enum /!\
-{
-    Red,
-    Blue
-}
 
 public class S_PlayersSpawner : MonoBehaviour
 {
@@ -16,8 +11,11 @@ public class S_PlayersSpawner : MonoBehaviour
 
     [SerializeField] private float _spawnDistance = 5f;
     [SerializeField] private float _SpawnRadius = 10f;
-
+    [SerializeField] private E_PlayerTeam _playerTeam;
     public static S_PlayersSpawner Instance { get; private set; }
+
+    private int _bluePlayer = 0;
+    private int _redPlayer = 0;
 
     private void Awake()
     {
@@ -31,25 +29,35 @@ public class S_PlayersSpawner : MonoBehaviour
         }
     }
 
-    public void SpawnPlayer(GameObject p_player, Transform p_origin)
+    public async void SpawnPlayer(GameObject p_player, Transform p_origin)
     {
-        Debug.Log($"[{nameof(S_PlayersSpawner)}] Spawn player {p_player.name} at {p_origin.position}");
+        S_GameLobbyManager gameLobbyManager = S_GameLobbyManager.instance;
+        _playerTeam = await gameLobbyManager.GetPlayerTeam();
         int count = NetworkManager.Singleton.ConnectedClients.Count;
-
         float totalWidth = (count - 1) * _spawnDistance;
         float startX = p_origin.position.x - totalWidth / 2f;
-        float fixedZ = p_origin.position.z;
-        NetworkObject networkObject = p_player.TryGetComponent(out NetworkObject netObj) ? netObj : null;
-        if (networkObject == null)
+        int nbPlayer;
+        float fixedZ = 0;
+        if (_playerTeam == E_PlayerTeam.BLUE)
         {
-            Debug.LogError($"[{nameof(S_PlayersSpawner)}] NetworkObject not found on {p_player.name}");
-            return;
+            _bluePlayer++;
+            nbPlayer = _bluePlayer;
+            fixedZ = _blueTeam.position.z;
+        }
+        else
+        {
+            _redPlayer++;
+            nbPlayer = _redPlayer;
+            fixedZ = _redTeam.position.z;
         }
 
-        Vector3 pos = new Vector3(startX + p_player.GetComponent<NetworkObject>().NetworkObjectId * _spawnDistance, p_origin.position.y, fixedZ);
-        p_player.transform.position = pos;
+        NetworkObject networkObject = p_player.TryGetComponent(out NetworkObject netObj) ? netObj : null;
 
-        p_player.transform.rotation = Quaternion.LookRotation(Vector3.right);
+        Vector3 pos = new Vector3(startX + nbPlayer * _spawnDistance, p_origin.position.y, fixedZ);
+        NetworkTransform playerNetworkTransform = p_player.GetComponentInChildren<NetworkTransform>();
+        playerNetworkTransform.Teleport(pos, Quaternion.Euler(Vector3.right), transform.localScale);
+
+        Debug.Log($"Spawn player {p_player.name} at {playerNetworkTransform.transform.position}");
     }
 
     public void RandomSpawnInRadius(GameObject p_player, Transform p_origin)
