@@ -8,12 +8,10 @@ using UnityEngine.Rendering.Universal;
 
 public class S_PlayerController : NetworkBehaviour
 {
-    [Header(" Debugging :")]
-    [Tooltip("Allow the devs to test there scenes without having to pass throw the Lobby")]
-    [SerializeField] private bool _isSoloTestModeEnabled = true;
+    [Header(" Debugging :")] [Tooltip("Allow the devs to test there scenes without having to pass throw the Lobby")] [SerializeField]
+    private bool _isSoloTestModeEnabled = true;
 
-    [Space]
-    [SerializeField] private Animator _armsAnimator;
+    [Space] [SerializeField] private Animator _armsAnimator;
     [SerializeField] private Transform _respawnPoint;
     [SerializeField] private GameObject _armsHandler;
 
@@ -56,6 +54,7 @@ public class S_PlayerController : NetworkBehaviour
             S_LifeManager.OnDie += Respawn;
             S_Extract.OnExtract += DisableAllMeshOfPlayer;
             S_Extract.OnExtract += DropInputsEvents;
+            S_PlayersSpawner.Instance.SpawnPlayer(_playerTransform.transform.parent.gameObject, _playerTransform);
         }
         else
         {
@@ -86,10 +85,9 @@ public class S_PlayerController : NetworkBehaviour
         if (_playerTransform == null)
         {
             Debug.LogError($"ERROR ! The '{nameof(_playerTransform)}' variable is null, " +
-                $"to fix this problem you can try enabling the '{nameof(_isSoloTestModeEnabled)}' variable. " +
-                "This bug may occur because you tried to launch your scene without passing throw the lobby scene.\n" +
-
-                "The update loop will not go any further."
+                           $"to fix this problem you can try enabling the '{nameof(_isSoloTestModeEnabled)}' variable. " +
+                           "This bug may occur because you tried to launch your scene without passing throw the lobby scene.\n" +
+                           "The update loop will not go any further."
             );
 
             return;

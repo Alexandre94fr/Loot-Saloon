@@ -1,11 +1,7 @@
 #region
-
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.Netcode;
 using Unity.Services.Authentication;
-using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class S_GameLobbyManager : MonoBehaviour
 {
     public static S_GameLobbyManager instance;
-    public string gameSceneName;
+    [SerializeField] private string gameSceneName;
 
     private List<S_LobbyPlayerData> _lobbyPlayerDatas = new List<S_LobbyPlayerData>();
     private S_LobbySettings _lobbySettings = new S_LobbySettings();
@@ -108,17 +104,15 @@ public class S_GameLobbyManager : MonoBehaviour
             {
                 _localLobbyPlayerData = lobbyPlayerData;
             }
-            
 
 
             _lobbyPlayerDatas.Add(lobbyPlayerData);
         }
 
-     
 
         _lobbyData = new S_LobbyData();
         _lobbyData.Initialize(p_lobby.Data);
-        
+
         S_LobbyEvents.OnLobbyUpdated?.Invoke();
 
         Debug.Log($"nb player ready  : {nbPlayerReady} / {_lobbyPlayerDatas.Count}");
@@ -160,7 +154,7 @@ public class S_GameLobbyManager : MonoBehaviour
         _localLobbyPlayerData.IsReady = true;
         return await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
     }
-    
+
     public async Task<bool> SetPlayerTeam(E_PlayerTeam p_team)
     {
         _localLobbyPlayerData.Team = p_team;
