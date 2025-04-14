@@ -191,6 +191,12 @@ public class S_GameLobbyManager : MonoBehaviour
         return await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
     }
 
+    public async Task<bool> SetPlayerUnready()
+    {
+        _localLobbyPlayerData.IsReady = false;
+        return await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
+    }
+
     public async Task<bool> SetPlayerTeam(E_PlayerTeam p_team)
     {
         _localLobbyPlayerData.Team = p_team;

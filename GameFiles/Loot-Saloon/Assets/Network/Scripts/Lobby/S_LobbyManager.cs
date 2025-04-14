@@ -66,7 +66,7 @@ public class S_LobbyManager : MonoBehaviour
             return false;
         }
 
-        _heartbeatCoroutine = StartCoroutine(HearthbeatLobbyCoroutine(_lobby.Id, 6f));
+        _heartbeatCoroutine = StartCoroutine(HearthbeatLobbyCoroutine(_lobby.Id, 2f));
         _refreshLobbyCoroutine = StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
         return true;
     }

@@ -70,11 +70,31 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     
     private async void OnBlueBtnPressed()
     {
+        if (await S_GameLobbyManager.instance.GetPlayerTeam() != E_PlayerTeam.NONE)
+        {
+            var succeeded1 = await S_GameLobbyManager.instance.SetPlayerUnready();
+            if (succeeded1)
+            {
+                readyButton.interactable = true;
+                startGameButton.gameObject.SetActive(false);
+            }
+
+        }
         var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.BLUE);
     }
     
     private async void OnRedBtnPressed()
     {
+        if (await S_GameLobbyManager.instance.GetPlayerTeam() != E_PlayerTeam.NONE)
+        {
+            var succeeded1 = await S_GameLobbyManager.instance.SetPlayerUnready();
+            if (succeeded1)
+            {
+                readyButton.interactable = true;
+                startGameButton.gameObject.SetActive(false);
+            }
+
+        }
         var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.RED);
     }
 
