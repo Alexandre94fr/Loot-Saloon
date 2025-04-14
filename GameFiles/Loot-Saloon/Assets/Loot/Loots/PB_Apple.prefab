@@ -109,6 +109,7 @@ MonoBehaviour:
   interactInstantly: 0
   _onPickUpOffset: {x: 0, y: 0, z: 1}
   parentIsPlayerInteract: 0
+  _pickUpTime: 2
   weight: 0
   properties: {fileID: 11400000, guid: 17f57adfaab8c284ea2e6b7510c9d8e1, type: 2}
 --- !u!135 &6262198284333202839
@@ -166,7 +167,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 147371705349791009}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
