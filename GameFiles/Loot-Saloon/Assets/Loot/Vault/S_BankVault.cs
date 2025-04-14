@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.Netcode;
 using UnityEngine;
 
 public class S_BankVault : S_Interactable
@@ -12,15 +13,27 @@ public class S_BankVault : S_Interactable
 
     private S_PlayerInteract _currentPlayer;
     private List<int> _lootIndeces = new List<int>();
-    private bool isOpen = false;
-    private bool isOpening = false;
-    public bool isAvailable { get { return !isOpen && !isOpening; }  private set {} }
 
     public float unlockTime = 6f;
 
+    public enum VaultState
+    {
+        Closed,
+        InUse,
+        Opened
+    }
 
+    public NetworkVariable<VaultState> vaultState = new NetworkVariable<VaultState>(VaultState.Closed,
+    NetworkVariableReadPermission.Everyone,
+    NetworkVariableWritePermission.Server);
 
-    private void Start()
+    [ServerRpc(RequireOwnership = false)]
+    private void SetVaultStateServerRPC(VaultState state)
+    {
+        vaultState.Value = state;
+    }
+
+    public override void OnNetworkSpawn()
     {
         GenerateLoots();
     }
@@ -48,25 +61,25 @@ public class S_BankVault : S_Interactable
     IEnumerator UnlockSequence()
     {
         float timer = 0f;
-        isOpening = true;
+        SetVaultStateServerRPC(VaultState.InUse);
 
         while (timer < unlockTime)
         {
-            if (!isOpening)
+            if (vaultState.Value != VaultState.InUse)
                 yield break;
             Debug.Log("Opening the Vault .....");
             S_CircleLoad.OnCircleChange(timer/ unlockTime);
             timer += Time.deltaTime;
             yield return null;
         }
-        isOpen = true;
+        SetVaultStateServerRPC(VaultState.Opened);
         Debug.Log("Vault is Open");
         SpawnLoot();
     }
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
-        if (!isOpen && (isAvailable || (_currentPlayer == p_playerInteract && isOpening == true)))
+        if (vaultState.Value != VaultState.Opened && (vaultState.Value == VaultState.Closed || (_currentPlayer == p_playerInteract && vaultState.Value == VaultState.InUse)))
         {
             _currentPlayer = p_playerInteract;
             StartCoroutine(UnlockSequence());
@@ -75,9 +88,27 @@ public class S_BankVault : S_Interactable
 
     public override void StopInteract(S_PlayerInteract p_playerInteract)
     {
-        isOpening = false;
+        SetVaultStateServerRPC(vaultState.Value == VaultState.Opened ? VaultState.Opened : VaultState.Closed);
         _currentPlayer = null;
         Debug.Log("Stop Open Vault");
         S_CircleLoad.OnCircleChange(0);
     }
+
+    private void OnEnable()
+    {
+        vaultState.OnValueChanged += OnVaultStateChanged;
+    }
+
+    private void OnDisable()
+    {
+        vaultState.OnValueChanged -= OnVaultStateChanged;
+    }
+
+    private void OnVaultStateChanged(VaultState oldState, VaultState newState)
+    {
+        Debug.Log($"Vault state changed from {oldState} to {newState}");
+    }
+
 }
+
+
