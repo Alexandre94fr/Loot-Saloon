@@ -98,11 +98,11 @@ public class S_PlayerInteract : MonoBehaviour
         _onPickUp.Invoke(null);
     }
 
-    private S_Pickable CheckObjectRaycast()
+    private S_Interactable CheckObjectRaycast()
     {
         if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
-            return hit.collider.GetComponent<S_Pickable>();
+            return hit.collider.GetComponent<S_Interactable>();
         }
 
         return null;

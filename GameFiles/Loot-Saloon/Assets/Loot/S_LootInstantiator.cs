@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.Netcode;
 
-public class S_LootInstantiator : MonoBehaviour
+public class S_LootInstantiator : NetworkBehaviour
 {
     [SerializeField] private List<SO_LootProperties> _lootProperties = new();
 
@@ -15,9 +16,12 @@ public class S_LootInstantiator : MonoBehaviour
 
     public S_Quota quota;
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        SpawnVaults();
+        if (IsServer)
+        {
+            SpawnVaults();
+        }
     }
 
     public int GetLootPrice(int p_index)
@@ -53,19 +57,34 @@ public class S_LootInstantiator : MonoBehaviour
 
     public void SpawnLoot(int p_index, Transform p_where)
     {
+        if (!NetworkManager.Singleton.IsServer) return;
+
         SO_LootProperties properties = GetLootProperties(p_index);
         GameObject lootObject = Instantiate(properties.PB_prefab, p_where.position, Quaternion.identity);
 
         S_Loot loot = lootObject.GetComponent<S_Loot>();
         loot.properties = Instantiate(properties);
+
+        if (!IsServer) return;
+        if (lootObject.TryGetComponent(out NetworkObject networkObject))
+        {
+            networkObject.Spawn();
+        }
     }
 
     public void SpawnVaults()
     {
+
         foreach (Transform t in vaultSpawnPoints)
         {
             S_BankVault vault = Instantiate(pb_vault, t).GetComponent<S_BankVault>();
             vault.lootInstantiator = this;
+
+            if (!IsServer) continue;
+            if (vault.TryGetComponent(out NetworkObject networkObject))
+            {
+                networkObject.Spawn();
+            }
         }
 
     }
