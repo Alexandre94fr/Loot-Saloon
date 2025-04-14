@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 public class S_WeaponSlot : MonoBehaviour
@@ -6,22 +7,24 @@ public class S_WeaponSlot : MonoBehaviour
     Camera _camera;
 
     public Transform weaponParent;
-    public bool weaponIsActive;
-    public SO_WeaponProperties heldWeapon;
+    private bool weaponIsActive;
+    private SO_WeaponProperties heldWeapon;
 
     public S_PlayerInteract interact;
 
-    public string weaponName = "";
-    public float damage;
-    public int nbBullet;
-    public int nbBulletMax;
-    public float cooldown;
+    [SerializeField] private string weaponName = "";
+    [SerializeField] private float damage;
+    [SerializeField] private int nbBullet;
+    [SerializeField] private int nbBulletMax;
+    [SerializeField] private float cooldown;
 
     private float _lastShotTime;
 
-    public GameObject weaponObject;
+    [SerializeField] private GameObject weaponObject;
 
     [SerializeField][Range(1f, 10f)] protected float _angleSpread = 5;
+
+    public S_LifeManager lifeManager;
 
     private void Start()
     {
@@ -35,8 +38,6 @@ public class S_WeaponSlot : MonoBehaviour
         interact.OnPickUp.AddListener(OnGenericPickUp);
 
         _lastShotTime = -cooldown;
-
-        TestInstantiateWeapon();
     }
 
     public void SetWeaponSlot(S_Weapon newWeapon)
@@ -59,14 +60,12 @@ public class S_WeaponSlot : MonoBehaviour
         nbBulletMax = properties.nbBulletMax;
         cooldown = properties.cooldown;
 
-        //// Mark it as held and parent it
-        //newWeapon.isHeld = true;
+        // parent it
         newWeapon.transform.SetParent(weaponParent);
         newWeapon.transform.localPosition = Vector3.zero;
         newWeapon.transform.localRotation = Quaternion.identity;
 
         EnableWeapon(newWeapon.gameObject);
-
     }
 
 
@@ -80,7 +79,6 @@ public class S_WeaponSlot : MonoBehaviour
         {
             EnableWeapon(weaponObject);
         }
-
     }
 
     public void EnableWeapon(GameObject newWeaponObject)
@@ -88,7 +86,6 @@ public class S_WeaponSlot : MonoBehaviour
         weaponIsActive = true;
         weaponObject = newWeaponObject;
         weaponObject.SetActive(true);
-
     }
 
     public void DisableWeapon()
@@ -141,48 +138,52 @@ public class S_WeaponSlot : MonoBehaviour
 
         if (Physics.Raycast(rayOrigin, raycastDirection, out RaycastHit hit))
         {
-            if (hit.transform.TryGetComponent(out TempTarget target)) // temp condition for testing
+            if (hit.transform.TryGetComponent(out S_LifeManager target))
             {
-                print($"Hit: {target.name}");
-                // apply damage
+                OnHitServerRpc(target.GetComponent<NetworkObject>(), damage);
             }
         }
 
         nbBullet--;
     }
 
-    public void Reload()
+    [ServerRpc]
+    public void OnHitServerRpc(NetworkObjectReference targetRef, float damage)
     {
+        if (targetRef.TryGet(out var netObj) && netObj.TryGetComponent(out S_LifeManager target))
+        {
+            target.TakeDamage(damage);
 
+            ulong targetClientId = netObj.OwnerClientId;
+
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { targetClientId }
+                }
+            };
+
+            OnHitClientRpc(damage, clientRpcParams);
+        }
     }
 
-    public Transform testTransform;
-    public Transform testTransform2;
-    public SO_WeaponProperties _weaponProperties;
-    public SO_WeaponProperties _weaponProperties2;
-
-    void TestInstantiateWeapon()
+    [ClientRpc]
+    public void OnHitClientRpc(float damage, ClientRpcParams clientRpcParams = default)
     {
-        SO_WeaponProperties properties = _weaponProperties;
-        SO_WeaponProperties properties2 = _weaponProperties2;
-        GameObject weaponObject1 = Instantiate(properties.prefab, testTransform.position, Quaternion.identity);
-        GameObject weaponObject2 = Instantiate(properties2.prefab, testTransform2.position, Quaternion.identity);
+        lifeManager.TakeDamage(damage);
+        print($"You took {damage} damage!");
+    }
 
-        S_Weapon weapon1 = weaponObject1.GetComponent<S_Weapon>();
-        weapon1.properties = Instantiate(properties);
-
-        S_Weapon weapon2 = weaponObject2.GetComponent<S_Weapon>();
-        weapon2.properties = Instantiate(properties2);
-
+    public void Reload()
+    {
+        nbBullet = nbBulletMax;
     }
 
     private void OnDestroy()
     {
         S_PlayerInputsReciever.OnInteract -= Shoot;
     }
-
-
-
 
     private IEnumerator DebugShoot(Vector3 origin, Vector3 direction, float duration)
     {
