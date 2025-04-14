@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1790806835177131458}
   - component: {fileID: -3846910836060819557}
   - component: {fileID: 8594431900264190085}
+  - component: {fileID: 3867010774021054363}
   m_Layer: 6
   m_Name: PB_Revolver
   m_TagString: Untagged
@@ -130,10 +131,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactName: Revolver
   interactInstantly: 0
-  _collider: {fileID: 0}
   _onPickUpOffset: {x: 0, y: 0, z: 1}
+  parentIsPlayerInteract: 0
+  _pickUpTime: 2
   weight: 0
   properties: {fileID: 0}
+  isHeld: 0
 --- !u!65 &8594431900264190085
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -155,3 +158,28 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3867010774021054363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 805333226351330194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0

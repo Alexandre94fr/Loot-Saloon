@@ -1,5 +1,6 @@
 #region
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 #endregion
@@ -15,7 +16,7 @@ public class S_PlayerInteract : MonoBehaviour
 
     public UnityEvent<S_Pickable> OnPickUp = new();
 
-    public UnityEvent<S_Weapon> OnWeaponPickUp = new();
+    public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
     [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
     public List<Collider> pickableIgnoresColliders = new();
 
@@ -34,6 +35,10 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void Start()
     {
+        if (!transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
+            return;
+        
+
         S_PlayerInputsReciever.OnInteract += Interact;
         S_PlayerInputsReciever.OnThrow += Throw;
         S_LifeManager.OnDie += PutDownPickable;
@@ -89,7 +94,7 @@ public class S_PlayerInteract : MonoBehaviour
     {
         if (p_pickable is S_Weapon weapon)
         {
-            OnWeaponPickUp.Invoke(weapon);
+            OnWeaponPickUp.Invoke(_transform, weapon);
             return;
         }
 

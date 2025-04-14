@@ -28,11 +28,14 @@ public class S_WeaponSlot : MonoBehaviour
 
     private void Start()
     {
+        if (!interact.transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
+            return;
+
         S_PlayerInputsReciever.OnShoot += Shoot;
         _camera = Camera.main;
 
         if (heldWeapon != null)
-            SetWeaponSlot(heldWeapon.prefab.GetComponent<S_Weapon>());
+            SetWeaponSlot(interact.transform, heldWeapon.prefab.GetComponent<S_Weapon>());
 
         interact.OnWeaponPickUp.AddListener(SetWeaponSlot);
         interact.OnPickUp.AddListener(OnGenericPickUp);
@@ -40,18 +43,39 @@ public class S_WeaponSlot : MonoBehaviour
         _lastShotTime = -cooldown;
     }
 
-    public void SetWeaponSlot(S_Weapon newWeapon)
+    public void SetWeaponSlot(Transform parent, S_Weapon newWeapon)
     {
         if (newWeapon == null)
             return;
 
-        // Drop the currently held weapon, if any
+        NetworkObject weaponNetworkObject = newWeapon.GetComponent<NetworkObject>();
+
+        if (weaponNetworkObject == null)
+        {
+            Debug.LogWarning("Le NetworkObject de l'arme est manquant.");
+            return;
+        }
+
+        // Si ce n’est pas encore spawn, on le spawn avec ownership
+        if (!weaponNetworkObject.IsSpawned)
+        {
+            weaponNetworkObject.Spawn(true); // true pour donner l'ownership au joueur local
+        }
+
+        // Vérifie si ce joueur est bien le propriétaire de cette arme
+        if (!weaponNetworkObject.IsOwner)
+        {
+            Debug.LogWarning("Ce joueur n'est pas propriétaire de cette arme.");
+            return;
+        }
+
+        // Drop l'arme actuellement tenue
         if (weaponObject != null)
         {
             DropWeapon(weaponObject.GetComponent<S_Weapon>());
         }
 
-        // Update with the new weapon's properties
+        // Mise à jour des propriétés de l'arme
         SO_WeaponProperties properties = newWeapon.properties;
         heldWeapon = properties;
         weaponName = properties.weaponName;
@@ -60,13 +84,18 @@ public class S_WeaponSlot : MonoBehaviour
         nbBulletMax = properties.nbBulletMax;
         cooldown = properties.cooldown;
 
-        // parent it
-        newWeapon.transform.SetParent(weaponParent);
-        newWeapon.transform.localPosition = Vector3.zero;
+        // Reparentage via TrySetParent()
+        weaponNetworkObject.transform.SetParent(weaponParent);
+        //newWeapon.transform.localPosition = Vector3.zero;
+        newWeapon.transform.localPosition = new Vector3(1,1,1);
         newWeapon.transform.localRotation = Quaternion.identity;
 
         EnableWeapon(newWeapon.gameObject);
+
+        Debug.Log("WEAPON PARENT IS " + weaponParent);
     }
+
+
 
 
     public void OnGenericPickUp(S_Pickable pickable)
@@ -165,6 +194,8 @@ public class S_WeaponSlot : MonoBehaviour
             };
 
             OnHitClientRpc(damage, clientRpcParams);
+            
+            
         }
     }
 
@@ -172,8 +203,10 @@ public class S_WeaponSlot : MonoBehaviour
     public void OnHitClientRpc(float damage, ClientRpcParams clientRpcParams = default)
     {
         lifeManager.TakeDamage(damage);
-        print($"You took {damage} damage!");
+        
+        Debug.Log($"You took {damage} damage!");
     }
+
 
     public void Reload()
     {

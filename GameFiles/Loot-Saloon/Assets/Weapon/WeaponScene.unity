@@ -421,6 +421,7 @@ MonoBehaviour:
   Life: 100
   MaxLife: 0
   Strengh: 0
+  Team: 0
 --- !u!1 &537206295
 GameObject:
   m_ObjectHideFlags: 0
@@ -889,6 +890,7 @@ MonoBehaviour:
   Life: 100
   MaxLife: 0
   Strengh: 0
+  Team: 0
 --- !u!1 &849104977
 GameObject:
   m_ObjectHideFlags: 0
@@ -1856,6 +1858,7 @@ MonoBehaviour:
   Life: 100
   MaxLife: 0
   Strengh: 0
+  Team: 0
 --- !u!1 &1698319698
 GameObject:
   m_ObjectHideFlags: 0
@@ -1930,7 +1933,7 @@ MonoBehaviour:
       m_Calls: []
   pickableIgnoresColliders: []
   _throwForce: 4
-  _throwAngle: {x: 0, y: 0.75, z: 1}
+  _throwAngle: 0
   objectLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -2145,6 +2148,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 250d46b1e08695a41b805f0cee544acd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  _isSoloTestModeEnabled: 1
   _armsAnimator: {fileID: 849104979}
   _respawnPoint: {fileID: 1532905878}
   _armsHandler: {fileID: 100392289}
@@ -2548,6 +2553,10 @@ PrefabInstance:
       propertyPath: interact
       value: 
       objectReference: {fileID: 1698319701}
+    - target: {fileID: 6262941833970894555, guid: a086a4f4321258e4090e770baca7eb4d, type: 3}
+      propertyPath: lifeManager
+      value: 
+      objectReference: {fileID: 375151762}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
