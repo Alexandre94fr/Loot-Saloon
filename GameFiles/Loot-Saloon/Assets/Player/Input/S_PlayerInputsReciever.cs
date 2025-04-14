@@ -12,55 +12,55 @@ public class S_PlayerInputsReciever : MonoBehaviour
     public static event Action<Vector2> OnScroll;
     public static event Action OnThrow;
 
-    public void JumpInput(InputAction.CallbackContext context)
+    public void JumpInput(InputAction.CallbackContext p_context)
     {
-        if (context.performed)
+        if (p_context.performed)
         {
             OnJump?.Invoke();
         }
     }
 
-    public void MoveInput(InputAction.CallbackContext context)
+    public void MoveInput(InputAction.CallbackContext p_context)
     {
-        OnMove?.Invoke(context.ReadValue<Vector2>());
+        OnMove?.Invoke(p_context.ReadValue<Vector2>());
     }
 
-    public void LookInput(InputAction.CallbackContext context)
+    public void LookInput(InputAction.CallbackContext p_context)
     {
-        OnLook?.Invoke(context.ReadValue<Vector2>());
+        OnLook?.Invoke(p_context.ReadValue<Vector2>());
     }
 
-    public void SprintInput(InputAction.CallbackContext context)
+    public void SprintInput(InputAction.CallbackContext p_context)
     {
-        if (context.started)
+        if (p_context.started)
         {
             OnSprint?.Invoke(true);
         }
-        else if (context.canceled)
+        else if (p_context.canceled)
         {
             OnSprint?.Invoke(false);
         }
     }
 
-    public void Interact(InputAction.CallbackContext context)
+    public void Interact(InputAction.CallbackContext p_context)
     {
-        if (!context.performed)
+        if (!p_context.performed)
             return;
         
         OnInteract?.Invoke();
     }
 
-    public void Scroll(InputAction.CallbackContext context)
+    public void Scroll(InputAction.CallbackContext p_context)
     {
-        if (!context.started)
+        if (!p_context.started)
             return;
         
-        OnScroll?.Invoke(context.ReadValue<Vector2>());
+        OnScroll?.Invoke(p_context.ReadValue<Vector2>());
     }
 
-    public void Throw(InputAction.CallbackContext context)
+    public void Throw(InputAction.CallbackContext p_context)
     {
-        if (!context.started)
+        if (!p_context.started)
             return;
         
         OnThrow?.Invoke();

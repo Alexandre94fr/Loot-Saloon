@@ -1409,6 +1409,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -2432999960191768794, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -2432999960191768794, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1225172142
+      objectReference: {fileID: 0}
+    - target: {fileID: -2432999960191768794, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 995832028
+      objectReference: {fileID: 0}
     - target: {fileID: 147371705349791009, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
       propertyPath: m_Name
       value: PB_Apple
@@ -1677,6 +1689,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 417390681784782778, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 417390681784782778, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 513347311718239379, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 513347311718239379, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3983363614776680269, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.94

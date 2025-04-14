@@ -1,5 +1,8 @@
+#region
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#endregion
 
 public abstract class S_Pickable : S_Interactable
 {
@@ -10,18 +13,18 @@ public abstract class S_Pickable : S_Interactable
 
     private List<Collider> _ignoredColliders = new();
 
-    public override void Interact(S_PlayerInteract p_playerInteract, Transform parent)
+    public override void Interact(S_PlayerInteract p_playerInteract, Transform p_transform)
     {
         if (!interactable)
             return;
+
         interactable = false;
-        
+
         _body.isKinematic = true;
 
-        _transform.SetParent(parent, false);
-        _transform.localPosition = _onPickUpOffset;
+        Transform handTransform = p_transform;
 
-        _transform.rotation = p_playerInteract.transform.rotation;
+        StartCoroutine(FollowHandCoroutine(handTransform));
 
         foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
         {
@@ -31,12 +34,21 @@ public abstract class S_Pickable : S_Interactable
         }
     }
 
+    private IEnumerator FollowHandCoroutine(Transform p_handTransform)
+    {
+        while (!interactable)
+        {
+            transform.position = p_handTransform.position + p_handTransform.TransformDirection(_onPickUpOffset);
+            transform.rotation = p_handTransform.rotation;
+            yield return null;
+        }
+    }
+
     public virtual void PutDown()
     {
         interactable = true;
         _body.isKinematic = false;
 
-        _transform.SetParent(null, true);
 
         foreach (Collider colliderToIgnore in _ignoredColliders)
         {
