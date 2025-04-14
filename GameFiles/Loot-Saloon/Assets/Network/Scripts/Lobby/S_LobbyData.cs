@@ -36,7 +36,7 @@ public class S_LobbyData
     {
         return new Dictionary<string, string>()
         {
-            { "RelayJoinCode", _relayJoinCode }
+            { "RelayJoinCode", _relayJoinCode },
         };
     }
 }

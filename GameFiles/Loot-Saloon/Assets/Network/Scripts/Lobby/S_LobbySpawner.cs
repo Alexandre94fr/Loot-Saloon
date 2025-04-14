@@ -7,6 +7,8 @@ using UnityEngine;
 public class S_LobbySpawner : MonoBehaviour
 {
     [SerializeField] private List<S_LobbyPlayer> _players;
+    public Material RedMaterial;
+    public Material BlueMaterial;
 
     private void OnEnable()
     {
@@ -26,6 +28,14 @@ public class S_LobbySpawner : MonoBehaviour
         {
             S_LobbyPlayerData playerData = playersData[i];
             _players[i].SetData(playerData);
+            if (playerData.Team == E_PlayerTeam.RED)
+            {
+                _players[i].GetComponent<MeshRenderer>().material = RedMaterial;
+            }
+            else if (playerData.Team == E_PlayerTeam.BLUE)
+            {
+                _players[i].GetComponent<MeshRenderer>().material = BlueMaterial;
+            }
         }
     }
 }
