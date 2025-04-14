@@ -8,6 +8,8 @@ public class S_PlayerAttributes : MonoBehaviour
     public float Life;
     public float MaxLife;
     public float Strengh;
+    public E_PlayerTeam Team;
+    
 
     public void Initialize()
     {
@@ -22,4 +24,16 @@ public class S_PlayerAttributes : MonoBehaviour
         Initialize();
         S_LifeManager.OnDie += Initialize;
     }
+
+    public void SetTeam(E_PlayerTeam team)
+    {
+        Team = team;
+    }
+}
+
+public enum E_PlayerTeam
+{
+    NONE,
+    BLUE,
+    RED
 }

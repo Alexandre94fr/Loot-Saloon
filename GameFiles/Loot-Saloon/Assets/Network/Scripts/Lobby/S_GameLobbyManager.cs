@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class S_GameLobbyManager : MonoBehaviour
 {
     public static S_GameLobbyManager instance;
-    public string gameSceneName;
+    [SerializeField] private string gameSceneName;
 
     private List<S_LobbyPlayerData> _lobbyPlayerDatas = new List<S_LobbyPlayerData>();
     private List<S_LobbyPlayerData> _previousLobbyPlayerDatas = new List<S_LobbyPlayerData>();
@@ -25,6 +25,10 @@ public class S_GameLobbyManager : MonoBehaviour
 
     public bool IsHost => _localLobbyPlayerData != null && _localLobbyPlayerData.Id == S_LobbyManager.instance.GetHostId();
 
+
+    private int _nbPlayersInBlueTeam = 0;
+    private int _nbPlayersInRedTeam = 0;
+    private bool _correctNumberinEachTeam = false;
 
     private void Awake()
     {
@@ -52,7 +56,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> CreateLobby()
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Host"));
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Host"), 0);
         _localLobbyPlayerData = playerData;
 
         _lobbyData = new S_LobbyData();
@@ -69,8 +73,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> JoinLobby(string p_code)
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"));
-
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"), 0);
         bool succeeded = await S_LobbyManager.instance.JoinLobby(p_code, playerData.Serialize());
         return succeeded;
     }
@@ -78,9 +81,9 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> JoinLobbyById(string p_id)
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"));
-
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"), 0);
         bool succeeded = await S_LobbyManager.instance.JoinLobbyById(p_id, playerData.Serialize());
+
         return succeeded;
     }
 
@@ -112,10 +115,9 @@ public class S_GameLobbyManager : MonoBehaviour
             {
                 LeaveLobby();
             }
-
-            _lobbyPlayerDatas.Add(lobbyPlayerData);
         }
-
+      
+            _lobbyPlayerDatas.Add(lobbyPlayerData);
 
         foreach (S_LobbyPlayerData previousPlayer in _previousLobbyPlayerDatas)
         {
@@ -144,6 +146,10 @@ public class S_GameLobbyManager : MonoBehaviour
         if (nbPlayerReady == _lobbyPlayerDatas.Count)
         {
             S_LobbyEvents.OnLobbyReady?.Invoke();
+        }
+        else
+        {
+            S_LobbyEvents.OnLobbyUnready?.Invoke();
         }
 
         if (_lobbyData.RelayJoinCode != default && !_inGame && !IsHost)
@@ -185,6 +191,12 @@ public class S_GameLobbyManager : MonoBehaviour
         return await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
     }
 
+    public async Task<bool> SetPlayerTeam(E_PlayerTeam p_team)
+    {
+        _localLobbyPlayerData.Team = p_team;
+        return await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
+    }
+
     public async Task StartGame()
     {
         string joinRelayCode = await S_RelayManager.instance.CreateRelay(_lobbySettings.maxPlayers);
@@ -221,5 +233,10 @@ public class S_GameLobbyManager : MonoBehaviour
 
         _localLobbyPlayerData.IsReady = false;
         await S_LobbyManager.instance.UpdateLobbyData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
+    }
+    
+    public async Task<E_PlayerTeam> GetPlayerTeam()
+    {
+        return _localLobbyPlayerData.Team;
     }
 }

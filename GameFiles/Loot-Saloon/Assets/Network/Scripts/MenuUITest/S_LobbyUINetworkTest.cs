@@ -1,5 +1,6 @@
 #region
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,6 +13,8 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     public Button readyButton;
     public Button LeaveButton;
 
+    public Button GoRedTeamButton;
+    public Button GoBlueTeamButton;
 
     private void OnEnable()
     {
@@ -22,17 +25,21 @@ public class S_LobbyUINetworkTest : MonoBehaviour
             if (S_GameLobbyManager.instance.IsHost)
             {
                 S_LobbyEvents.OnLobbyReady += OnLobbyReady;
+                S_LobbyEvents.OnLobbyUnready += OnLobbyUnready;
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
 
             LeaveButton.onClick.AddListener(HandleHostDisconnection);
             readyButton.onClick.AddListener(OnReadyPressed);
+            GoRedTeamButton.onClick.AddListener(OnRedBtnPressed);
+            GoBlueTeamButton.onClick.AddListener(OnBlueBtnPressed);
         }
     }
 
     private void OnDisable()
     {
         S_LobbyEvents.OnLobbyReady -= OnLobbyReady;
+        S_LobbyEvents.OnLobbyUnready -= OnLobbyUnready;
         startGameButton.onClick.RemoveAllListeners();
     }
 
@@ -47,10 +54,28 @@ public class S_LobbyUINetworkTest : MonoBehaviour
         startGameButton.gameObject.SetActive(true);
     }
 
+    private void OnLobbyUnready()
+    {
+        startGameButton.gameObject.SetActive(false);
+    }
+
     private async void OnReadyPressed()
     {
-        var succeeded = await S_GameLobbyManager.instance.SetPlayerReady();
-        if (succeeded) readyButton.interactable = false;
+        if (await S_GameLobbyManager.instance.GetPlayerTeam() != E_PlayerTeam.NONE)
+        {
+            var succeeded = await S_GameLobbyManager.instance.SetPlayerReady();
+            if (succeeded) readyButton.interactable = false;
+        }
+    }
+    
+    private async void OnBlueBtnPressed()
+    {
+        var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.BLUE);
+    }
+    
+    private async void OnRedBtnPressed()
+    {
+        var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.RED);
     }
 
     private async void HandleHostDisconnection()
