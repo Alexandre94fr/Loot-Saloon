@@ -1,5 +1,7 @@
 #region
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 #endregion
 
@@ -22,7 +24,8 @@ public class S_LobbyUINetworkTest : MonoBehaviour
                 S_LobbyEvents.OnLobbyReady += OnLobbyReady;
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
-            LeaveButton.onClick.AddListener(OnLeavePressed);
+
+            LeaveButton.onClick.AddListener(HandleHostDisconnection);
             readyButton.onClick.AddListener(OnReadyPressed);
         }
     }
@@ -49,9 +52,21 @@ public class S_LobbyUINetworkTest : MonoBehaviour
         var succeeded = await S_GameLobbyManager.instance.SetPlayerReady();
         if (succeeded) readyButton.interactable = false;
     }
-    
-    private async void OnLeavePressed()
+
+    private async void HandleHostDisconnection()
     {
-        S_GameLobbyManager.instance.LeaveLobby();
+        try
+        {
+            await S_LobbyManager.instance.LeaveLobbyAsync();
+            Debug.Log("Player has left the lobby.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error while leaving the lobby: {ex.Message}");
+        }
+        finally
+        {
+            SceneManager.LoadSceneAsync("MainMenu");
+        }
     }
 }
