@@ -13,7 +13,9 @@ public abstract class S_Interactable : MonoBehaviour
     protected Rigidbody _body;
     protected Transform _transform;
 
-    public abstract void Interact(S_PlayerInteract p_playerInteract, Transform parent);
+    public abstract void Interact(S_PlayerInteract p_playerInteract, Transform p_parent);
+    public abstract void StopInteract(S_PlayerInteract p_playerInteract);
+
 
     protected virtual void Awake()
     {

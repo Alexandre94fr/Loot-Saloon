@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3259728575922776122}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Spawn point 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2802489670607691167}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Spawn point 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75,7 +75,8 @@ GameObject:
   - component: {fileID: 292077747943857475}
   - component: {fileID: 394330212626957705}
   - component: {fileID: 6802736312389035369}
-  m_Layer: 0
+  - component: {fileID: 6052849851924987539}
+  m_Layer: 6
   m_Name: PB_Vault
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -186,6 +187,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01d4d4a5415ebb84da2c2a8c8882fb60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactName: ???
+  interactInstantly: 0
+  _collider: {fileID: 0}
   lootInstantiator: {fileID: 0}
   spawnPoints:
   - {fileID: 9104762117149105255}
@@ -193,6 +197,33 @@ MonoBehaviour:
   - {fileID: 2802489670607691167}
   moneyValue: 0
   unlockTime: 2
+--- !u!54 &6052849851924987539
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4282436999244886530}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &8839029356640117071
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,7 +233,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9104762117149105255}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Spawn point 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

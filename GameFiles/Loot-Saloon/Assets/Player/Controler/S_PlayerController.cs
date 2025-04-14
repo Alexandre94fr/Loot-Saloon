@@ -8,11 +8,16 @@ using UnityEngine.Rendering.Universal;
 
 public class S_PlayerController : NetworkBehaviour
 {
-    private Transform _playerTransform;
+    [Header(" Debugging :")]
+    [Tooltip("Allow the devs to test there scenes without having to pass throw the Lobby")]
+    [SerializeField] private bool _isSoloTestModeEnabled = true;
+
+    [Space]
     [SerializeField] private Animator _armsAnimator;
     [SerializeField] private Transform _respawnPoint;
     [SerializeField] private GameObject _armsHandler;
 
+    private Transform _playerTransform;
     private Vector3 _playerDirection;
     public Vector3 boxExtents = new Vector3(0.4f, 0.05f, 0.4f);
 
@@ -26,8 +31,24 @@ public class S_PlayerController : NetworkBehaviour
     private bool _isSprinting = false;
     private float _speedMult = 1f;
 
+    void Start()
+    {
+        if (!_isSoloTestModeEnabled)
+            return;
+
+        _playerTransform = transform.parent.transform;
+
+        HandleInputsEvents();
+        S_LifeManager.OnDie += Respawn;
+        S_Extract.OnExtract += DisableAllMeshOfPlayer;
+        S_Extract.OnExtract += DropInputsEvents;
+    }
+
     public override void OnNetworkSpawn()
     {
+        if (_isSoloTestModeEnabled)
+            return;
+
         _playerTransform = transform.parent.transform;
         if (_playerTransform.parent.GetComponent<NetworkObject>().IsOwner)
         {
@@ -62,8 +83,19 @@ public class S_PlayerController : NetworkBehaviour
 
     void Update()
     {
+        if (_playerTransform == null)
+        {
+            Debug.LogError($"ERROR ! The '{nameof(_playerTransform)}' variable is null, " +
+                $"to fix this problem you can try enabling the '{nameof(_isSoloTestModeEnabled)}' variable. " +
+                "This bug may occur because you tried to launch your scene without passing throw the lobby scene.\n" +
+
+                "The update loop will not go any further."
+            );
+
+            return;
+        }
+
         Move();
-        // Debug.Log(Grounded());
     }
 
     private void Jump()
