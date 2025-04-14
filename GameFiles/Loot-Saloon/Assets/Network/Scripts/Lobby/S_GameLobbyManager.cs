@@ -1,7 +1,11 @@
 #region
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using Unity.Services.Authentication;
+using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,6 +26,10 @@ public class S_GameLobbyManager : MonoBehaviour
 
     public bool IsHost => _localLobbyPlayerData != null && _localLobbyPlayerData.Id == S_LobbyManager.instance.GetHostId();
 
+
+    private int _nbPlayersInBlueTeam = 0;
+    private int _nbPlayersInRedTeam = 0;
+    private bool _correctNumberinEachTeam = false;
 
     private void Awake()
     {
@@ -49,7 +57,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> CreateLobby()
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Host"));
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Host"), 0);
         _localLobbyPlayerData = playerData;
 
         _lobbyData = new S_LobbyData();
@@ -66,8 +74,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> JoinLobby(string p_code)
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"));
-
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"), 0);
         bool succeeded = await S_LobbyManager.instance.JoinLobby(p_code, playerData.Serialize());
         return succeeded;
     }
@@ -75,9 +82,9 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> JoinLobbyById(string p_id)
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"));
-
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"), 0);
         bool succeeded = await S_LobbyManager.instance.JoinLobbyById(p_id, playerData.Serialize());
+
         return succeeded;
     }
 
@@ -101,19 +108,27 @@ public class S_GameLobbyManager : MonoBehaviour
             {
                 _localLobbyPlayerData = lobbyPlayerData;
             }
+            
+
 
             _lobbyPlayerDatas.Add(lobbyPlayerData);
         }
 
+     
+
         _lobbyData = new S_LobbyData();
         _lobbyData.Initialize(p_lobby.Data);
-
+        
         S_LobbyEvents.OnLobbyUpdated?.Invoke();
 
         Debug.Log($"nb player ready  : {nbPlayerReady} / {_lobbyPlayerDatas.Count}");
         if (nbPlayerReady == _lobbyPlayerDatas.Count)
         {
             S_LobbyEvents.OnLobbyReady?.Invoke();
+        }
+        else
+        {
+            S_LobbyEvents.OnLobbyUnready?.Invoke();
         }
 
         if (_lobbyData.RelayJoinCode != default && !_inGame && !IsHost)
@@ -145,6 +160,12 @@ public class S_GameLobbyManager : MonoBehaviour
         _localLobbyPlayerData.IsReady = true;
         return await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
     }
+    
+    public async Task<bool> SetPlayerTeam(E_PlayerTeam p_team)
+    {
+        _localLobbyPlayerData.Team = p_team;
+        return await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
+    }
 
     public async Task StartGame()
     {
@@ -168,5 +189,10 @@ public class S_GameLobbyManager : MonoBehaviour
         string connectionData = S_RelayManager.instance.GetConnectionData();
         await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize(), allocationId, connectionData);
         return true;
+    }
+
+    public async Task<E_PlayerTeam> GetPlayerTeam()
+    {
+        return _localLobbyPlayerData.Team;
     }
 }
