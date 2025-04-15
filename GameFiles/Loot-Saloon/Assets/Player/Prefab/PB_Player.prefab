@@ -197,6 +197,7 @@ Transform:
   - {fileID: 1252039610696458379}
   - {fileID: 2674873216008935888}
   - {fileID: 4605135871608779987}
+  - {fileID: 7796951616184119252}
   m_Father: {fileID: 852305454986241953}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &3542514805176929306
@@ -1009,11 +1010,6 @@ MonoBehaviour:
   _playerCanvas: {fileID: 179517894091854995}
   _countdownText: {fileID: 1541723027009372591}
   _respawningCountdownImage: {fileID: 4590785823127257119}
-  _endPanelGameObject: {fileID: 1020962379305285403}
-  _myTeamResultText: {fileID: 1600316211947458656}
-  _myTeamMoneyText: {fileID: 2636560149023488117}
-  _otherTeamResultText: {fileID: 7507924365442175812}
-  _otherTeamMoneyText: {fileID: 6469631736468878188}
 --- !u!1 &3737326765765070412
 GameObject:
   m_ObjectHideFlags: 0
@@ -2147,3 +2143,52 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &8653786353474976599
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7796951616184119252}
+  - component: {fileID: 3576424083082897270}
+  m_Layer: 0
+  m_Name: EndGameMenu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7796951616184119252
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8653786353474976599}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 999589151499278140}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3576424083082897270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8653786353474976599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60d76c87d7089a14f96daf0968f63f0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _endPanelGameObject: {fileID: 1020962379305285403}
+  _myTeamResultText: {fileID: 1600316211947458656}
+  _myTeamMoneyText: {fileID: 2636560149023488117}
+  _otherTeamResultText: {fileID: 7507924365442175812}
+  _otherTeamMoneyText: {fileID: 6469631736468878188}

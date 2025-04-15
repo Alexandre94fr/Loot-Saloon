@@ -12,8 +12,7 @@ public class S_Extract : MonoBehaviour
     
     [SerializeField] private E_PlayerTeam _team;
     public static event Action<E_PlayerTeam> OnExtract;
-
-    public E_PlayerTeam team => _team;
+    public static event Action<E_PlayerTeam, int> GetQuota;
 
     private int _totalEntityInExract = 0;
     private bool _cartInExtract = false;
@@ -27,6 +26,8 @@ public class S_Extract : MonoBehaviour
         quotaComponent = GetComponent<S_Quota>();
         _quotaText = "{0} / " + quotaComponent.quota + "$";
         MoneyRequiredText.text = string.Format(_quotaText, 0);
+
+        OnExtract += (winner) => GetQuota.Invoke(_team, quotaComponent.quota);
     }
 
     private void Start()
@@ -36,7 +37,6 @@ public class S_Extract : MonoBehaviour
 
     private void Update()
     {
-        print(_totalEntityInExract);
         if (_canExtract)
         {
             timer += Time.deltaTime;
@@ -97,3 +97,4 @@ public class S_Extract : MonoBehaviour
         }
     }
 }
+// :)
