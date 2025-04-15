@@ -1,34 +1,34 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class S_PlayerAttributes : MonoBehaviour
 {
     public S_PlayerProperties properties;
-    public float Speed;
-    public float Life;
-    public float MaxLife;
-    public float Strengh;
-    public E_PlayerTeam Team;
-    
-
-    public void Initialize()
-    {
-        Speed = properties.Speed;
-        Life = properties.Life;
-        MaxLife = Life;
-        Strengh = properties.Strengh;
-    }
+    public float speed;
+    public float life;
+    public float maxLife;
+    public float strengh;
+    public E_PlayerTeam team;
 
     private void Awake()
     {
-        Initialize();
-        S_LifeManager.OnDie += Initialize;
+        ResetStat();
+        S_LifeManager.OnDie += ResetStat;
     }
 
-    public void SetTeam(E_PlayerTeam team)
+    public void SetTeam(E_PlayerTeam p_team)
     {
-        Team = team;
+        this.team = p_team;
     }
+    private void ResetStat()
+    {
+        speed = properties.speed;
+        life = properties.life;
+        maxLife = life;
+        strengh = properties.strengh;
+    }
+
 }
 
 public enum E_PlayerTeam
