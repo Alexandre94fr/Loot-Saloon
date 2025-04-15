@@ -543,7 +543,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &161118297
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1728,9 +1728,9 @@ MonoBehaviour:
   lobbyIdText: {fileID: 1030472248}
   startGameButton: {fileID: 58303396}
   readyButton: {fileID: 161118298}
-  LeaveButton: {fileID: 2012813303}
-  GoRedTeamButton: {fileID: 111545714}
-  GoBlueTeamButton: {fileID: 1527637507}
+  leaveButton: {fileID: 2012813303}
+  goRedTeamButton: {fileID: 111545714}
+  goBlueTeamButton: {fileID: 1527637507}
 --- !u!1 &1371262953
 GameObject:
   m_ObjectHideFlags: 0
