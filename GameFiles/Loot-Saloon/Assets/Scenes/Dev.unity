@@ -127,6 +127,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1814199956}
     m_Modifications:
+    - target: {fileID: -2432999960191768794, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3642897912
+      objectReference: {fileID: 0}
+    - target: {fileID: -2432999960191768794, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 995832028
+      objectReference: {fileID: 0}
     - target: {fileID: 147371705349791009, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
       propertyPath: m_Name
       value: PB_Apple
@@ -685,6 +693,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2043014529}
     m_Modifications:
+    - target: {fileID: 276917334908103284, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 911954376
+      objectReference: {fileID: 0}
+    - target: {fileID: 276917334908103284, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 183091457
+      objectReference: {fileID: 0}
     - target: {fileID: 417390681784782778, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
@@ -756,6 +772,10 @@ PrefabInstance:
     - target: {fileID: 6748158381944389326, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7483233458419870956, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: team
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8267085892196296300, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_Name

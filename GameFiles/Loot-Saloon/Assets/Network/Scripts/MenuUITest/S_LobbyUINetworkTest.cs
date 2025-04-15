@@ -57,7 +57,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
 
     private async void OnReadyPressed()
     {
-        if (await S_GameLobbyManager.instance.GetPlayerTeam() != E_PlayerTeam.NONE)
+        if (await S_GameLobbyManager.instance.GetPlayerTeamAsync() != E_PlayerTeam.NONE)
         {
             var succeeded = await S_GameLobbyManager.instance.SetPlayerReady();
             if (succeeded) readyButton.interactable = false;

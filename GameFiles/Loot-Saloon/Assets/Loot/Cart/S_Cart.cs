@@ -9,17 +9,12 @@ public class S_Cart : S_Pickable
 {
     public int total { get; private set; } = 0;
 
-    [SerializeField] private List<S_PlayerInteract> players;
+    public E_PlayerTeam team;
     private HashSet<S_Loot> _inCart = new();
 
     [SerializeField] private GameObject slot;
     [SerializeField] private UnityEvent OnLootAdded = new();
     [SerializeField] private UnityEvent OnLootRemoved = new();
-
-    public bool KnowPlayer(S_PlayerInteract player)
-    {
-        return players.Contains(player);
-    }
 
     private void OnTriggerEnter(Collider p_collider)
     {

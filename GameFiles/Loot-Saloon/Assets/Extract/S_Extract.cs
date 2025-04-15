@@ -10,7 +10,10 @@ public class S_Extract : MonoBehaviour
     public TextMeshProUGUI MoneyRequiredText;
     public TextMeshProUGUI TimeToExractText;
     
-    public static event Action OnExtract;
+    [SerializeField] private E_PlayerTeam _team;
+    public static event Action<E_PlayerTeam> OnExtract;
+
+    public E_PlayerTeam team => _team;
 
     private int _totalEntityInExract = 0;
     private bool _cartInExtract = false;
@@ -26,6 +29,11 @@ public class S_Extract : MonoBehaviour
         MoneyRequiredText.text = string.Format(_quotaText, 0);
     }
 
+    private void Start()
+    {
+        S_GameTimer.OnEnd += () => OnExtract?.Invoke(E_PlayerTeam.NONE);
+    }
+
     private void Update()
     {
         print(_totalEntityInExract);
@@ -34,7 +42,7 @@ public class S_Extract : MonoBehaviour
             timer += Time.deltaTime;
             if (timer >= TimeToExtract)
             {
-                OnExtract?.Invoke();
+                OnExtract?.Invoke(_team);
                 _canExtract = false;
             }
         }
@@ -49,7 +57,7 @@ public class S_Extract : MonoBehaviour
     {
         if (other.gameObject.layer == 6)
         {
-            if (_cartInExtract == false && other.TryGetComponent(out S_Cart cart))
+            if (!_cartInExtract && other.TryGetComponent(out S_Cart cart))
             {
                 MoneyRequiredText.text = string.Format(_quotaText, cart.total);
                 if (quotaComponent.quota - cart.total <= 0)
@@ -59,7 +67,9 @@ public class S_Extract : MonoBehaviour
                 }
             }
         }
-        if (other.gameObject.CompareTag("Player")) _totalEntityInExract++;
+        else if (other.gameObject.CompareTag("Player"))
+            _totalEntityInExract++;
+
         if (_totalEntityInExract >= 2 && _cartInExtract)
         {
             _canExtract = true;
@@ -77,7 +87,10 @@ public class S_Extract : MonoBehaviour
                 MoneyRequiredText.text = string.Format(_quotaText, 0);
             }
         }
-        else if (other.gameObject.CompareTag("Player")) _totalEntityInExract--;
+
+        else if (other.gameObject.CompareTag("Player")) 
+            _totalEntityInExract--;
+
         if (_totalEntityInExract < 2 || !_cartInExtract)
         {
             _canExtract = false;

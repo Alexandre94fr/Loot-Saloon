@@ -191,7 +191,12 @@ public class S_GameLobbyManager : MonoBehaviour
         return true;
     }
 
-    public async Task<E_PlayerTeam> GetPlayerTeam()
+    public E_PlayerTeam GetPlayerTeam()
+    {
+        return _localLobbyPlayerData.Team;
+    }
+
+    public async Task<E_PlayerTeam> GetPlayerTeamAsync()
     {
         return _localLobbyPlayerData.Team;
     }
