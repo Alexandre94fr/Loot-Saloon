@@ -101,12 +101,34 @@ public class S_BankVault : S_Interactable
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
-        if (!IsServer) return;
-        if (vaultState.Value != VaultState.Opened && (vaultState.Value == VaultState.Closed || (_currentPlayer == p_playerInteract && vaultState.Value == VaultState.InUse)))
+        ulong clientId = p_playerInteract.GetComponentInParent<NetworkObject>().OwnerClientId;
+        RequestUnlockServerRpc(clientId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestUnlockServerRpc(ulong clientId)
+    {
+        S_PlayerInteract player = FindPlayerByClientId(clientId);
+
+        if (vaultState.Value == VaultState.Opened) return;
+
+        // Si c'est déjà en cours et c'est un autre joueur qui interagit, on ne fait rien
+        if (_currentPlayer != null && _currentPlayer != player && vaultState.Value == VaultState.InUse)
+            return;
+
+        _currentPlayer = player;
+        StartCoroutine(UnlockSequence());
+    }
+
+    private S_PlayerInteract FindPlayerByClientId(ulong clientId)
+    {
+        foreach (var p in FindObjectsOfType<S_PlayerInteract>())
         {
-            _currentPlayer = p_playerInteract;
-            StartCoroutine(UnlockSequence());
+            NetworkObject netObj = p.GetComponent<NetworkObject>();
+            if (netObj != null && netObj.OwnerClientId == clientId)
+                return p;
         }
+        return null;
     }
 
     public override void StopInteract(S_PlayerInteract p_playerInteract)
