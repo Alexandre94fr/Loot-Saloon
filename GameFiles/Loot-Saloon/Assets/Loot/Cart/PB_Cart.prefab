@@ -1281,7 +1281,8 @@ MonoBehaviour:
   parentIsPlayerInteract: 1
   _pickUpTime: 2
   weight: 0
-  players: []
+  throwable: 0
+  team: 0
   slot: {fileID: 6901994336261196213}
   OnLootAdded:
     m_PersistentCalls:
@@ -1430,7 +1431,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 911954376
+  GlobalObjectIdHash: 183091457
   InScenePlacedSourceGlobalObjectIdHash: 183091457
   DeferredDespawnTick: 0
   Ownership: 8

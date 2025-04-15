@@ -145,7 +145,7 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void Throw()
     {
-        if (_pickableHeld == null)
+        if (_pickableHeld == null || !_pickableHeld.throwable)
             return;
 
         S_Pickable pickable = _pickableHeld;

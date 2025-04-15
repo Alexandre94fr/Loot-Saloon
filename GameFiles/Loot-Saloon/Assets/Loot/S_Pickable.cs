@@ -15,6 +15,8 @@ public abstract class S_Pickable : S_Interactable
 
     private List<Collider> _ignoredColliders = new();
 
+    public bool throwable = true;
+
 
     public S_Cart cart { get; private set; }
 
