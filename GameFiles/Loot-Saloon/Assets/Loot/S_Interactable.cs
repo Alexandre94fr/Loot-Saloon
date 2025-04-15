@@ -1,7 +1,8 @@
+using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof (Rigidbody))]
-public abstract class S_Interactable : MonoBehaviour
+public abstract class S_Interactable : NetworkBehaviour
 {
     public string interactName = "???";
     public bool interactInstantly = false;
