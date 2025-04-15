@@ -1,6 +1,8 @@
 #region
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 #endregion
 
@@ -93,10 +95,41 @@ public abstract class S_Pickable : S_Interactable
     {
         while (!interactable)
         {
-            transform.position = p_handTransform.position + p_handTransform.TransformDirection(_onPickUpOffset);
-            transform.rotation = p_handTransform.rotation;
+            Vector3 targetPosition = p_handTransform.position + p_handTransform.TransformDirection(_onPickUpOffset);
+            Quaternion targetRotation = p_handTransform.rotation;
+
+            // Update position and rotation locally
+            transform.position = targetPosition;
+            transform.rotation = targetRotation;
+
+            // Call the ClientRpc to update clients
+            if (IsServer)
+            {
+                UpdateTransformClientRpc(targetPosition, targetRotation);
+            }
+            else
+            {
+                UpdateTransformServerRpc(targetPosition, targetRotation);
+            }
+
             yield return null;
         }
+    }
+
+    [ClientRpc]
+    private void UpdateTransformClientRpc(Vector3 position, Quaternion rotation)
+    {
+        if (NetworkManager.Singleton.IsServer) return;
+        transform.position = position;
+        transform.rotation = rotation;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdateTransformServerRpc(Vector3 position, Quaternion rotation)
+    {
+        // Update the transform on the server
+        transform.position = position;
+        transform.rotation = rotation;
     }
 
     public virtual void PutDown()

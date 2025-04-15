@@ -86,7 +86,7 @@ public class S_PlayerInteract : MonoBehaviour
 
         Transform interactParent = _transform;
         _currentInteraction = p_interactable;
-
+        Debug.Log($"{p_interactable} interactable");
         if (p_interactable is S_Pickable pickable)
         {
             if (_pickableHeld != null)
