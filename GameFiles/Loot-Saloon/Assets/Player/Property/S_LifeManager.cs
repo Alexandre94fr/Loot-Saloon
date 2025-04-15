@@ -15,7 +15,9 @@ public class S_LifeManager : MonoBehaviour
     public void TakeDamage(float p_damageToTake)
     {
         TakeDamageEvent?.Invoke();
+
         _playerAttributes.life -= p_damageToTake;
+
         CheckDie();
     }
 

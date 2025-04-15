@@ -7,19 +7,17 @@ using UnityEngine.SceneManagement;
 
 public class S_NetworkGameManager : MonoBehaviour
 {
+    private NetworkManager _networkManagerInstance;
+
     private void OnEnable()
     {
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
-
-        NetworkManager.Singleton.LogLevel = LogLevel.Developer;
-        NetworkManager.Singleton.NetworkConfig.EnableNetworkLogs = true;
+        // Useless for now
     }
 
     private void OnDisable()
     {
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+        _networkManagerInstance.OnClientConnectedCallback -= OnClientConnected;
+        _networkManagerInstance.OnClientDisconnectCallback -= OnClientDisconnect;
     }
 
     private void OnClientConnected(ulong p_obj)
@@ -29,26 +27,35 @@ public class S_NetworkGameManager : MonoBehaviour
 
     private void OnClientDisconnect(ulong p_client)
     {
-        if (NetworkManager.Singleton.LocalClientId == p_client)
+        if (_networkManagerInstance.LocalClientId == p_client)
         {
             Debug.Log("Player Disconnected = " + p_client);
-            NetworkManager.Singleton.Shutdown();
+            _networkManagerInstance.Shutdown();
             SceneManager.LoadSceneAsync("MainMenu");
         }
     }
 
     private void Start()
     {
-        NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+        _networkManagerInstance = NetworkManager.Singleton;
+
+        _networkManagerInstance.OnClientConnectedCallback += OnClientConnected;
+        _networkManagerInstance.OnClientDisconnectCallback += OnClientDisconnect;
+
+        _networkManagerInstance.LogLevel = LogLevel.Developer;
+        _networkManagerInstance.NetworkConfig.EnableNetworkLogs = true;
+
+
+        _networkManagerInstance.NetworkConfig.ConnectionApproval = true;
         UnityTransport transport = GetComponent<UnityTransport>();
 
         if (S_RelayManager.instance.IsHost)
         {
             // Host setup
-            NetworkManager.Singleton.ConnectionApprovalCallback = ConnectionApproval;
+            _networkManagerInstance.ConnectionApprovalCallback = ConnectionApproval;
             (byte[] allocationId, byte[] key, byte[] connectionData, string ip, int port) = S_RelayManager.instance.GetHostConnectionInfo();
             transport.SetHostRelayData(ip, (ushort)port, allocationId, key, connectionData, true);
-            NetworkManager.Singleton.StartHost();
+            _networkManagerInstance.StartHost();
         }
 
         else
@@ -56,13 +63,13 @@ public class S_NetworkGameManager : MonoBehaviour
             // Client setup
             (byte[] allocationId, byte[] key, byte[] connectionData, byte[] hostConnectionData, string ip, int port) = S_RelayManager.instance.GetClientConnectionInfo();
             transport.SetClientRelayData(ip, (ushort)port, allocationId, key, connectionData, hostConnectionData, true);
-            NetworkManager.Singleton.StartClient();
+            _networkManagerInstance.StartClient();
         }
     }
 
     private void Update()
     {
-        if (NetworkManager.Singleton.ShutdownInProgress)
+        if (_networkManagerInstance.ShutdownInProgress)
         {
             S_GameLobbyManager.instance.LeaveLobby();
         }

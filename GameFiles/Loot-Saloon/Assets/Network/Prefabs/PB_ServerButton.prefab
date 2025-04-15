@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 1219930878809695580}
   - component: {fileID: 4834448016549838368}
   m_Layer: 5
-  m_Name: ServerButton
+  m_Name: PB_ServerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

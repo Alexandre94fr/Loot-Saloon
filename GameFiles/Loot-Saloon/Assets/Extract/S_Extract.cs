@@ -28,7 +28,6 @@ public class S_Extract : MonoBehaviour
 
     private void Update()
     {
-        print(_totalEntityInExract);
         if (_canExtract)
         {
             timer += Time.deltaTime;
