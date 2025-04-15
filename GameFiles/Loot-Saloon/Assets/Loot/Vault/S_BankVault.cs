@@ -16,6 +16,8 @@ public class S_BankVault : S_Interactable
 
     public float unlockTime = 6f;
 
+    private bool _hasSpawnedLoot = false;
+
     public enum VaultState
     {
         Closed,
@@ -71,10 +73,13 @@ public class S_BankVault : S_Interactable
         SpawnLoot();
     }
 
+
     public void SpawnLoot()
     {
-        if (!IsServer) return;
-        for (int i = 0; i< spawnPoints.Length; i++)
+        //if (!IsServer || _hasSpawnedLoot) return;
+        //_hasSpawnedLoot = true;
+
+        for (int i = 0; i < spawnPoints.Length; i++)
         {
             lootInstantiator.SpawnLoot(_lootIndeces[i], spawnPoints[i]);
         }
@@ -84,13 +89,19 @@ public class S_BankVault : S_Interactable
     {
         float timer = 0f;
         SetVaultStateServerRPC(VaultState.InUse);
+        Debug.Log("Unlock Sequence Start");
 
         while (timer < unlockTime)
         {
             if (vaultState.Value != VaultState.InUse)
                 yield break;
             Debug.Log("Opening the Vault .....");
-            S_CircleLoad.OnCircleChange(timer/ unlockTime);
+
+            if (_currentPlayer == null)
+                Debug.Log("Faut aller se faire enculé un jour");
+
+            NetworkObject networkObject = _currentPlayer.GetComponentInParent<NetworkObject>();
+            CircleProgressClientRpc(timer/ unlockTime, networkObject.OwnerClientId);
             timer += Time.deltaTime;
             yield return null;
         }
@@ -99,20 +110,35 @@ public class S_BankVault : S_Interactable
         RequestSpawnLootServerRpc();
     }
 
+    [ClientRpc]
+    private void CircleProgressClientRpc(float progress, ulong targetClientId)
+    {
+        if (NetworkManager.Singleton.LocalClientId != targetClientId) return;
+        S_CircleLoad.OnCircleChange(progress);
+    }
+
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
-        ulong clientId = p_playerInteract.GetComponentInParent<NetworkObject>().OwnerClientId;
-        RequestUnlockServerRpc(clientId);
+        RequestUnlockServerRpc(p_playerInteract.GetComponentInParent<NetworkObject>());
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestUnlockServerRpc(ulong clientId)
+    private void RequestUnlockServerRpc(NetworkObjectReference playerRef)
     {
-        S_PlayerInteract player = FindPlayerByClientId(clientId);
+        if (!playerRef.TryGet(out NetworkObject netObj))
+        {
+            Debug.Log("Player Interact is Null");
+            return;
+        }
 
+        S_PlayerInteract player = netObj.GetComponentInChildren<S_PlayerInteract>();
+        if (player == null)
+        {
+            Debug.Log("Player Interact is Null");
+            return;
+        }
         if (vaultState.Value == VaultState.Opened) return;
 
-        // Si c'est déjà en cours et c'est un autre joueur qui interagit, on ne fait rien
         if (_currentPlayer != null && _currentPlayer != player && vaultState.Value == VaultState.InUse)
             return;
 
@@ -134,9 +160,10 @@ public class S_BankVault : S_Interactable
     public override void StopInteract(S_PlayerInteract p_playerInteract)
     {
         SetVaultStateServerRPC(vaultState.Value == VaultState.Opened ? VaultState.Opened : VaultState.Closed);
+        NetworkObject networkObject = _currentPlayer.GetComponentInParent<NetworkObject>();
+        CircleProgressClientRpc(0, networkObject.OwnerClientId);
         _currentPlayer = null;
         Debug.Log("Stop Open Vault");
-        S_CircleLoad.OnCircleChange(0);
     }
 
     private void OnEnable()

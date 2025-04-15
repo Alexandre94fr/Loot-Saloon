@@ -37,26 +37,26 @@ public class S_PlayerInteract : MonoBehaviour
         attributes = GetComponent<S_PlayerAttributes>();
     }
 
-    private void OnEnable()
-    {
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-    }
+    //private void OnEnable()
+    //{
+    //    NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+    //}
 
-    private void OnDisable()
-    {
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-    }
+    //private void OnDisable()
+    //{
+    //    NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+    //}
 
-    private void OnClientConnected(ulong clientId)
-    {
-        Debug.Log($"Client connecté : {clientId}");
+    //private void OnClientConnected(ulong clientId)
+    //{
+    //    Debug.Log($"Client connecté : {clientId}");
 
-        // Exemple : assigner une référence à un composant réseau spécifique
-        // S_LootInstantiator inst = ...
-        // inst.AssignToClient(clientId);
+    //    // Exemple : assigner une référence à un composant réseau spécifique
+    //    // S_LootInstantiator inst = ...
+    //    // inst.AssignToClient(clientId);
 
-        // Tu peux aussi stocker une référence à ton player, ou lier des objets spécifiques
-    }
+    //    // Tu peux aussi stocker une référence à ton player, ou lier des objets spécifiques
+    //}
 
     private void Start()
     {
