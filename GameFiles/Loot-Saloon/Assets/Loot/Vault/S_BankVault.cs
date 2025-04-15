@@ -113,7 +113,9 @@ public class S_BankVault : S_Interactable
     [ClientRpc]
     private void CircleProgressClientRpc(float progress, ulong targetClientId)
     {
+        Debug.Log("Enter in It");
         if (NetworkManager.Singleton.LocalClientId != targetClientId) return;
+        Debug.Log("Set To smt :: " + progress + " :: Traget :: " + targetClientId);
         S_CircleLoad.OnCircleChange(progress);
     }
 
@@ -159,11 +161,30 @@ public class S_BankVault : S_Interactable
 
     public override void StopInteract(S_PlayerInteract p_playerInteract)
     {
+        NetworkObject netObj = p_playerInteract?.GetComponentInParent<NetworkObject>();
+        if (netObj == null) return;
+
+        StopInteractServerRpc(netObj.OwnerClientId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void StopInteractServerRpc(ulong playerClientId)
+    {
+        if (_currentPlayer == null) return;
+
+        NetworkObject currentNetObj = _currentPlayer.GetComponentInParent<NetworkObject>();
+        if (currentNetObj.OwnerClientId != playerClientId)
+        {
+            Debug.LogWarning($"[StopInteractServerRpc] Unauthorized client tried to stop interaction: {playerClientId}");
+            return;
+        }
+
         SetVaultStateServerRPC(vaultState.Value == VaultState.Opened ? VaultState.Opened : VaultState.Closed);
-        NetworkObject networkObject = _currentPlayer.GetComponentInParent<NetworkObject>();
-        CircleProgressClientRpc(0, networkObject.OwnerClientId);
+
+        CircleProgressClientRpc(0, playerClientId);
+        Debug.Log("Stop Open Vault ::: " + playerClientId);
+
         _currentPlayer = null;
-        Debug.Log("Stop Open Vault");
     }
 
     private void OnEnable()
