@@ -70,7 +70,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     
     private async void OnBlueBtnPressed()
     {
-        if (await S_GameLobbyManager.instance.GetPlayerTeam() != E_PlayerTeam.NONE)
+        if (await S_GameLobbyManager.instance.GetPlayerTeamAsync() != E_PlayerTeam.NONE)
         {
             var succeeded1 = await S_GameLobbyManager.instance.SetPlayerUnready();
             if (succeeded1)
@@ -85,7 +85,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     
     private async void OnRedBtnPressed()
     {
-        if (await S_GameLobbyManager.instance.GetPlayerTeam() != E_PlayerTeam.NONE)
+        if (await S_GameLobbyManager.instance.GetPlayerTeamAsync() != E_PlayerTeam.NONE)
         {
             var succeeded1 = await S_GameLobbyManager.instance.SetPlayerUnready();
             if (succeeded1)

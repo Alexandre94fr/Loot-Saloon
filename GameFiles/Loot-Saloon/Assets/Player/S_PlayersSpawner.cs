@@ -38,7 +38,7 @@ public class S_PlayersSpawner : NetworkBehaviour
     public async void SpawnPlayer(GameObject p_player, Transform p_origin)
     {
         S_GameLobbyManager gameLobbyManager = S_GameLobbyManager.instance;
-        _playerTeam = await gameLobbyManager.GetPlayerTeam();
+        _playerTeam = await gameLobbyManager.GetPlayerTeamAsync();
         int count = NetworkManager.Singleton.ConnectedClients.Count;
         float totalWidth = (count - 1) * _spawnDistance;
         float startX = p_origin.position.x - totalWidth / 2f;
