@@ -25,11 +25,6 @@ public class S_GameLobbyManager : MonoBehaviour
 
     public bool IsHost => _localLobbyPlayerData != null && _localLobbyPlayerData.Id == S_LobbyManager.instance.GetHostId();
 
-
-    private int _nbPlayersInBlueTeam = 0;
-    private int _nbPlayersInRedTeam = 0;
-    private bool _correctNumberinEachTeam = false;
-
     private void Awake()
     {
         if (instance == null)
@@ -164,7 +159,7 @@ public class S_GameLobbyManager : MonoBehaviour
             else
             {
                 await JoinRelayServer(_lobbyData.RelayJoinCode);
-                SceneManager.LoadSceneAsync(gameSceneName);
+                await SceneManager.LoadSceneAsync(gameSceneName);
             }
         }
     }
@@ -241,8 +236,8 @@ public class S_GameLobbyManager : MonoBehaviour
         await S_LobbyManager.instance.UpdateLobbyData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
     }
     
-    public async Task<E_PlayerTeam> GetPlayerTeam()
+    public Task<E_PlayerTeam> GetPlayerTeam()
     {
-        return _localLobbyPlayerData.Team;
+        return Task.FromResult(_localLobbyPlayerData.Team);
     }
 }

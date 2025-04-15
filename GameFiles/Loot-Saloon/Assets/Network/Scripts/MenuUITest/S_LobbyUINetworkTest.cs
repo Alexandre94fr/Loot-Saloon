@@ -111,7 +111,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
         }
         finally
         {
-            SceneManager.LoadSceneAsync("MainMenu");
+            await SceneManager.LoadSceneAsync("MainMenu");
         }
     }
 }
