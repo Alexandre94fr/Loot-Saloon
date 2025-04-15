@@ -28,8 +28,8 @@ public class S_PlayerCamera : MonoBehaviour
         _playerTransform.Rotate(Vector3.up * mouseX);
     }
 
-    private void GetLookInput(Vector2 lookInput)
+    private void GetLookInput(Vector2 p_lookInput)
     {
-        _lookInput = lookInput;
+        _lookInput = p_lookInput;
     }
 }
