@@ -13,7 +13,10 @@ public class S_GameLobbyManager : MonoBehaviour
     [SerializeField] private string gameSceneName;
 
     private List<S_LobbyPlayerData> _lobbyPlayerDatas = new List<S_LobbyPlayerData>();
+
     private List<S_LobbyPlayerData> _previousLobbyPlayerDatas = new List<S_LobbyPlayerData>();
+    public List<S_LobbyPlayerData> LobbyPlayerDatas => _lobbyPlayerDatas;
+
     private S_LobbySettings _lobbySettings = new S_LobbySettings();
 
     private S_LobbyPlayerData _localLobbyPlayerData;
