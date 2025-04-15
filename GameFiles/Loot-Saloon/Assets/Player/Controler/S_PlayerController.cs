@@ -8,7 +8,10 @@ using UnityEngine.Rendering.Universal;
 
 public class S_PlayerController : NetworkBehaviour
 {
-    [Header(" Debugging :")]
+    public Vector3 boxExtents = new(0.4f, 0.05f, 0.4f);
+    public LayerMask groundLayer;
+
+    [Header(" Debugging :")] 
     [Tooltip("Allow the devs to test there scenes without having to pass throw the Lobby")]
     [SerializeField] private bool _isSoloTestModeEnabled = true;
 
@@ -17,15 +20,13 @@ public class S_PlayerController : NetworkBehaviour
     [SerializeField] private Transform _respawnPoint;
     [SerializeField] private GameObject _armsHandler;
 
-    private Transform _playerTransform;
-    private Vector3 _playerDirection;
-    public Vector3 boxExtents = new Vector3(0.4f, 0.05f, 0.4f);
-
-    public LayerMask groundLayer;
-
     [SerializeField] private float _walkSpeed = 2f;
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private float _sprintSpeed = 4f;
+
+    private Transform _playerTransform;
+    private Vector3 _playerDirection;
+
     private float _currentSpeed = 4f;
 
     private bool _isSprinting = false;
@@ -39,6 +40,7 @@ public class S_PlayerController : NetworkBehaviour
         _playerTransform = transform.parent.transform;
 
         HandleInputsEvents();
+
         S_LifeManager.OnDie += Respawn;
         S_Extract.OnExtract += DisableAllMeshOfPlayer;
         S_Extract.OnExtract += DropInputsEvents;
@@ -50,16 +52,20 @@ public class S_PlayerController : NetworkBehaviour
             return;
 
         _playerTransform = transform.parent.transform;
+
         if (_playerTransform.parent.GetComponent<NetworkObject>().IsOwner)
         {
             HandleInputsEvents();
+
             S_LifeManager.OnDie += Respawn;
             S_Extract.OnExtract += DisableAllMeshOfPlayer;
             S_Extract.OnExtract += DropInputsEvents;
+
+            S_PlayersSpawner.Instance.SpawnPlayer(_playerTransform.transform.parent.gameObject, _playerTransform);
         }
         else
         {
-            //Client Side
+            // Client Side
             GameObject camerObject = _playerTransform.GetComponentInChildren<Camera>().gameObject;
             camerObject.GetComponent<Camera>().enabled = false;
             camerObject.GetComponent<S_PlayerCamera>().enabled = false;
@@ -85,10 +91,10 @@ public class S_PlayerController : NetworkBehaviour
     {
         if (_playerTransform == null)
         {
-            Debug.LogError($"ERROR ! The '{nameof(_playerTransform)}' variable is null, " +
+            Debug.LogError(
+                $"ERROR ! The '{nameof(_playerTransform)}' variable is null, " +
                 $"to fix this problem you can try enabling the '{nameof(_isSoloTestModeEnabled)}' variable. " +
                 "This bug may occur because you tried to launch your scene without passing throw the lobby scene.\n" +
-
                 "The update loop will not go any further."
             );
 
@@ -116,10 +122,10 @@ public class S_PlayerController : NetworkBehaviour
         _armsAnimator.speed = sprint ? 2 : 1;
     }
 
-    private void GetDirection(Vector3 playerDirection)
+    private void GetDirection(Vector3 p_playerDirection)
     {
-        _playerDirection.x = playerDirection.x;
-        _playerDirection.z = playerDirection.y;
+        _playerDirection.x = p_playerDirection.x;
+        _playerDirection.z = p_playerDirection.y;
         if (_playerDirection.x != 0 || _playerDirection.z != 0)
         {
             _armsAnimator.SetBool("Walking", true);

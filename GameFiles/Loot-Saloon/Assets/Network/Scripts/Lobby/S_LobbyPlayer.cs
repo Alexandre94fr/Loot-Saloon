@@ -9,6 +9,7 @@ public class S_LobbyPlayer : MonoBehaviour
     public void SetData(S_LobbyPlayerData p_data)
     {
         _data = p_data;
+        _data.PrefabInstance = gameObject;
         _playerName.text = _data.GamerTag;
         gameObject.SetActive(true);
 
@@ -21,4 +22,5 @@ public class S_LobbyPlayer : MonoBehaviour
             _playerName.color = Color.red;
         }
     }
+    
 }
