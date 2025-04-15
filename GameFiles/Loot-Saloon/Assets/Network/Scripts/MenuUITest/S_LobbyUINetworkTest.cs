@@ -11,10 +11,10 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     public Text lobbyIdText;
     public Button startGameButton;
     public Button readyButton;
-    public Button LeaveButton;
+    public Button leaveButton;
 
-    public Button GoRedTeamButton;
-    public Button GoBlueTeamButton;
+    public Button goRedTeamButton;
+    public Button goBlueTeamButton;
 
     private void OnEnable()
     {
@@ -29,10 +29,10 @@ public class S_LobbyUINetworkTest : MonoBehaviour
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
 
-            LeaveButton.onClick.AddListener(HandleHostDisconnection);
+            leaveButton.onClick.AddListener(HandleHostDisconnection);
             readyButton.onClick.AddListener(OnReadyPressed);
-            GoRedTeamButton.onClick.AddListener(OnRedBtnPressed);
-            GoBlueTeamButton.onClick.AddListener(OnBlueBtnPressed);
+            goRedTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.RED));
+            goBlueTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.BLUE));
         }
     }
 
@@ -47,6 +47,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     private async void OnStartButtonClicked()
     {
         await S_GameLobbyManager.instance.StartGame();
+        startGameButton.interactable = false;
     }
 
     private void OnLobbyReady()
@@ -67,9 +68,21 @@ public class S_LobbyUINetworkTest : MonoBehaviour
             if (succeeded) readyButton.interactable = false;
         }
     }
-    
-    private async void OnBlueBtnPressed()
+
+    private async void OnTeamBtnPressed(E_PlayerTeam p_choosedTeam)
     {
+        readyButton.gameObject.SetActive(true);
+        if (p_choosedTeam == E_PlayerTeam.RED)
+        {
+            goBlueTeamButton.interactable = true;
+            goRedTeamButton.interactable = false;
+        }
+        else if (p_choosedTeam == E_PlayerTeam.BLUE)
+        {
+            goRedTeamButton.interactable = true;
+            goBlueTeamButton.interactable = false;
+        }
+
         if (await S_GameLobbyManager.instance.GetPlayerTeamAsync() != E_PlayerTeam.NONE)
         {
             var succeeded1 = await S_GameLobbyManager.instance.SetPlayerUnready();
@@ -80,22 +93,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
             }
 
         }
-        var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.BLUE);
-    }
-    
-    private async void OnRedBtnPressed()
-    {
-        if (await S_GameLobbyManager.instance.GetPlayerTeamAsync() != E_PlayerTeam.NONE)
-        {
-            var succeeded1 = await S_GameLobbyManager.instance.SetPlayerUnready();
-            if (succeeded1)
-            {
-                readyButton.interactable = true;
-                startGameButton.gameObject.SetActive(false);
-            }
-
-        }
-        var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.RED);
+        var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(p_choosedTeam);
     }
 
     private async void HandleHostDisconnection()
