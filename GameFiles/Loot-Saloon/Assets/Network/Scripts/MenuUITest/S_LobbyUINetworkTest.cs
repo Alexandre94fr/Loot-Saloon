@@ -1,6 +1,8 @@
 #region
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -46,7 +48,17 @@ public class S_LobbyUINetworkTest : MonoBehaviour
 
     private async void OnStartButtonClicked()
     {
+
+        PlayerPrefs.SetInt("NbrOfPlayer", S_GameLobbyManager.instance.LobbyPlayerDatas.Count);
+
+        if (S_GameLobbyManager.instance == null)
+        {
+            Debug.LogError("S_GameLobbyManager.instance is null !");
+            return;
+        }
+
         await S_GameLobbyManager.instance.StartGame();
+
     }
 
     private void OnLobbyReady()

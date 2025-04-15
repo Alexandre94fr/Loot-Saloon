@@ -33,10 +33,25 @@ public class S_BankVault : S_Interactable
         vaultState.Value = state;
     }
 
-    public override void OnNetworkSpawn()
+    [ClientRpc]
+    public void SetLootInstantiatorClientRpc(ulong lootInstantiatorNetworkId)
     {
-        GenerateLoots();
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(lootInstantiatorNetworkId, out var lootInstantiatorObject))
+        {
+            lootInstantiator = lootInstantiatorObject.GetComponent<S_LootInstantiator>();
+        }
     }
+
+    //public override void OnNetworkSpawn()
+    //{
+    //    if(Server)
+    //    if (lootInstantiator == null)
+    //    {
+    //        Debug.LogError("lootInstantiator is not assigned on network spawn.");
+    //        return;
+    //    }
+    //    GenerateLoots();
+    //}
 
     public void GenerateLoots()
     {
@@ -50,8 +65,15 @@ public class S_BankVault : S_Interactable
         lootInstantiator.UpdateQuota(this);
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestSpawnLootServerRpc()
+    {
+        SpawnLoot();
+    }
+
     public void SpawnLoot()
     {
+        if (!IsServer) return;
         for (int i = 0; i< spawnPoints.Length; i++)
         {
             lootInstantiator.SpawnLoot(_lootIndeces[i], spawnPoints[i]);
@@ -74,11 +96,12 @@ public class S_BankVault : S_Interactable
         }
         SetVaultStateServerRPC(VaultState.Opened);
         Debug.Log("Vault is Open");
-        SpawnLoot();
+        RequestSpawnLootServerRpc();
     }
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
+        if (!IsServer) return;
         if (vaultState.Value != VaultState.Opened && (vaultState.Value == VaultState.Closed || (_currentPlayer == p_playerInteract && vaultState.Value == VaultState.InUse)))
         {
             _currentPlayer = p_playerInteract;
@@ -108,7 +131,6 @@ public class S_BankVault : S_Interactable
     {
         Debug.Log($"Vault state changed from {oldState} to {newState}");
     }
-
 }
 
 
