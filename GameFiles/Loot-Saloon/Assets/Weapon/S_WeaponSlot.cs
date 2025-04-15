@@ -1,7 +1,6 @@
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class S_WeaponSlot : MonoBehaviour
 {
@@ -57,16 +56,8 @@ public class S_WeaponSlot : MonoBehaviour
             return;
         }
 
-        // Si ce n’est pas encore spawn, on le spawn avec ownership
-        if (!weaponNetworkObject.IsSpawned)
-        {
-            //ServerSpawnRpc(weaponNetworkObject);
-        }
-
-
         if (weaponObject != null)
             DropWeapon(weaponObject.GetComponent<S_Weapon>());
-
 
         SO_WeaponProperties properties = newWeapon.properties;
         heldWeapon = properties;
@@ -82,7 +73,7 @@ public class S_WeaponSlot : MonoBehaviour
     [ServerRpc]
     public void ServerSpawnRpc(NetworkObject obj)
     {
-        obj.Spawn(true);// true pour donner l'ownership au joueur local
+        obj.Spawn(true);
     }
 
     public void OnGenericPickUp(S_Pickable pickable)
@@ -156,7 +147,7 @@ public class S_WeaponSlot : MonoBehaviour
             print("HIT " + hit.transform.name);
             if (hit.transform.TryGetComponent(out S_PlayerCharacter target))
             {
-                OnHitServerRpc(target.GetComponent<NetworkObject>(), damage);
+                OnHitServerRpc(target.transform.parent.GetComponent<NetworkObject>(), damage);
             }
         }
 
@@ -166,9 +157,11 @@ public class S_WeaponSlot : MonoBehaviour
     [ServerRpc]
     public void OnHitServerRpc(NetworkObjectReference targetRef, float damage)
     {
-        if (targetRef.TryGet(out var netObj) && netObj.TryGetComponent(out S_LifeManager target))
+        print("OnHitServerRpc");
+        if (targetRef.TryGet(out var netObj) && netObj.TryGetComponent(out S_PlayerCharacter target))
         {
-            target.TakeDamage(damage);
+
+            target.LifeManager.TakeDamage(damage);
 
             ulong targetClientId = netObj.OwnerClientId;
 
