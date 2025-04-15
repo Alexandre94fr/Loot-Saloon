@@ -556,7 +556,7 @@ MonoBehaviour:
       m_Calls: []
   pickableIgnoresColliders:
   - {fileID: 6579715726715751187}
-  _throwForce: 10
+  _throwForce: 5
   _throwAngle: 0
   objectLayer:
     serializedVersion: 2
@@ -819,6 +819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 167091146179e3843b245badc75a90b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sensitivity: 50
 --- !u!95 &2432516737232652957
 Animator:
   serializedVersion: 7
