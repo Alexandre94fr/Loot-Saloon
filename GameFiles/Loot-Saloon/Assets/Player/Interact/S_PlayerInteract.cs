@@ -11,7 +11,7 @@ public class S_PlayerInteract : MonoBehaviour
     // [SerializeField] private GameObject _interactPanel;
 
     private Transform _transform;
-    private Transform _cameraTransform;
+    [SerializeField] private Transform _cameraTransform;
     public Transform _armTransform;
     private S_Pickable _pickableHeld = null;
 

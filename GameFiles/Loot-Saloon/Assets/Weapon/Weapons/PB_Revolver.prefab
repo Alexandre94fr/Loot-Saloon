@@ -136,7 +136,7 @@ MonoBehaviour:
   parentIsPlayerInteract: 0
   _pickUpTime: 2
   weight: 0
-  properties: {fileID: 0}
+  properties: {fileID: 11400000, guid: 12470538e934705448fae49c28923e93, type: 2}
   isHeld: 0
 --- !u!65 &8594431900264190085
 BoxCollider:
