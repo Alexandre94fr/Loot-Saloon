@@ -5,7 +5,7 @@ using UnityEngine;
 public class S_PlayerCamera : MonoBehaviour
 {
     private Vector2 _lookInput;
-    private float _sensitivity = 100f;
+    [SerializeField] [Range(0f, 100f)] private float _sensitivity = 50f;
     private float _xRotation = 0f;
     private Transform _playerTransform;
 
