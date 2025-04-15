@@ -32,7 +32,7 @@ public class S_PlayerInteract : MonoBehaviour
     {
         _transform = transform;
         _cameraTransform = Camera.main.transform;
-        attributes = GetComponent<S_PlayerAttributes>();
+        attributes = transform.parent.GetComponentInChildren<S_PlayerAttributes>();
     }
 
     private void Start()
