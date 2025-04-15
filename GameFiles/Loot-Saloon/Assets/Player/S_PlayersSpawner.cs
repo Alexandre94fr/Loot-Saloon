@@ -67,7 +67,6 @@ public class S_PlayersSpawner : NetworkBehaviour
 
     IEnumerator TPPlayer(GameObject p_player, Vector3 pos)
     {
-        yield return new WaitForSeconds(2);
         if (p_player.GetComponentInChildren<NetworkTransform>() != null)
         {
             
@@ -77,6 +76,8 @@ public class S_PlayersSpawner : NetworkBehaviour
         {
             Debug.LogWarning("NetworkTransform non trouvé sur le joueur.");
         }
+        
+        yield break;
     }
 
     public void RandomSpawnInRadius(GameObject p_player, Transform p_origin)
