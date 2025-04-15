@@ -19,7 +19,7 @@ public class S_PlayerInputsReciever : MonoBehaviour
 
     private void Awake()
     {
-        OnLockMovement += (bool canMove) => _canMove = canMove;
+        OnLockMovement += (bool p_canMove) => _canMove = p_canMove;
     }
 
     public void JumpInput(InputAction.CallbackContext p_context)

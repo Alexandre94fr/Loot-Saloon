@@ -18,9 +18,9 @@ public class S_ConsoleLogger : MonoBehaviour
         Application.logMessageReceived -= HandleLog;
     }
 
-    private void HandleLog(string logString, string stackTrace, LogType type)
+    private void HandleLog(string p_logString, string p_stackTrace, LogType p_type)
     {
-        _consoleContent += logString + "\n";
+        _consoleContent += p_logString + "\n";
         _consoleText.text = _consoleContent;
 
         if (_consoleText.text.Split('\n').Length > maxLines)
