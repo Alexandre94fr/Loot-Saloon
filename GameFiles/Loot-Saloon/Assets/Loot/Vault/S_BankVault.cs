@@ -44,17 +44,6 @@ public class S_BankVault : S_Interactable
         }
     }
 
-    //public override void OnNetworkSpawn()
-    //{
-    //    if(Server)
-    //    if (lootInstantiator == null)
-    //    {
-    //        Debug.LogError("lootInstantiator is not assigned on network spawn.");
-    //        return;
-    //    }
-    //    GenerateLoots();
-    //}
-
     public void GenerateLoots()
     {
         foreach (Transform point in spawnPoints)
@@ -98,7 +87,7 @@ public class S_BankVault : S_Interactable
             Debug.Log("Opening the Vault .....");
 
             if (_currentPlayer == null)
-                Debug.Log("Faut aller se faire enculé un jour");
+                Debug.Log("_currentPlayer is null Check it");
 
             NetworkObject networkObject = _currentPlayer.GetComponentInParent<NetworkObject>();
             CircleProgressClientRpc(timer/ unlockTime, networkObject.OwnerClientId);
