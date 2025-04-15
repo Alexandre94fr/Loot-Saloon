@@ -1,6 +1,7 @@
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class S_WeaponSlot : MonoBehaviour
 {
@@ -59,15 +60,15 @@ public class S_WeaponSlot : MonoBehaviour
         // Si ce n’est pas encore spawn, on le spawn avec ownership
         if (!weaponNetworkObject.IsSpawned)
         {
-            weaponNetworkObject.Spawn(true); // true pour donner l'ownership au joueur local
+            ServerSpawnRpc(weaponNetworkObject);
         }
 
         // Vérifie si ce joueur est bien le propriétaire de cette arme
-        if (!weaponNetworkObject.IsOwner)
-        {
-            Debug.LogWarning("Ce joueur n'est pas propriétaire de cette arme.");
-            return;
-        }
+        //if (!weaponNetworkObject.IsOwner)
+        //{
+        //    Debug.LogWarning("Ce joueur n'est pas propriétaire de cette arme.");
+        //    return;
+        //}
 
         if (weaponObject != null)
             DropWeapon(weaponObject.GetComponent<S_Weapon>());
@@ -82,6 +83,12 @@ public class S_WeaponSlot : MonoBehaviour
         cooldown = properties.cooldown;
 
         EnableWeapon(newWeapon.gameObject);
+    }
+
+    [ServerRpc]
+    public void ServerSpawnRpc(NetworkObject obj)
+    {
+        //obj.Spawn(true);// true pour donner l'ownership au joueur local
     }
 
     public void OnGenericPickUp(S_Pickable pickable)
