@@ -223,6 +223,11 @@ public class S_GameLobbyManager : MonoBehaviour
         return true;
     }
 
+    public E_PlayerTeam GetPlayerTeam()
+    {
+        return _localLobbyPlayerData.Team;
+    }
+
     public async void LeaveLobby()
     {
         _inGame = false;
@@ -236,7 +241,7 @@ public class S_GameLobbyManager : MonoBehaviour
         await S_LobbyManager.instance.UpdateLobbyData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
     }
     
-    public Task<E_PlayerTeam> GetPlayerTeam()
+    public Task<E_PlayerTeam> GetPlayerTeamAsync()
     {
         return Task.FromResult(_localLobbyPlayerData.Team);
     }

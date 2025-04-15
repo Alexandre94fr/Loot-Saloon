@@ -13,6 +13,9 @@ public class S_PlayerInteract : MonoBehaviour
     private Transform _cameraTransform;
     private S_Pickable _pickableHeld = null;
 
+
+    public S_PlayerAttributes attributes {get; private set;}
+
     [SerializeField] private UnityEvent<S_Pickable> _onPickUp = new();
 
     [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
@@ -29,6 +32,7 @@ public class S_PlayerInteract : MonoBehaviour
     {
         _transform = transform;
         _cameraTransform = Camera.main.transform;
+        attributes = GetComponent<S_PlayerAttributes>();
     }
 
     private void Start()

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -13,6 +12,7 @@ public class S_UIManager : MonoBehaviour
 
     #region Respawn Cool Down
     [SerializeField] private TextMeshProUGUI _countdownText;
+
     [SerializeField] private Image _respawningCountdownImage;
     [SerializeField] private int _timeBeforeRespawn = 5;
     #endregion
@@ -22,13 +22,11 @@ public class S_UIManager : MonoBehaviour
     private void OnEnable()
     {
         S_LifeManager.OnDie += StartRespawnCountdown;
-        S_Extract.OnExtract += FinishMenu;
     }
 
     private void OnDisable()
     {
         S_LifeManager.OnDie -= StartRespawnCountdown;
-        S_Extract.OnExtract -= FinishMenu;
     }
     #endregion
 
@@ -41,16 +39,11 @@ public class S_UIManager : MonoBehaviour
             _countdownText.text = i.ToString();
             yield return new WaitForSecondsRealtime(1f);
         }
-        _respawningCountdownImage.gameObject.SetActive(false);
+        _respawningCountdownImage.gameObject.SetActive(false); 
     }
 
     private void StartRespawnCountdown()
     {
         StartCoroutine(RespawnCountdown());
-    }
-
-    private void FinishMenu()
-    {
-        _finishMenuImage.gameObject.SetActive(true);
     }
 }

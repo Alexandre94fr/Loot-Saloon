@@ -165,7 +165,7 @@ public class S_PlayerController : NetworkBehaviour
         S_PlayerInputsReciever.OnSprint += Sprint;
     }
 
-    private void DropInputsEvents()
+    private void DropInputsEvents(E_PlayerTeam team = E_PlayerTeam.NONE)
     {
         S_PlayerInputsReciever.OnJump -= Jump;
         S_PlayerInputsReciever.OnMove -= GetDirection;
@@ -173,7 +173,7 @@ public class S_PlayerController : NetworkBehaviour
         _playerDirection = Vector3.zero;
     }
 
-    private void DisableAllMeshOfPlayer()
+    private void DisableAllMeshOfPlayer(E_PlayerTeam team = E_PlayerTeam.NONE)
     {
         _playerTransform.GetComponent<MeshRenderer>().enabled = false;
         _armsHandler.SetActive(false);

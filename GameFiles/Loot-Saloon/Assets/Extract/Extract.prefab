@@ -1033,6 +1033,7 @@ MonoBehaviour:
   TimeToExtract: 10
   MoneyRequiredText: {fileID: 8290102617098325113}
   TimeToExractText: {fileID: 972453972462790759}
+  _team: 1
 --- !u!65 &396847480577925359
 BoxCollider:
   m_ObjectHideFlags: 0
