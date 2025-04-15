@@ -1,5 +1,6 @@
 #region
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 #endregion
@@ -12,6 +13,7 @@ public class S_PlayerInteract : MonoBehaviour
     private Transform _transform;
     private Transform _cameraTransform;
     private S_Pickable _pickableHeld = null;
+    private S_Interactable _currentInteraction = null;
 
     [SerializeField] private UnityEvent<S_Pickable> _onPickUp = new();
 
@@ -31,11 +33,40 @@ public class S_PlayerInteract : MonoBehaviour
         _cameraTransform = Camera.main.transform;
     }
 
+    private void OnEnable()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+    }
+
+    private void OnDisable()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        Debug.Log($"Client connecté : {clientId}");
+
+        // Exemple : assigner une référence à un composant réseau spécifique
+        // S_LootInstantiator inst = ...
+        // inst.AssignToClient(clientId);
+
+        // Tu peux aussi stocker une référence à ton player, ou lier des objets spécifiques
+    }
+
     private void Start()
     {
         S_PlayerInputsReciever.OnInteract += Interact;
+        S_PlayerInputsReciever.OnStopInteract += StopInteract;
         S_PlayerInputsReciever.OnThrow += Throw;
         S_LifeManager.OnDie += PutDownPickable;
+    }
+    private void StopInteract()
+    {
+        if (_currentInteraction == null)
+            return;
+        _currentInteraction.StopInteract(this);
+        _currentInteraction = null;
     }
 
     private void Interact()
@@ -71,6 +102,7 @@ public class S_PlayerInteract : MonoBehaviour
             return;
 
         Transform interactParent = _transform;
+        _currentInteraction = p_interactable;
 
         if (p_interactable is S_Pickable pickable)
         {
@@ -82,6 +114,16 @@ public class S_PlayerInteract : MonoBehaviour
         }
 
         p_interactable.Interact(this, interactParent);
+        S_PlayerInputsReciever.OnLook += CheckLookInteraction;
+    }
+
+    private void CheckLookInteraction(Vector2 _)
+    {
+        if (CheckObjectRaycast() == null)
+        {
+            StopInteract();
+            S_PlayerInputsReciever.OnLook -= CheckLookInteraction;
+        }
     }
 
     private void PickUp(S_Pickable p_pickable)

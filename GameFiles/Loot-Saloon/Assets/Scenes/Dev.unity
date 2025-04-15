@@ -924,7 +924,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1474464714a50374a98e3d17d68f1c6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _instantiator: {fileID: 1932888841}
+  _instantiator: {fileID: 1365502717}
   _fraction: 0.67
 --- !u!65 &683971394
 BoxCollider:
@@ -1646,8 +1646,7 @@ Transform:
   m_LocalPosition: {x: 1.5174303, y: 1.045409, z: 4.7511206}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1932888842}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1600226400
@@ -2063,62 +2062,6 @@ Transform:
   - {fileID: 33925372}
   - {fileID: 2043014529}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1932888840
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1932888842}
-  - component: {fileID: 1932888841}
-  m_Layer: 0
-  m_Name: LootInstantiator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1932888841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1932888840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 112d4b5a5e05d1844ad1a3bc930055f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  _lootProperties:
-  - {fileID: 11400000, guid: 17f57adfaab8c284ea2e6b7510c9d8e1, type: 2}
-  OnLootSpawned:
-    m_PersistentCalls:
-      m_Calls: []
-  OnVaultFilled:
-    m_PersistentCalls:
-      m_Calls: []
-  vaultSpawnPoints: []
-  pb_vault: {fileID: 0}
-  quota: {fileID: 0}
---- !u!4 &1932888842
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1932888840}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1595885566}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1966006398
 GameObject:
