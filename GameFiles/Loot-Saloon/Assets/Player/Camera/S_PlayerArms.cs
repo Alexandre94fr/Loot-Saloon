@@ -6,12 +6,14 @@ public class S_PlayerArms : MonoBehaviour
 {
     private Vector2 _lookInput;
     private float _sensitivity = 100f;
-    float _xRotation = 0f;
+    private float _xRotation = 0f;
     private Transform _playerTransform;
+
+
     private void Start()
     {
         _playerTransform = transform.parent.transform;
-        if (_playerTransform.parent.GetComponent<NetworkObject>().IsOwner)
+        if (_playerTransform.GetComponentInParent<NetworkObject>().IsOwner)
         {
             S_PlayerInputsReciever.OnLook += GetLookInput;
         }
@@ -27,8 +29,8 @@ public class S_PlayerArms : MonoBehaviour
         transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
     }
     
-    private void GetLookInput(Vector2 lookInput)
+    private void GetLookInput(Vector2 p_lookInput)
     {
-        _lookInput = lookInput;
+        _lookInput = p_lookInput;
     }
 }
