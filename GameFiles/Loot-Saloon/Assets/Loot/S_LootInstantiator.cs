@@ -18,6 +18,7 @@ public class S_LootInstantiator : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        print("Je viens de spawn");
 
         NetworkManager.Singleton.OnClientConnectedCallback += StartGame;
     }
