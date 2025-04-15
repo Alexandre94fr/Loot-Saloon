@@ -127,6 +127,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1814199956}
     m_Modifications:
+    - target: {fileID: -2432999960191768794, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3642897912
+      objectReference: {fileID: 0}
+    - target: {fileID: -2432999960191768794, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 995832028
+      objectReference: {fileID: 0}
     - target: {fileID: 147371705349791009, guid: 4cfda1465a62e504abbd9f6929466059, type: 3}
       propertyPath: m_Name
       value: PB_Apple
@@ -628,6 +636,10 @@ PrefabInstance:
       propertyPath: _instantiator
       value: 
       objectReference: {fileID: 1932888841}
+    - target: {fileID: 3909925925429405288, guid: 5b11d85738f7ba647974cd724ff3a829, type: 3}
+      propertyPath: _lootInstantiatorInstance
+      value: 
+      objectReference: {fileID: 1932888841}
     - target: {fileID: 6451633802582235191, guid: 5b11d85738f7ba647974cd724ff3a829, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -840,6 +852,22 @@ PrefabInstance:
     - target: {fileID: 276917334908103284, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 911954376
+      objectReference: {fileID: 0}
+    - target: {fileID: 417390681784782778, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 417390681784782778, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 513347311718239379, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 513347311718239379, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3983363614776680269, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_LocalPosition.x
