@@ -6,7 +6,7 @@ public class S_Quota : MonoBehaviour
     public int quota { get; private set; }
 
     [Header(" External references :")]
-    [SerializeField] private S_LootInstantiator _lootInstantiatorInstance;
+    [SerializeField] private S_VaultInstantiator _vaultInstantiatorInstance;
 
     [Header(" Properties :")]
     [Tooltip("How much of the total sum the quota is equal to")]
@@ -15,16 +15,16 @@ public class S_Quota : MonoBehaviour
 
     private void Start()
     {
-        if (!_lootInstantiatorInstance)
+        if (!_vaultInstantiatorInstance)
         {
             Debug.LogError(
-                $"ERROR ! The '{nameof(_lootInstantiatorInstance)}' variable of the '{nameof(name)}' GameObject was not set, the value is null. " +
+                $"ERROR ! The '{nameof(_vaultInstantiatorInstance)}' variable of the '{nameof(name)}' GameObject was not set, the value is null. " +
                 $"Stopping Start method execution"
             );
             return;
         }
 
-        _lootInstantiatorInstance.OnVaultFilled.AddListener(OnVaultFilled);
+        _vaultInstantiatorInstance.OnVaultFilled.AddListener(OnVaultFilled);
     }
     
     public void OnVaultFilled(S_BankVault p_bankVault)
