@@ -144,10 +144,20 @@ public class S_WeaponSlot : MonoBehaviour
 
         if (Physics.Raycast(rayOrigin, raycastDirection, out RaycastHit hit))
         {
-            print("HIT " + hit.transform.name);
+            Debug.Log("HIT " + hit.transform.name);
+
             if (hit.transform.TryGetComponent(out S_PlayerCharacter target))
             {
-                OnHitServerRpc(target.transform.parent.GetComponent<NetworkObject>(), damage);
+                // Récupération du NetworkObject du parent (PB_Player)
+                var playerRoot = target.GetComponentInParent<NetworkObject>();
+                if (playerRoot != null)
+                {
+                    OnHitServerRpc(playerRoot, damage);
+                }
+                else
+                {
+                    Debug.LogWarning("No NetworkObject found on target's parent!");
+                }
             }
         }
 
@@ -157,35 +167,67 @@ public class S_WeaponSlot : MonoBehaviour
     [ServerRpc]
     public void OnHitServerRpc(NetworkObjectReference targetRef, float damage)
     {
-        print("OnHitServerRpc");
-        if (targetRef.TryGet(out var netObj) && netObj.TryGetComponent(out S_PlayerCharacter target))
+        Debug.Log("OnHitServerRpc");
+
+        if (targetRef.TryGet(out var netObj))
         {
-
-            target.LifeManager.TakeDamage(damage);
-
-            ulong targetClientId = netObj.OwnerClientId;
-
-            ClientRpcParams clientRpcParams = new ClientRpcParams
+            // On cherche le S_PlayerCharacter dans les enfants
+            var targetCharacter = netObj.GetComponentInChildren<S_PlayerCharacter>();
+            if (targetCharacter != null && targetCharacter.LifeManager != null)
             {
-                Send = new ClientRpcSendParams
+                // Appliquer les dégâts côté serveur
+                targetCharacter.LifeManager.TakeDamage(damage);
+
+                // Envoi d’un feedback côté client touché
+                ulong targetClientId = netObj.OwnerClientId;
+
+                ClientRpcParams clientRpcParams = new ClientRpcParams
                 {
-                    TargetClientIds = new ulong[] { targetClientId }
-                }
-            };
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new ulong[] { targetClientId }
+                    }
+                };
 
-            OnHitClientRpc(damage, clientRpcParams);
-
-
+                OnHitClientRpc(damage, clientRpcParams);
+            }
+            else
+            {
+                Debug.LogWarning("Target has no S_PlayerCharacter or LifeManager!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Invalid NetworkObjectReference in OnHitServerRpc.");
         }
     }
 
     [ClientRpc]
     public void OnHitClientRpc(float damage, ClientRpcParams clientRpcParams = default)
     {
-        lifeManager.TakeDamage(damage);
-
-        Debug.Log($"You took {damage} damage!");
+        // On est sûr que ce RPC ne s’exécute que pour le client visé
+        if (NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject() is NetworkObject localPlayer)
+        {
+            var character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
+            if (character != null && character.LifeManager != null)
+            {
+                character.LifeManager.TakeDamage(damage);
+                Debug.Log($"You took {damage} damage!");
+            }
+            else
+            {
+                Debug.LogWarning("No S_PlayerCharacter or LifeManager on local player.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Local player not found.");
+        }
     }
+
+
+
+
 
     public void Reload()
     {
