@@ -31,6 +31,8 @@ public class S_WeaponSlot : MonoBehaviour
         if (!interact.transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
             return;
 
+        DebugAllNetworkClients();
+
         S_PlayerInputsReciever.OnShoot += Shoot;
         _camera = Camera.main;
 
@@ -133,7 +135,7 @@ public class S_WeaponSlot : MonoBehaviour
 
         _lastShotTime = Time.time;
 
-        Vector3 rayOrigin = _camera.ViewportToWorldPoint(new Vector2(0.5f, 0.5f));
+        Vector3 rayOrigin = _camera.transform.position + _camera.transform.forward * 0.2f;
 
         float xAngle = S_Utils.RandomFloat(-_angleSpread, _angleSpread);
         float yAngle = S_Utils.RandomFloat(-_angleSpread, _angleSpread);
@@ -144,15 +146,12 @@ public class S_WeaponSlot : MonoBehaviour
 
         if (Physics.Raycast(rayOrigin, raycastDirection, out RaycastHit hit))
         {
-            Debug.Log("HIT " + hit.transform.name);
-
             if (hit.transform.TryGetComponent(out S_PlayerCharacter target))
             {
-                // RÈcupÈration du NetworkObject du parent (PB_Player)
                 var playerRoot = target.GetComponentInParent<NetworkObject>();
                 if (playerRoot != null)
                 {
-                    OnHitServerRpc(playerRoot, damage);
+                    OnHitServerRpc(playerRoot.NetworkObjectId, damage);
                 }
                 else
                 {
@@ -165,31 +164,30 @@ public class S_WeaponSlot : MonoBehaviour
     }
 
     [ServerRpc]
-    public void OnHitServerRpc(NetworkObjectReference targetRef, float damage)
+    public void OnHitServerRpc(ulong targetNetworkId, float damage)
     {
-        Debug.Log("OnHitServerRpc");
+        DebugAllNetworkClients();
 
-        if (targetRef.TryGet(out var netObj))
+        // R√©cup√©rer le NetworkObject du joueur cible via SpawnManager
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkId, out NetworkObject targetNetObj))
         {
-            // On cherche le S_PlayerCharacter dans les enfants
-            var targetCharacter = netObj.GetComponentInChildren<S_PlayerCharacter>();
+            var targetCharacter = targetNetObj.GetComponentInChildren<S_PlayerCharacter>();
             if (targetCharacter != null && targetCharacter.LifeManager != null)
             {
-                // Appliquer les dÈg‚ts cÙtÈ serveur
-                targetCharacter.LifeManager.TakeDamage(damage);
+                // Envoi du feedback c√¥t√© client touch√©
+                ulong targetClientId = targetNetObj.OwnerClientId;
 
-                // Envoi díun feedback cÙtÈ client touchÈ
-                ulong targetClientId = netObj.OwnerClientId;
+                //ClientRpcParams clientRpcParams = new ClientRpcParams
+                //{
+                //    Send = new ClientRpcSendParams
+                //    {
+                //        TargetClientIds = new ulong[] { targetClientId }
+                //    }
+                //};
 
-                ClientRpcParams clientRpcParams = new ClientRpcParams
-                {
-                    Send = new ClientRpcSendParams
-                    {
-                        TargetClientIds = new ulong[] { targetClientId }
-                    }
-                };
-
-                OnHitClientRpc(damage, clientRpcParams);
+                // Appel de la fonction ClientRpc pour appliquer les d√©g√¢ts
+                Debug.Log($"Sent damage to {targetClientId}");
+                OnHitClientRpc(damage, targetClientId);
             }
             else
             {
@@ -198,35 +196,29 @@ public class S_WeaponSlot : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Invalid NetworkObjectReference in OnHitServerRpc.");
+            Debug.LogWarning("Invalid target network object.");
         }
     }
 
+
+    // ClientRpc pour appliquer les d√©g√¢ts sur le client concern√©
     [ClientRpc]
-    public void OnHitClientRpc(float damage, ClientRpcParams clientRpcParams = default)
+    public void OnHitClientRpc(float damage, ulong targetClientId)
     {
-        // On est s˚r que ce RPC ne síexÈcute que pour le client visÈ
-        if (NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject() is NetworkObject localPlayer)
+        print("OnHitClientRpc" + targetClientId);
+        // Si ce n'est pas le client touch√©, on ne fait rien
+        if (NetworkManager.Singleton.LocalClientId != targetClientId)
+            return;
+
+        // Appliquer les d√©g√¢ts sur le joueur local
+        var localPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+        var character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
+        if (character != null && character.LifeManager != null)
         {
-            var character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
-            if (character != null && character.LifeManager != null)
-            {
-                character.LifeManager.TakeDamage(damage);
-                Debug.Log($"You took {damage} damage!");
-            }
-            else
-            {
-                Debug.LogWarning("No S_PlayerCharacter or LifeManager on local player.");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Local player not found.");
+            character.LifeManager.TakeDamage(damage);
+            Debug.Log($"You took {damage} damage!");
         }
     }
-
-
-
 
 
     public void Reload()
@@ -255,4 +247,23 @@ public class S_WeaponSlot : MonoBehaviour
             yield return null;
         }
     }
+
+    private void DebugAllNetworkClients()
+    {
+        // V√©rifie si on est bien sur le serveur
+        if (NetworkManager.Singleton.IsServer)
+        {
+            // Parcourir tous les clients connect√©s
+            foreach (var client in NetworkManager.Singleton.ConnectedClients)
+            {
+                // Afficher l'ID du client et le NetworkClient
+                Debug.Log($"Client Id: {client.Key}, NetworkClient: {client.Value}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("DebugAllNetworkClients() doit √™tre ex√©cut√©e sur le serveur.");
+        }
+    }
+
 }
