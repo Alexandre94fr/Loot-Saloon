@@ -2442,7 +2442,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6c96990431477b4681408e31133fb24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: Dev
+  gameSceneName: Map
   _inGame: 0
 --- !u!114 &1579779106
 MonoBehaviour:
