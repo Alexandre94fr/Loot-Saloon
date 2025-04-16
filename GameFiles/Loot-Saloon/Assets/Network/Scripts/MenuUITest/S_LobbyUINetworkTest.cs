@@ -48,9 +48,8 @@ public class S_LobbyUINetworkTest : MonoBehaviour
 
     private async void OnStartButtonClicked()
     {
-
+        startGameButton.interactable = false;
         PlayerPrefs.SetInt("NbrOfPlayer", S_GameLobbyManager.instance.LobbyPlayerDatas.Count);
-
         if (S_GameLobbyManager.instance == null)
         {
             Debug.LogError("S_GameLobbyManager.instance is null !");
@@ -59,7 +58,6 @@ public class S_LobbyUINetworkTest : MonoBehaviour
 
         await S_GameLobbyManager.instance.StartGame();
         
-        startGameButton.interactable = false;
     }
 
     private void OnLobbyReady()
