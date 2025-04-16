@@ -15,7 +15,7 @@ public abstract class S_Pickable : S_Interactable
     private bool _isPickUp = false;
     [Range(0f, 20f)] public float weight = 0f;
 
-    private List<Collider> _ignoredColliders = new();
+    protected List<Collider> _ignoredColliders = new();
 
     public bool throwable = true;
 
@@ -68,7 +68,7 @@ public abstract class S_Pickable : S_Interactable
         PickUp(p_playerInteract, p_parent);
     }
 
-    private void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
+    protected virtual void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         if (!interactable)
             return;
