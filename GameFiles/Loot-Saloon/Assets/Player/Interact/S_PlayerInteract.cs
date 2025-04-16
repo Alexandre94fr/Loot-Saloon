@@ -13,18 +13,15 @@ public class S_PlayerInteract : NetworkBehaviour
 
     private Transform _transform;
     [SerializeField] private Transform _cameraTransform;
-    public Transform _armTransform;
+    [SerializeField] Transform _rightArmTransform;
     private S_Pickable _pickableHeld = null;
     private S_Interactable _currentInteraction = null;
-    public Transform _armTransform;
-
 
     public S_PlayerAttributes attributes { get; private set; }
 
     public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
-    [SerializeField] private UnityEvent<S_Pickable> _onPickUp = new();
+    public UnityEvent<S_Pickable> OnPickUp = new();
 
-    public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
     [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
     public List<Collider> pickableIgnoresColliders = new();
 
@@ -44,6 +41,10 @@ public class S_PlayerInteract : NetworkBehaviour
 
     private void Start()
     {
+        if (!S_VariablesChecker.AreVariablesCorrectlySetted(name, null,
+            (_rightArmTransform, nameof(_rightArmTransform))
+        )) return;
+
         if (GetComponentInParent<NetworkObject>().IsOwner)
         {
             S_PlayerInputsReciever.OnInteract += Interact;
@@ -106,7 +107,7 @@ public class S_PlayerInteract : NetworkBehaviour
             interactParent = pickable.parentIsPlayerInteract ? _transform : _cameraTransform;
 
             if (pickable is S_Weapon)
-                interactParent = pickable.parentIsPlayerInteract ? _transform : _armTransform;
+                interactParent = pickable.parentIsPlayerInteract ? _transform : _rightArmTransform;
         }
 
         p_interactable.Interact(this, interactParent);

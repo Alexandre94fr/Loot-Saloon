@@ -44,12 +44,16 @@ public class S_PlayersSpawner : NetworkBehaviour
         float startX = p_origin.position.x - totalWidth / 2f;
         int nbPlayer;
         float fixedZ = 0;
+
+        S_PlayerController playerController = p_player.GetComponentInChildren<S_PlayerController>();
+
         if (_playerTeam == E_PlayerTeam.BLUE)
         {
             _bluePlayer++;
             nbPlayer = _bluePlayer;
             fixedZ = _blueTeam.position.z;
             p_player.GetComponentInChildren<MeshRenderer>().material = _blueTeamMaterial;
+            playerController.respawnPoint = _blueTeam;
         }
         else
         {
@@ -57,12 +61,12 @@ public class S_PlayersSpawner : NetworkBehaviour
             nbPlayer = _redPlayer;
             fixedZ = _redTeam.position.z;
             p_player.GetComponentInChildren<MeshRenderer>().material = _redTeamMaterial;
+            playerController.respawnPoint = _redTeam;
         }
+
         Vector3 pos = new Vector3(startX + nbPlayer * _spawnDistance, p_origin.position.y, fixedZ);
         
         StartCoroutine(TPPlayer(p_player, pos));
-        
-
     }
 
     IEnumerator TPPlayer(GameObject p_player, Vector3 pos)
