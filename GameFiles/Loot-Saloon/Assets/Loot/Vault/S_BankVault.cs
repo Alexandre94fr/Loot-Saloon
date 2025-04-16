@@ -48,6 +48,15 @@ public class S_BankVault : S_Interactable
     public void SetVaultInstantiator(in S_VaultInstantiator p_vaultInstantiator) { _vaultInstantiator = p_vaultInstantiator; }
     #endregion
 
+    [ClientRpc]
+    public void UpadteVaultClientRpc(int value)
+    {
+        if (IsServer) return;
+
+        _moneyValue = value;
+        _vaultInstantiator.UpdateQuota(this);
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();

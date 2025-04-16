@@ -37,7 +37,7 @@ public class S_VaultInstantiator : NetworkBehaviour
             var vault = vaultObject.GetComponent<S_BankVault>();
             if (vault != null)
             {
-                // Récupérer _lootInstantiator via son ID réseau
+                // Rï¿½cupï¿½rer _lootInstantiator via son ID rï¿½seau
                 if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(lootInstantiatorNetworkId, out var lootInstantiatorObject))
                 {
                     S_LootInstantiator lootInstantiator = lootInstantiatorObject.GetComponent<S_LootInstantiator>();
@@ -60,6 +60,7 @@ public class S_VaultInstantiator : NetworkBehaviour
             vault.SetVaultInstantiator(this);
 
             vault.GenerateLoots();
+            vault.UpadteVaultClientRpc(vault.GetMoneyValue());            
 
             ulong vaultNetworkId = vault.GetComponent<NetworkObject>().NetworkObjectId;
             ulong vaultInstantiatorNetworkId = this.GetComponent<NetworkObject>().NetworkObjectId;

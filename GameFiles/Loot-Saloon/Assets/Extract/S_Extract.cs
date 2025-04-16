@@ -57,18 +57,24 @@ public class S_Extract : MonoBehaviour
     {
         if (other.gameObject.layer == 6)
         {
-            if (!_cartInExtract && other.TryGetComponent(out S_Cart cart))
+            if (!_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
+                print("quota: " + quotaComponent.quota);
                 MoneyRequiredText.text = string.Format(_quotaText, cart.total);
-                if (quotaComponent.quota - cart.total <= 0)
+                if (quotaComponent.quota <= cart.total)
                 {
+                    print("cart in extract");
                     _totalEntityInExract++;
                     _cartInExtract = true;
                 }
             }
         }
+
         else if (other.gameObject.CompareTag("Player"))
+        {
             _totalEntityInExract++;
+            print("player in extract");
+        }
 
         if (_totalEntityInExract >= 2 && _cartInExtract)
         {
@@ -80,7 +86,7 @@ public class S_Extract : MonoBehaviour
     {
         if (other.gameObject.layer == 6)
         {
-            if (_cartInExtract && other.TryGetComponent(out S_Cart cart))
+            if (_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
                 _cartInExtract = false;
                 _totalEntityInExract--;
