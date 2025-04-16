@@ -37,11 +37,11 @@ public class S_VaultInstantiator : NetworkBehaviour
             var vault = vaultObject.GetComponent<S_BankVault>();
             if (vault != null)
             {
-                // Récupérer lootInstantiator via son ID réseau
+                // Récupérer _lootInstantiator via son ID réseau
                 if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(lootInstantiatorNetworkId, out var lootInstantiatorObject))
                 {
-                    var lootInstantiator = lootInstantiatorObject.GetComponent<S_LootInstantiator>();
-                    vault.lootInstantiator = lootInstantiator;
+                    S_LootInstantiator lootInstantiator = lootInstantiatorObject.GetComponent<S_LootInstantiator>();
+                    vault.SetLootInstantiator(lootInstantiator);
                 }
             }
         }
@@ -55,8 +55,9 @@ public class S_VaultInstantiator : NetworkBehaviour
         {
             S_BankVault vault = Instantiate(pb_vault, t).GetComponent<S_BankVault>();
             Debug.Log(vault.name + " : Set loot Instanciator with : " + this.name);
-            vault.lootInstantiator = _lootInstantiatorInstance;
-            vault.vaultInstantiator = this;
+
+            vault.SetLootInstantiator(_lootInstantiatorInstance);
+            vault.SetVaultInstantiator(this);
 
             vault.GenerateLoots();
 

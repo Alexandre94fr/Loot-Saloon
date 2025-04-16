@@ -1,12 +1,13 @@
 #region
-using System.Collections.Generic;
-using Unity.Netcode;
-using UnityEngine;
-using UnityEngine.Events;
+ using System.Collections.Generic;
+ using System.Linq;
+ using Unity.Netcode;
+ using UnityEngine;
+ using UnityEngine.Events;
 #endregion
 
 [RequireComponent(typeof(SphereCollider))]
-public class S_PlayerInteract : MonoBehaviour
+public class S_PlayerInteract : NetworkBehaviour
 {
     // [SerializeField] private GameObject _interactPanel;
 
@@ -15,17 +16,19 @@ public class S_PlayerInteract : MonoBehaviour
     public Transform _armTransform;
     private S_Pickable _pickableHeld = null;
     private S_Interactable _currentInteraction = null;
+    public Transform _armTransform;
 
 
-    public S_PlayerAttributes attributes {get; private set;}
+    public S_PlayerAttributes attributes { get; private set; }
 
-    public UnityEvent<S_Pickable> OnPickUp = new();
+    public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
+    [SerializeField] private UnityEvent<S_Pickable> _onPickUp = new();
 
     public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
     [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
     public List<Collider> pickableIgnoresColliders = new();
 
-    [SerializeField] [Range(0, 20)] private float _throwForce = 10;
+    [SerializeField][Range(0, 20)] private float _throwForce = 10;
     [SerializeField] private float _throwAngle = 0f;
 
     public LayerMask objectLayer;
@@ -35,25 +38,26 @@ public class S_PlayerInteract : MonoBehaviour
     private void Awake()
     {
         _transform = transform;
-        _cameraTransform = Camera.main.transform;
+        _cameraTransform = GetComponentInParent<NetworkObject>().GetComponentInChildren<Camera>().transform;
         attributes = transform.parent.GetComponentInChildren<S_PlayerAttributes>();
     }
 
     private void Start()
     {
-        if (!transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
-            return;
-        
-
-        S_PlayerInputsReciever.OnInteract += Interact;
-        S_PlayerInputsReciever.OnStopInteract += StopInteract;
-        S_PlayerInputsReciever.OnThrow += Throw;
-        S_LifeManager.OnDie += PutDownPickable;
+        if (GetComponentInParent<NetworkObject>().IsOwner)
+        {
+            S_PlayerInputsReciever.OnInteract += Interact;
+            S_PlayerInputsReciever.OnStopInteract += StopInteract;
+            S_PlayerInputsReciever.OnThrow += Throw;
+            S_LifeManager.OnDie += PutDownPickable;
+        }
     }
+    
     private void StopInteract()
     {
         if (_currentInteraction == null)
             return;
+            
         _currentInteraction.StopInteract(this);
         _currentInteraction = null;
     }
@@ -92,7 +96,7 @@ public class S_PlayerInteract : MonoBehaviour
 
         Transform interactParent = _transform;
         _currentInteraction = p_interactable;
-        Debug.Log($"{p_interactable} interactable");
+        
         if (p_interactable is S_Pickable pickable)
         {
             if (_pickableHeld != null)
@@ -132,8 +136,11 @@ public class S_PlayerInteract : MonoBehaviour
 
     private void PutDownPickable()
     {
-        if (_pickableHeld == null) return;
-        if (_pickableHeld is S_Weapon) return;
+        if (_pickableHeld == null)
+            return;
+
+        if (_pickableHeld is S_Weapon)
+            return;
 
         _pickableHeld.PutDown();
         _pickableHeld = null;
@@ -186,14 +193,54 @@ public class S_PlayerInteract : MonoBehaviour
         if (_pickableHeld == null || !_pickableHeld.throwable)
             return;
 
-        S_Pickable pickable = _pickableHeld;
-        PutDownPickable();
-
         Vector3 throwDirection = _cameraTransform.forward.normalized;
-
         throwDirection = Quaternion.AngleAxis(_throwAngle, _cameraTransform.right) * throwDirection;
 
-        Rigidbody rb = pickable.GetComponent<Rigidbody>();
-        rb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
+        ulong objectId = _pickableHeld.NetworkObjectId;
+
+        if (_pickableHeld.TryGetComponent(out Rigidbody clientRb))
+        {
+            clientRb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
+        }
+
+        PutDownPickable();
+
+        ApplyImpulseServerRpc(objectId, throwDirection);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ApplyImpulseServerRpc(ulong p_objectId, Vector3 p_throwDirection)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_objectId, out NetworkObject networkObject))
+        {
+            if (networkObject.TryGetComponent(out Rigidbody rb))
+            {
+                if (networkObject.TryGetComponent(out S_Pickable pickable))
+                {
+                    pickable.PutDown();
+                }
+
+                rb.AddForce(p_throwDirection * _throwForce, ForceMode.Impulse);
+                ThrowObjectClientRpc(p_objectId, p_throwDirection);
+            }
+            else
+            {
+                Debug.LogWarning($"Object with ID {p_objectId} does not have a Rigidbody component.");
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void ThrowObjectClientRpc(ulong p_objectId, Vector3 p_throwDirection)
+    {
+        if (NetworkManager.Singleton.IsServer || GetComponentInParent<NetworkObject>().IsOwner) return;
+
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_objectId, out NetworkObject networkObject))
+        {
+            if (networkObject.TryGetComponent(out Rigidbody rb))
+            {
+                rb.AddForce(p_throwDirection * _throwForce, ForceMode.Impulse);
+            }
+        }
     }
 }
