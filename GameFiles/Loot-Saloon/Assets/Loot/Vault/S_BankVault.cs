@@ -8,6 +8,7 @@ using UnityEngine;
 public class S_BankVault : S_Interactable
 {
     public S_LootInstantiator lootInstantiator;
+    public S_VaultInstantiator vaultInstantiator;
     public Transform[] spawnPoints;
     public int moneyValue;
 
@@ -36,11 +37,12 @@ public class S_BankVault : S_Interactable
     }
 
     [ClientRpc]
-    public void SetLootInstantiatorClientRpc(ulong lootInstantiatorNetworkId)
+    public void SetInstantiatorsClientRpc(ulong vaultInstantiatorNetworkId)
     {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(lootInstantiatorNetworkId, out var lootInstantiatorObject))
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(vaultInstantiatorNetworkId, out var vaultInstantiatorObject))
         {
-            lootInstantiator = lootInstantiatorObject.GetComponent<S_LootInstantiator>();
+            vaultInstantiator = vaultInstantiatorObject.GetComponent<S_VaultInstantiator>();
+            lootInstantiator = vaultInstantiator.LootInstanciator;
         }
     }
 
@@ -53,7 +55,7 @@ public class S_BankVault : S_Interactable
             moneyValue += lootInstantiator.GetLootPrice(lootIndex);
         }
 
-        lootInstantiator.UpdateQuota(this);
+        vaultInstantiator.UpdateQuota(this);
     }
 
     [ServerRpc(RequireOwnership = false)]
