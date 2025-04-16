@@ -2,7 +2,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public class S_WeaponSlot : MonoBehaviour
+public class S_WeaponSlot : NetworkBehaviour
 {
     Camera _camera;
 
@@ -24,14 +24,11 @@ public class S_WeaponSlot : MonoBehaviour
 
     [SerializeField][Range(1f, 10f)] protected float _angleSpread = 5;
 
-    public S_LifeManager lifeManager;
 
     private void Start()
     {
         if (!interact.transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
             return;
-
-        DebugAllNetworkClients();
 
         S_PlayerInputsReciever.OnShoot += Shoot;
         _camera = Camera.main;
@@ -48,6 +45,9 @@ public class S_WeaponSlot : MonoBehaviour
     public void SetWeaponSlot(Transform parent, S_Weapon newWeapon)
     {
         if (newWeapon == null)
+            return;
+
+        if (newWeapon.isHeld)
             return;
 
         NetworkObject weaponNetworkObject = newWeapon.GetComponent<NetworkObject>();
@@ -70,12 +70,8 @@ public class S_WeaponSlot : MonoBehaviour
         cooldown = properties.cooldown;
 
         EnableWeapon(newWeapon.gameObject);
-    }
 
-    [ServerRpc]
-    public void ServerSpawnRpc(NetworkObject obj)
-    {
-        obj.Spawn(true);
+        newWeapon.isHeld = true;
     }
 
     public void OnGenericPickUp(S_Pickable pickable)
@@ -166,32 +162,19 @@ public class S_WeaponSlot : MonoBehaviour
     [ServerRpc]
     public void OnHitServerRpc(ulong targetNetworkId, float damage)
     {
-        DebugAllNetworkClients();
-
-        // Récupérer le NetworkObject du joueur cible via SpawnManager
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkId, out NetworkObject targetNetObj))
         {
             var targetCharacter = targetNetObj.GetComponentInChildren<S_PlayerCharacter>();
-            if (targetCharacter != null && targetCharacter.LifeManager != null)
+            if (targetCharacter != null && targetCharacter.lifeManager != null)
             {
-                // Envoi du feedback côté client touché
                 ulong targetClientId = targetNetObj.OwnerClientId;
 
-                //ClientRpcParams clientRpcParams = new ClientRpcParams
-                //{
-                //    Send = new ClientRpcSendParams
-                //    {
-                //        TargetClientIds = new ulong[] { targetClientId }
-                //    }
-                //};
 
-                // Appel de la fonction ClientRpc pour appliquer les dégâts
-                Debug.Log($"Sent damage to {targetClientId}");
                 OnHitClientRpc(damage, targetClientId);
             }
             else
             {
-                Debug.LogWarning("Target has no S_PlayerCharacter or LifeManager!");
+                Debug.LogWarning("Target has no S_PlayerCharacter or LifeManager! " + targetNetObj.name);
             }
         }
         else
@@ -201,21 +184,18 @@ public class S_WeaponSlot : MonoBehaviour
     }
 
 
-    // ClientRpc pour appliquer les dégâts sur le client concerné
     [ClientRpc]
     public void OnHitClientRpc(float damage, ulong targetClientId)
     {
         print("OnHitClientRpc" + targetClientId);
-        // Si ce n'est pas le client touché, on ne fait rien
         if (NetworkManager.Singleton.LocalClientId != targetClientId)
             return;
 
-        // Appliquer les dégâts sur le joueur local
         var localPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
         var character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
-        if (character != null && character.LifeManager != null)
+        if (character != null && character.lifeManager != null)
         {
-            character.LifeManager.TakeDamage(damage);
+            character.lifeManager.TakeDamage(damage);
             Debug.Log($"You took {damage} damage!");
         }
     }
@@ -245,24 +225,6 @@ public class S_WeaponSlot : MonoBehaviour
             Debug.DrawLine(origin, end);
             t += Time.deltaTime;
             yield return null;
-        }
-    }
-
-    private void DebugAllNetworkClients()
-    {
-        // Vérifie si on est bien sur le serveur
-        if (NetworkManager.Singleton.IsServer)
-        {
-            // Parcourir tous les clients connectés
-            foreach (var client in NetworkManager.Singleton.ConnectedClients)
-            {
-                // Afficher l'ID du client et le NetworkClient
-                Debug.Log($"Client Id: {client.Key}, NetworkClient: {client.Value}");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("DebugAllNetworkClients() doit être exécutée sur le serveur.");
         }
     }
 

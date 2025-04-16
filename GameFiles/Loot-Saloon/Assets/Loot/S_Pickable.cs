@@ -2,10 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
 #endregion
-using Unity.Netcode;
 
 public abstract class S_Pickable : S_Interactable
 {
@@ -43,10 +41,7 @@ public abstract class S_Pickable : S_Interactable
     {
         if (IsEasyToPickUp(p_playerInteract))
         {
-            RequestPickupServerRpc(
-                p_playerInteract.transform.parent.parent.GetComponent<NetworkObject>().OwnerClientId,
-                p_playerInteract.transform.parent.parent.GetComponent<NetworkObject>().NetworkObjectId
-            );
+            PickUp(p_playerInteract, p_parent);
             return;
         }
 
@@ -69,56 +64,16 @@ public abstract class S_Pickable : S_Interactable
             yield return null;
         }
 
-        RequestPickupServerRpc(
-            p_playerInteract.transform.parent.parent.GetComponent<NetworkObject>().OwnerClientId,
-            p_playerInteract.transform.parent.parent.GetComponent<NetworkObject>().NetworkObjectId
-        );
+        PickUp(p_playerInteract, p_parent);
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void RequestPickupServerRpc(ulong clientId, ulong playerNetworkObjectId)
+    private void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
-        // Vérifie si l'objet est bien spawné
-        var netObj = GetComponent<NetworkObject>();
-        if (netObj != null && netObj.IsSpawned)
-        {
-            // Change ownership depuis le serveur
-            netObj.ChangeOwnership(clientId);
-        }
-
-        // Notifie tous les autres clients de suivre visuellement
-        FollowHandClientRpc(clientId, playerNetworkObjectId);
-    }
-
-    [ClientRpc]
-    private void FollowHandClientRpc(ulong targetClientId, ulong playerNetworkObjectId)
-    {
-        if (NetworkManager.Singleton.LocalClientId != targetClientId)
+        if (!interactable)
             return;
 
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(playerNetworkObjectId, out NetworkObject playerNetObj))
-        {
-            // Change ce chemin si ton WeaponSlot est ailleurs
-            //Transform handTransform = playerNetObj.transform.Find("Hand/WeaponSlot");
-            Transform handTransform = Camera.main.transform.Find("Arms/Cube (1)");
-
-            if (handTransform != null)
-            {
-                LocalPickUp(handTransform);
-            }
-            else
-            {
-                Debug.LogWarning("WeaponSlot non trouvé dans le joueur !");
-            }
-        }
-    }
-
-    private void LocalPickUp(Transform p_parent)
-    {
         interactable = false;
-        _body.isKinematic = true;
 
-        if (!(this is S_Weapon))
         Transform handTransform = p_parent;
         _transform.localPosition = _onPickUpOffset;
 
@@ -127,10 +82,10 @@ public abstract class S_Pickable : S_Interactable
 
         foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
         {
-            _transform.localPosition = _onPickUpOffset;
+            foreach (Collider collider in _colliders)
+                Physics.IgnoreCollision(colliderToIgnore, collider, true);
+            _ignoredColliders.Add(colliderToIgnore);
         }
-
-        StartCoroutine(FollowHandCoroutine(p_parent));
     }
 
     private IEnumerator FollowHandCoroutine(Transform p_handTransform)
@@ -161,7 +116,7 @@ public abstract class S_Pickable : S_Interactable
     [ClientRpc]
     private void UpdateTransformClientRpc(Vector3 position, Quaternion rotation)
     {
-        if (NetworkManager.Singleton.IsServer) 
+        if (NetworkManager.Singleton.IsServer)
             return;
 
         if (TryGetComponent(out Rigidbody rb))
@@ -188,7 +143,6 @@ public abstract class S_Pickable : S_Interactable
     public virtual void PutDown()
     {
         interactable = true;
-        _body.isKinematic = false;
 
         foreach (Collider colliderToIgnore in _ignoredColliders)
         {
