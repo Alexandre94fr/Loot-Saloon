@@ -1,4 +1,5 @@
 #region
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,16 +10,24 @@ public class S_Cart : S_Pickable
 {
     public int total { get; private set; } = 0;
 
-    [SerializeField] private List<S_PlayerInteract> players;
+    public E_PlayerTeam team;
+    public static event Action<E_PlayerTeam, int> GetCartValue;
+
     private HashSet<S_Loot> _inCart = new();
 
     [SerializeField] private GameObject slot;
     [SerializeField] private UnityEvent OnLootAdded = new();
     [SerializeField] private UnityEvent OnLootRemoved = new();
 
-    public bool KnowPlayer(S_PlayerInteract player)
+    protected override void Awake()
     {
-        return players.Contains(player);
+        base.Awake();
+        S_Extract.OnExtract += EndGameEvent;
+    }
+
+    private void EndGameEvent(E_PlayerTeam winner)
+    {
+        GetCartValue?.Invoke(team, total);
     }
 
     private void OnTriggerEnter(Collider p_collider)

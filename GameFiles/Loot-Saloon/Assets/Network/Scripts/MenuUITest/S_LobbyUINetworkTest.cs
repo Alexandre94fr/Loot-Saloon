@@ -1,7 +1,10 @@
 #region
-
+using System;
 using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 #endregion
 
@@ -10,8 +13,10 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     public Text lobbyIdText;
     public Button startGameButton;
     public Button readyButton;
-    public Button GoRedTeamButton;
-    public Button GoBlueTeamButton;
+    public Button leaveButton;
+
+    public Button goRedTeamButton;
+    public Button goBlueTeamButton;
 
     private void OnEnable()
     {
@@ -26,9 +31,10 @@ public class S_LobbyUINetworkTest : MonoBehaviour
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
 
+            leaveButton.onClick.AddListener(HandleHostDisconnection);
             readyButton.onClick.AddListener(OnReadyPressed);
-            GoRedTeamButton.onClick.AddListener(OnRedBtnPressed);
-            GoBlueTeamButton.onClick.AddListener(OnBlueBtnPressed);
+            goRedTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.RED));
+            goBlueTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.BLUE));
         }
     }
 
@@ -42,12 +48,19 @@ public class S_LobbyUINetworkTest : MonoBehaviour
 
     private async void OnStartButtonClicked()
     {
+        startGameButton.interactable = false;
+        PlayerPrefs.SetInt("NbrOfPlayer", S_GameLobbyManager.instance.LobbyPlayerDatas.Count);
+        if (S_GameLobbyManager.instance == null)
+            return;
+
         await S_GameLobbyManager.instance.StartGame();
+        
     }
 
-    private void OnLobbyReady()
+    private async void OnLobbyReady()
     {
-        startGameButton.gameObject.SetActive(true);
+        if(await S_GameLobbyManager.instance.SameNbPlayerInEachTeam())
+            startGameButton.gameObject.SetActive(true);
     }
 
     private void OnLobbyUnready()
@@ -57,20 +70,58 @@ public class S_LobbyUINetworkTest : MonoBehaviour
 
     private async void OnReadyPressed()
     {
-        if (await S_GameLobbyManager.instance.GetPlayerTeam() != E_PlayerTeam.NONE)
+        if (await S_GameLobbyManager.instance.GetPlayerTeamAsync() != E_PlayerTeam.NONE)
         {
             var succeeded = await S_GameLobbyManager.instance.SetPlayerReady();
             if (succeeded) readyButton.interactable = false;
         }
     }
-    
-    private async void OnBlueBtnPressed()
+
+    private async void OnTeamBtnPressed(E_PlayerTeam p_choosedTeam)
     {
-        var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.BLUE);
+        readyButton.gameObject.SetActive(true);
+
+        // Mise à jour des boutons d'équipe
+        if (p_choosedTeam == E_PlayerTeam.RED)
+        {
+            goBlueTeamButton.interactable = true;
+            goRedTeamButton.interactable = false;
+        }
+        else if (p_choosedTeam == E_PlayerTeam.BLUE)
+        {
+            goRedTeamButton.interactable = true;
+            goBlueTeamButton.interactable = false;
+        }
+
+        if (await S_GameLobbyManager.instance.GetPlayerTeamAsync() != E_PlayerTeam.NONE)
+        {
+            var succeededUnready = await S_GameLobbyManager.instance.SetPlayerUnready();
+            if (succeededUnready)
+            {
+                readyButton.interactable = true;
+                startGameButton.gameObject.SetActive(false);
+            }
+        }
+
+        var succeededTeamChange = await S_GameLobbyManager.instance.SetPlayerTeam(p_choosedTeam);
+
+        S_LobbyEvents.OnLobbyUnready?.Invoke();
     }
-    
-    private async void OnRedBtnPressed()
+
+    private async void HandleHostDisconnection()
     {
-        var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(E_PlayerTeam.RED);
+        try
+        {
+            await S_LobbyManager.instance.LeaveLobbyAsync();
+            Debug.Log("Player has left the lobby.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error while leaving the lobby: {ex.Message}");
+        }
+        finally
+        {
+            await SceneManager.LoadSceneAsync("MainMenu");
+        }
     }
 }

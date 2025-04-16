@@ -12,7 +12,8 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
     public string sceneToLoad;
     public InputField codeInputField;
 
-    [Header("Show Lobbies Panel")] public GameObject showLobbiesPanel;
+    [Header("Show Lobbies Panel")]
+    public GameObject showLobbiesPanel;
     public RectTransform content;
     public GameObject lobbyButtonPrefab;
 

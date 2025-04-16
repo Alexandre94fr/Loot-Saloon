@@ -13,19 +13,20 @@ public class S_LifeManager : MonoBehaviour
         _playerAttributes = GetComponent<S_PlayerAttributes>();
     }
 
-    public void TakeDamage(float damageToTake)
+    public void TakeDamage(float p_damageToTake)
     {
         TakeDamageEvent?.Invoke();
-        _playerAttributes.Life -= damageToTake;
-        print("test");
+
+        _playerAttributes.life -= p_damageToTake;
+
         CheckDie();
     }
 
     private void CheckDie()
     {
-        if (_playerAttributes.Life <= 0)
+        if (_playerAttributes.life <= 0)
         {
-            _playerAttributes.Life = 0;
+            _playerAttributes.life = 0;
             OnDie?.Invoke();
         }
     }

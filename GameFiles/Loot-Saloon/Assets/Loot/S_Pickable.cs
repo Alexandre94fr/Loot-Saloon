@@ -1,6 +1,8 @@
 #region
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 #endregion
 using Unity.Netcode;
@@ -16,6 +18,9 @@ public abstract class S_Pickable : S_Interactable
 
     private List<Collider> _ignoredColliders = new();
 
+    public bool throwable = true;
+
+
     public S_Cart cart { get; private set; }
 
     public void SetCart(S_Cart p_cart)
@@ -25,7 +30,7 @@ public abstract class S_Pickable : S_Interactable
 
     public bool IsEasyToPickUp(S_PlayerInteract p_player)
     {
-        return cart == null || cart.KnowPlayer(p_player);
+        return cart == null || cart.team == p_player.attributes.team;
     }
 
     public override void StopInteract(S_PlayerInteract p_playerInteract)
@@ -58,7 +63,8 @@ public abstract class S_Pickable : S_Interactable
             if (!_isPickUp)
                 yield break;
 
-            S_CircleLoad.OnCircleChange(timer / _pickUpTime);
+            S_CircleLoad.OnCircleChange?.Invoke(timer / _pickUpTime);
+
             timer += Time.deltaTime;
             yield return null;
         }
@@ -113,6 +119,13 @@ public abstract class S_Pickable : S_Interactable
         _body.isKinematic = true;
 
         if (!(this is S_Weapon))
+        Transform handTransform = p_parent;
+        _transform.localPosition = _onPickUpOffset;
+
+
+        StartCoroutine(FollowHandCoroutine(handTransform));
+
+        foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
         {
             _transform.localPosition = _onPickUpOffset;
         }
@@ -124,10 +137,52 @@ public abstract class S_Pickable : S_Interactable
     {
         while (!interactable)
         {
-            transform.position = p_handTransform.position + p_handTransform.TransformDirection(_onPickUpOffset);
-            transform.rotation = p_handTransform.rotation;
+            Vector3 targetPosition = p_handTransform.position + p_handTransform.TransformDirection(_onPickUpOffset);
+            Quaternion targetRotation = p_handTransform.rotation;
+
+            // Update position and rotation locally
+            transform.position = targetPosition;
+            transform.rotation = targetRotation;
+
+            // Call the ClientRpc to update clients
+            if (IsServer)
+            {
+                UpdateTransformClientRpc(targetPosition, targetRotation);
+            }
+            else
+            {
+                UpdateTransformServerRpc(targetPosition, targetRotation);
+            }
+
             yield return null;
         }
+    }
+
+    [ClientRpc]
+    private void UpdateTransformClientRpc(Vector3 position, Quaternion rotation)
+    {
+        if (NetworkManager.Singleton.IsServer) 
+            return;
+
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = false;
+        }
+
+        transform.position = position;
+        transform.rotation = rotation;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdateTransformServerRpc(Vector3 position, Quaternion rotation)
+    {
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = false;
+        }
+        // Update the transform on the server
+        transform.position = position;
+        transform.rotation = rotation;
     }
 
     public virtual void PutDown()
@@ -142,5 +197,28 @@ public abstract class S_Pickable : S_Interactable
         }
 
         _ignoredColliders.Clear();
+
+        ActivateRigidbodyServerRpc();
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ActivateRigidbodyServerRpc()
+    {
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = true;
+        }
+
+        ActivateRigidbodyClientRpc();
+    }
+
+    [ClientRpc(RequireOwnership = false)]
+    private void ActivateRigidbodyClientRpc()
+    {
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = true;
+        }
+    }
+
 }
