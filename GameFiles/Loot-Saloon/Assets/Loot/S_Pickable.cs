@@ -75,11 +75,9 @@ public abstract class S_Pickable : S_Interactable
 
         interactable = false;
 
-        _body.isKinematic = true;
-
         Transform handTransform = p_parent;
-        // _transform.SetParent(p_parent, false);
         _transform.localPosition = _onPickUpOffset;
+
 
         StartCoroutine(FollowHandCoroutine(handTransform));
 
@@ -127,6 +125,10 @@ public abstract class S_Pickable : S_Interactable
     [ServerRpc(RequireOwnership = false)]
     private void UpdateTransformServerRpc(Vector3 position, Quaternion rotation)
     {
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = false;
+        }
         // Update the transform on the server
         transform.position = position;
         transform.rotation = rotation;
@@ -135,7 +137,6 @@ public abstract class S_Pickable : S_Interactable
     public virtual void PutDown()
     {
         interactable = true;
-        _body.isKinematic = false;
 
 
         foreach (Collider colliderToIgnore in _ignoredColliders)
@@ -145,5 +146,17 @@ public abstract class S_Pickable : S_Interactable
         }
 
         _ignoredColliders.Clear();
+
+        ActivateRigidbodyServerRpc();
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ActivateRigidbodyServerRpc()
+    {
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = true;
+        }
+    }
+
 }
