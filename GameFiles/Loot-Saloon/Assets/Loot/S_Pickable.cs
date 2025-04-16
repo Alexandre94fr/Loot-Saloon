@@ -117,7 +117,14 @@ public abstract class S_Pickable : S_Interactable
     [ClientRpc]
     private void UpdateTransformClientRpc(Vector3 position, Quaternion rotation)
     {
-        if (NetworkManager.Singleton.IsServer) return;
+        if (NetworkManager.Singleton.IsServer) 
+            return;
+
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = false;
+        }
+
         transform.position = position;
         transform.rotation = rotation;
     }
@@ -138,7 +145,6 @@ public abstract class S_Pickable : S_Interactable
     {
         interactable = true;
 
-
         foreach (Collider colliderToIgnore in _ignoredColliders)
         {
             foreach (Collider collider in _colliders)
@@ -152,6 +158,17 @@ public abstract class S_Pickable : S_Interactable
 
     [ServerRpc(RequireOwnership = false)]
     private void ActivateRigidbodyServerRpc()
+    {
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = true;
+        }
+
+        ActivateRigidbodyClientRpc();
+    }
+
+    [ClientRpc(RequireOwnership = false)]
+    private void ActivateRigidbodyClientRpc()
     {
         if (TryGetComponent(out Rigidbody rb))
         {
