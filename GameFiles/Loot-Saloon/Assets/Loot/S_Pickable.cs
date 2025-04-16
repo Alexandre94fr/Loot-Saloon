@@ -9,11 +9,11 @@ using UnityEngine;
 public abstract class S_Pickable : S_Interactable
 {
     [SerializeField] private Vector3 _onPickUpOffset = Vector3.forward;
-    public bool parentIsPlayerInteract = false;
+    public bool parentIsPlayerInteract;
 
     [SerializeField] private float _pickUpTime = 2f;
-    private bool _isPickUp = false;
-    [Range(0f, 20f)] public float weight = 0f;
+    private bool _isPickUp;
+    [Range(0f, 20f)] public float weight;
 
     private List<Collider> _ignoredColliders = new();
 
@@ -100,7 +100,7 @@ public abstract class S_Pickable : S_Interactable
             transform.position = targetPosition;
             transform.rotation = targetRotation;
 
-            // Call the ClientRpc to update clients
+
             if (IsServer)
             {
                 UpdateTransformClientRpc(targetPosition, targetRotation);
@@ -124,6 +124,10 @@ public abstract class S_Pickable : S_Interactable
         {
             rb.useGravity = false;
         }
+        if(TryGetComponent(out SphereCollider sphereCollider))
+        {
+            sphereCollider.enabled = false;
+        }
 
         transform.position = position;
         transform.rotation = rotation;
@@ -135,6 +139,10 @@ public abstract class S_Pickable : S_Interactable
         if (TryGetComponent(out Rigidbody rb))
         {
             rb.useGravity = false;
+        }
+        if(TryGetComponent(out SphereCollider sphereCollider)  && TryGetComponent(out S_Cart _)==false)
+        {
+            sphereCollider.enabled = false;
         }
         // Update the transform on the server
         transform.position = position;
@@ -153,27 +161,39 @@ public abstract class S_Pickable : S_Interactable
 
         _ignoredColliders.Clear();
 
-        ActivateRigidbodyServerRpc();
+        ResetRigidbodyServerRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void ActivateRigidbodyServerRpc()
+    private void ResetRigidbodyServerRpc()
     {
         if (TryGetComponent(out Rigidbody rb))
         {
             rb.useGravity = true;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+        if(TryGetComponent(out SphereCollider sphereCollider) && TryGetComponent(out S_Cart _)==false)
+        {
+            sphereCollider.enabled = true;
         }
 
-        ActivateRigidbodyClientRpc();
+        ResetRigidbodyClientRpc();
     }
 
     [ClientRpc(RequireOwnership = false)]
-    private void ActivateRigidbodyClientRpc()
+    private void ResetRigidbodyClientRpc()
     {
+        if (NetworkManager.Singleton.IsServer)
+            return;
+
         if (TryGetComponent(out Rigidbody rb))
         {
             rb.useGravity = true;
         }
+        if(TryGetComponent(out SphereCollider sphereCollider) && TryGetComponent(out S_Cart _)==false)
+        {
+            sphereCollider.enabled = true;
+        }
     }
-
 }
