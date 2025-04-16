@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
 #endregion
 
@@ -117,7 +116,7 @@ public abstract class S_Pickable : S_Interactable
     [ClientRpc]
     private void UpdateTransformClientRpc(Vector3 position, Quaternion rotation)
     {
-        if (NetworkManager.Singleton.IsServer) 
+        if (NetworkManager.Singleton.IsServer)
             return;
 
         if (TryGetComponent(out Rigidbody rb))

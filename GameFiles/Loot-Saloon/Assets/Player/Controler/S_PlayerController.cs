@@ -72,6 +72,7 @@ public class S_PlayerController : NetworkBehaviour
             camerObject.GetComponent<AudioListener>().enabled = false;
             camerObject.GetComponent<UniversalAdditionalCameraData>().enabled = false;
             _playerTransform.GetComponentInChildren<PlayerInput>().gameObject.SetActive(false);
+            _playerTransform.GetComponentInChildren<S_PlayerInteract>().gameObject.SetActive(false);
         }
     }
 

@@ -12,7 +12,8 @@ public class S_PlayerInteract : NetworkBehaviour
     // [SerializeField] private GameObject _interactPanel;
 
     private Transform _transform;
-    private Transform _cameraTransform;
+    [SerializeField] private Transform _cameraTransform;
+    public Transform _armTransform;
     private S_Pickable _pickableHeld = null;
     private S_Interactable _currentInteraction = null;
     public Transform _armTransform;
@@ -23,6 +24,7 @@ public class S_PlayerInteract : NetworkBehaviour
     public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
     [SerializeField] private UnityEvent<S_Pickable> _onPickUp = new();
 
+    public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
     [Tooltip("When pickung up a pickable, collisions between the pickable's colliders and these colliders will be disabled.")]
     public List<Collider> pickableIgnoresColliders = new();
 
@@ -50,10 +52,12 @@ public class S_PlayerInteract : NetworkBehaviour
             S_LifeManager.OnDie += PutDownPickable;
         }
     }
+    
     private void StopInteract()
     {
         if (_currentInteraction == null)
             return;
+            
         _currentInteraction.StopInteract(this);
         _currentInteraction = null;
     }
@@ -92,6 +96,7 @@ public class S_PlayerInteract : NetworkBehaviour
 
         Transform interactParent = _transform;
         _currentInteraction = p_interactable;
+        
         if (p_interactable is S_Pickable pickable)
         {
             if (_pickableHeld != null)
@@ -126,7 +131,7 @@ public class S_PlayerInteract : NetworkBehaviour
         }
 
         _pickableHeld = p_pickable;
-        _onPickUp.Invoke(p_pickable);
+        OnPickUp.Invoke(p_pickable);
     }
 
     private void PutDownPickable()
@@ -139,7 +144,7 @@ public class S_PlayerInteract : NetworkBehaviour
 
         _pickableHeld.PutDown();
         _pickableHeld = null;
-        _onPickUp.Invoke(null);
+        OnPickUp.Invoke(null);
     }
 
     private S_Interactable CheckObjectRaycast()

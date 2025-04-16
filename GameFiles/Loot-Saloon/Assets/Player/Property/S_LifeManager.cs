@@ -9,7 +9,8 @@ public class S_LifeManager : MonoBehaviour
 
     private void Awake()
     {
-        _playerAttributes = GameObject.Find("Attributes").GetComponent<S_PlayerAttributes>();
+        //_playerAttributes = GameObject.Find("Attributes").GetComponent<S_PlayerAttributes>();
+        _playerAttributes = GetComponent<S_PlayerAttributes>();
     }
 
     public void TakeDamage(float p_damageToTake)
