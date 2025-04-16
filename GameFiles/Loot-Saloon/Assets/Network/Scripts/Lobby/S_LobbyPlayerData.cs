@@ -40,13 +40,12 @@ public class S_LobbyPlayerData
         set => _isReady = value;
     }
 
-    public void Initialize(string p_id, string p_gamerTag, int nbOfBluePlayers)
+    public void Initialize(string p_id, string p_gamerTag)
     {
         _id = p_id;
         _gamerTag = p_gamerTag;
         _isReady = false;
         _team = E_PlayerTeam.NONE;
-        Debug.Log(nbOfBluePlayers);
     }
 
     public void Initialize(Dictionary<string,PlayerDataObject> p_playerData)
