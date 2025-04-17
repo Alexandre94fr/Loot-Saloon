@@ -17,10 +17,9 @@ public class S_VaultInstantiator : NetworkBehaviour
         if (_lootInstantiatorInstance == null)
             Debug.Assert(true," Loot Instanciator Reference should be set in the Vault Instanciator + " + this.name);
 
-        print("Je viens de spawn");
-
         NetworkManager.Singleton.OnClientConnectedCallback += StartGame;
     }
+    
     private void StartGame(ulong _)
     {
         if (PlayerPrefs.GetInt("NbrOfPlayer") == NetworkManager.Singleton.ConnectedClients.Count)
