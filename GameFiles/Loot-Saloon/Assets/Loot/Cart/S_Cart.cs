@@ -63,32 +63,24 @@ public class S_Cart : S_Pickable
         }
 
         float moveSpeed = 5f;
-        float turnSmoothness = 2f; // Plus petit = plus lent à tourner
-
-        Vector3 smoothedForward = _parent.forward;
+        float rotationSmoothness = 5f;
 
         while (_isCarried)
         {
-            if (_direction.sqrMagnitude > 0.01f)
-            {
-                // Calcule direction du regard sans Y
-                Vector3 targetForward = _parent.forward;
-                targetForward.y = 0;
-                targetForward.Normalize();
+            // Direction sans le Y
+            Vector3 forward = _parent.forward;
+            forward.y = 0;
+            forward.Normalize();
 
-                // Interpolation douce de la direction
-                smoothedForward = Vector3.Slerp(smoothedForward, targetForward, Time.deltaTime * turnSmoothness);
+            // Position souhaitée : devant le joueur
+            Vector3 targetPosition = _parent.position + forward * followDistance;
+            targetPosition.y = rb.position.y;
 
-                // Calcule position cible avec offset devant
-                Vector3 targetPos = _parent.position + smoothedForward * followDistance;
-                targetPos.y = rb.position.y;
+            rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, Time.deltaTime * moveSpeed));
 
-                rb.MovePosition(Vector3.Lerp(rb.position, targetPos, Time.deltaTime * moveSpeed));
-
-                // Rotation en direction inverse pour que le cart regarde le joueur (cul vers joueur)
-                Quaternion targetRot = Quaternion.LookRotation(-smoothedForward, Vector3.up);
-                rb.MoveRotation(Quaternion.Lerp(rb.rotation, targetRot, Time.deltaTime * turnSmoothness));
-            }
+            // Rotation douce du cart pour pointer vers le joueur (son arrière)
+            Quaternion targetRotation = Quaternion.LookRotation(-forward, Vector3.up);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.deltaTime * rotationSmoothness));
 
             yield return null;
         }
