@@ -24,10 +24,13 @@ public class S_Extract : MonoBehaviour
     private void Awake()
     {
         quotaComponent = GetComponent<S_Quota>();
-        _quotaText = "{0} / " + quotaComponent.quota + "$";
-        MoneyRequiredText.text = string.Format(_quotaText, 0);
+        MoneyRequiredText.text = "-";
 
         OnExtract += (winner) => GetQuota.Invoke(_team, quotaComponent.quota);
+        quotaComponent.OnQuotaChanged += () => {
+            _quotaText = "{0} - " + quotaComponent.quota + " $";
+            MoneyRequiredText.text = string.Format(_quotaText, 0);
+        };
     }
 
     private void Start()
@@ -60,7 +63,7 @@ public class S_Extract : MonoBehaviour
             if (!_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
                 print("quota: " + quotaComponent.quota);
-                MoneyRequiredText.text = string.Format(_quotaText, cart.total);
+                MoneyRequiredText.text = string.Format(_quotaText, cart.total, quotaComponent.quota);
                 if (quotaComponent.quota <= cart.total)
                 {
                     print("cart in extract");
@@ -90,7 +93,7 @@ public class S_Extract : MonoBehaviour
             {
                 _cartInExtract = false;
                 _totalEntityInExract--;
-                MoneyRequiredText.text = string.Format(_quotaText, 0);
+                MoneyRequiredText.text = string.Format(_quotaText, 0, quotaComponent.quota);
             }
         }
 

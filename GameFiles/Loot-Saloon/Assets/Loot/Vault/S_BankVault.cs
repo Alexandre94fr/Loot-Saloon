@@ -49,10 +49,8 @@ public class S_BankVault : S_Interactable
     #endregion
 
     [ClientRpc]
-    public void UpadteVaultClientRpc(int value)
+    public void UpdateQuotaClientRpc(int value)
     {
-        if (IsServer) return;
-
         _moneyValue = value;
         _vaultInstantiator.UpdateQuota(this);
     }
@@ -106,8 +104,6 @@ public class S_BankVault : S_Interactable
             _lootIndices.Add(lootIndex);
             _moneyValue += _lootInstantiator.GetLootPrice(lootIndex);
         }
-
-        _vaultInstantiator.UpdateQuota(this);
     }
 
     [ServerRpc(RequireOwnership = false)]
