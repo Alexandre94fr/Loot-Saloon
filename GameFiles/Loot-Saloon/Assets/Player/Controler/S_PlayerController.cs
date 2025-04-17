@@ -32,6 +32,8 @@ public class S_PlayerController : NetworkBehaviour
     private bool _isSprinting = false;
     private float _speedMult = 1f;
 
+    public bool activeInputs = true;
+
     void Start()
     {
         if (!_isSoloTestModeEnabled)
@@ -164,6 +166,8 @@ public class S_PlayerController : NetworkBehaviour
         S_PlayerInputsReciever.OnJump += Jump;
         S_PlayerInputsReciever.OnMove += GetDirection;
         S_PlayerInputsReciever.OnSprint += Sprint;
+
+        activeInputs = true;
     }
 
     private void DropInputsEvents(E_PlayerTeam team = E_PlayerTeam.NONE)
@@ -171,6 +175,9 @@ public class S_PlayerController : NetworkBehaviour
         S_PlayerInputsReciever.OnJump -= Jump;
         S_PlayerInputsReciever.OnMove -= GetDirection;
         S_PlayerInputsReciever.OnSprint -= Sprint;
+
+        activeInputs = false;
+
         _playerDirection = Vector3.zero;
     }
 

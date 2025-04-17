@@ -11,6 +11,8 @@ public class S_PlayerInteract : NetworkBehaviour
 {
     // [SerializeField] private GameObject _interactPanel;
 
+    public S_PlayerController controller;
+
     private Transform _transform;
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] Transform _rightArmTransform;
