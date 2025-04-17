@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +16,19 @@ public class S_PlayerInputsReciever : MonoBehaviour
     public static event Action OnThrow;
     public static event Action OnShoot;
 
+    public static void ClearEvents()
+    {
+        OnJump         = null;
+        OnMove         = null;
+        OnLockMovement = null;
+        OnLook         = null;
+        OnSprint       = null;
+        OnInteract     = null;
+        OnStopInteract = null;
+        OnScroll       = null;
+        OnThrow        = null;
+        OnShoot        = null;
+    }
 
     private bool _canMove = true;
 

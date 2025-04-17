@@ -13,6 +13,11 @@ public class S_Cart : S_Pickable
     public E_PlayerTeam team;
     public static event Action<E_PlayerTeam, int> GetCartValue;
 
+    public static void ClearEvents()
+    {
+        GetCartValue = null;
+    }
+
     private HashSet<S_Loot> _inCart = new();
 
     [SerializeField] private GameObject slot;

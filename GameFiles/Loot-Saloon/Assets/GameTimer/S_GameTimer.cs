@@ -25,6 +25,17 @@ public class S_GameTimer : MonoBehaviour
         GetCountdownTimer += () => { return _gameMaxTime - _timer; };
     }
 
+    public static void ClearEvents()
+    {
+        OnStart           = null;
+        IsRunning         = null;
+        GetTimer          = null;
+        GetCountdownTimer = null;
+        OnPause           = null;
+        OnReset           = null;
+        OnEnd             = null;
+    }
+
     private IEnumerator StartTimer() 
     { 
         if (_isRunning)

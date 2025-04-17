@@ -7,6 +7,12 @@ public class S_LifeManager : MonoBehaviour
     public static event Action OnDie;
     public static event Action TakeDamageEvent;
 
+    public static void ClearEvents()
+    {
+        OnDie           = null;
+        TakeDamageEvent = null;
+    }
+
     private void Awake()
     {
         //_playerAttributes = GameObject.Find("Attributes").GetComponent<S_PlayerAttributes>();

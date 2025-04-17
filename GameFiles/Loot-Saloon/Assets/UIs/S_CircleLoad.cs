@@ -10,6 +10,11 @@ public class S_CircleLoad : MonoBehaviour
     [SerializeField] private Image _image;
     private float _timerValue;
 
+    public static void ClearEvents()
+    {
+        OnCircleChange = null;
+    }
+
     private void Awake()
     {
         OnCircleChange += SetLoader;

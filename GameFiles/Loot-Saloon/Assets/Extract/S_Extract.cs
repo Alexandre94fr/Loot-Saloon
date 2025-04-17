@@ -21,6 +21,12 @@ public class S_Extract : MonoBehaviour
     
     S_Quota quotaComponent;
 
+    public static void ClearEvents()
+    {
+        OnExtract = null;
+        GetQuota  = null;
+    }
+
     private void Awake()
     {
         quotaComponent = GetComponent<S_Quota>();
