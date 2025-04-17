@@ -21,8 +21,10 @@ public class S_WeaponSlot : NetworkBehaviour
 
     [SerializeField] private GameObject weaponObject;
 
-    [SerializeField] [Range(1f, 10f)] private float _angleSpread = 5;
+    [SerializeField][Range(1f, 10f)] private float _angleSpread = 5;
 
+    [SerializeField] private bool isReloading = false;
+    [SerializeField] private float reloadTime = 20f;
 
     private void Start()
     {
@@ -122,11 +124,19 @@ public class S_WeaponSlot : NetworkBehaviour
         cooldown = 0;
     }
 
-
     public void Shoot()
     {
-        if (!weaponIsActive || Time.time - _lastShotTime < cooldown || nbBullet <= 0)
+        if (!weaponIsActive || Time.time - _lastShotTime < cooldown)
             return;
+
+        if (nbBullet <= 0)
+        {
+            if (!isReloading)
+                Reload();
+            return;
+        }
+
+        print("SHOOT");
 
         _lastShotTime = Time.time;
 
@@ -156,6 +166,8 @@ public class S_WeaponSlot : NetworkBehaviour
         }
 
         nbBullet--;
+        if (nbBullet <= 0)
+            Reload();
     }
 
     [ServerRpc]
@@ -199,10 +211,23 @@ public class S_WeaponSlot : NetworkBehaviour
         }
     }
 
-
     public void Reload()
     {
+        if (!isReloading)
+            StartCoroutine(ReloadCoroutine());
+    }
+
+    private IEnumerator ReloadCoroutine()
+    {
+        isReloading = true;
+        Debug.Log("Reloading...");
+
+        yield return new WaitForSeconds(reloadTime);
+
         nbBullet = nbBulletMax;
+        Debug.Log("Reload complete");
+
+        isReloading = false;
     }
 
     public override void OnNetworkDespawn()
@@ -228,5 +253,4 @@ public class S_WeaponSlot : NetworkBehaviour
             yield return null;
         }
     }
-
 }
