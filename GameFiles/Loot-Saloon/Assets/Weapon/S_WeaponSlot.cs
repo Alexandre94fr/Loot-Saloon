@@ -4,43 +4,50 @@ using UnityEngine;
 
 public class S_WeaponSlot : NetworkBehaviour
 {
+    [Header(" External references :")]
+    [SerializeField] private S_PlayerInteract _playerInteractComponent;
+
+    [Space]
+    [ReadOnlyInInspector] [SerializeField] private string _weaponName = "";
+    [ReadOnlyInInspector] [SerializeField] private float _damage;
+    [ReadOnlyInInspector] [SerializeField] private int _remainingBullet;
+    [ReadOnlyInInspector] [SerializeField] private int _maxBulletNumber;
+    [ReadOnlyInInspector] [SerializeField] private float _cooldown;
+
+    [ReadOnlyInInspector] [SerializeField] private GameObject _weaponObject;
+
+    [ReadOnlyInInspector] [SerializeField] [Range(1f, 10f)] private float _angleSpread = 5;
+
+    [ReadOnlyInInspector] [SerializeField] private bool _isReloading = false;
+    [ReadOnlyInInspector] [SerializeField] private float _reloadTime = 20f;
+
     Camera _camera;
 
-    private bool weaponIsActive;
-    private SO_WeaponProperties heldWeapon;
-
-    public S_PlayerInteract interact;
-
-    [SerializeField] private string weaponName = "";
-    [SerializeField] private float damage;
-    [SerializeField] private int nbBullet;
-    [SerializeField] private int nbBulletMax;
-    [SerializeField] private float cooldown;
+    private bool _weaponIsActive;
+    private SO_WeaponProperties _heldWeapon;
 
     private float _lastShotTime;
 
-    [SerializeField] private GameObject weaponObject;
-
-    [SerializeField][Range(1f, 10f)] private float _angleSpread = 5;
-
-    [SerializeField] private bool isReloading = false;
-    [SerializeField] private float reloadTime = 20f;
 
     private void Start()
     {
-        if (!interact.transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
+        if (!S_VariablesChecker.AreVariablesCorrectlySetted(name, null,
+            (_playerInteractComponent, nameof(_playerInteractComponent))
+        )) return;
+
+        if (!_playerInteractComponent.transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
             return;
 
         S_PlayerInputsReciever.OnShoot += Shoot;
         _camera = Camera.main;
 
-        if (heldWeapon != null)
-            SetWeaponSlot(interact.transform, heldWeapon.prefab.GetComponent<S_Weapon>());
+        if (_heldWeapon != null)
+            SetWeaponSlot(_playerInteractComponent.transform, _heldWeapon.prefab.GetComponent<S_Weapon>());
 
-        interact.OnWeaponPickUp.AddListener(SetWeaponSlot);
-        interact.OnPickUp.AddListener(OnGenericPickUp);
+        _playerInteractComponent.OnWeaponPickUp.AddListener(SetWeaponSlot);
+        _playerInteractComponent.OnPickUp.AddListener(OnGenericPickUp);
 
-        _lastShotTime = -cooldown;
+        _lastShotTime = -_cooldown;
     }
 
     public void SetWeaponSlot(Transform p_parent, S_Weapon p_newWeapon)
@@ -59,16 +66,16 @@ public class S_WeaponSlot : NetworkBehaviour
             return;
         }
 
-        if (weaponObject != null)
-            DropWeapon(weaponObject.GetComponent<S_Weapon>());
+        if (_weaponObject != null)
+            DropWeapon(_weaponObject.GetComponent<S_Weapon>());
 
         SO_WeaponProperties properties = p_newWeapon.properties;
-        heldWeapon = properties;
-        weaponName = properties.weaponName;
-        damage = properties.damage;
-        nbBullet = properties.nbBullet;
-        nbBulletMax = properties.nbBulletMax;
-        cooldown = properties.cooldown;
+        _heldWeapon = properties;
+        _weaponName = properties.weaponName;
+        _damage = properties.damage;
+        _remainingBullet = properties.nbBullet;
+        _maxBulletNumber = properties.nbBulletMax;
+        _cooldown = properties.cooldown;
 
         EnableWeapon(p_newWeapon.gameObject);
 
@@ -81,24 +88,24 @@ public class S_WeaponSlot : NetworkBehaviour
         {
             DisableWeapon();
         }
-        else if (weaponObject != null)
+        else if (_weaponObject != null)
         {
-            EnableWeapon(weaponObject);
+            EnableWeapon(_weaponObject);
         }
     }
 
     public void EnableWeapon(GameObject p_newWeaponObject)
     {
-        weaponIsActive = true;
-        weaponObject = p_newWeaponObject;
-        weaponObject.GetComponent<MeshRenderer>().enabled = true;
+        _weaponIsActive = true;
+        _weaponObject = p_newWeaponObject;
+        _weaponObject.GetComponent<MeshRenderer>().enabled = true;
     }
 
     public void DisableWeapon()
     {
-        weaponIsActive = false;
-        if (weaponObject != null)
-            weaponObject.GetComponent<MeshRenderer>().enabled = false;
+        _weaponIsActive = false;
+        if (_weaponObject != null)
+            _weaponObject.GetComponent<MeshRenderer>().enabled = false;
     }
 
     public void DropWeapon(S_Weapon p_weapon)
@@ -106,35 +113,35 @@ public class S_WeaponSlot : NetworkBehaviour
         p_weapon.PutDown();
         p_weapon.isHeld = false;
 
-        weaponObject.transform.SetParent(null);
-        weaponObject.transform.position = _camera.transform.position + _camera.transform.forward * 1.5f;
-        weaponObject.SetActive(true);
+        _weaponObject.transform.SetParent(null);
+        _weaponObject.transform.position = _camera.transform.position + _camera.transform.forward * 1.5f;
+        _weaponObject.SetActive(true);
 
-        if (weaponObject.TryGetComponent(out Rigidbody rb))
+        if (_weaponObject.TryGetComponent(out Rigidbody rb))
             rb.isKinematic = false;
 
-        weaponObject = null;
-        heldWeapon = null;
-        weaponIsActive = false;
+        _weaponObject = null;
+        _heldWeapon = null;
+        _weaponIsActive = false;
 
-        weaponName = "";
-        damage = 0;
-        nbBullet = 0;
-        nbBulletMax = 0;
-        cooldown = 0;
+        _weaponName = "";
+        _damage = 0;
+        _remainingBullet = 0;
+        _maxBulletNumber = 0;
+        _cooldown = 0;
     }
 
     public void Shoot()
     {
-        if (!interact.controller.activeInputs)
+        if (!_playerInteractComponent.controller.activeInputs)
             return;
 
-        if (!weaponIsActive || Time.time - _lastShotTime < cooldown)
+        if (!_weaponIsActive || Time.time - _lastShotTime < _cooldown)
             return;
 
-        if (nbBullet <= 0)
+        if (_remainingBullet <= 0)
         {
-            if (!isReloading)
+            if (!_isReloading)
                 Reload();
             return;
         }
@@ -159,7 +166,7 @@ public class S_WeaponSlot : NetworkBehaviour
                 var playerRoot = target.GetComponentInParent<NetworkObject>();
                 if (playerRoot != null)
                 {
-                    OnHitServerRpc(playerRoot.NetworkObjectId, damage);
+                    OnHitServerRpc(playerRoot.NetworkObjectId, _damage);
                 }
                 else
                 {
@@ -168,8 +175,8 @@ public class S_WeaponSlot : NetworkBehaviour
             }
         }
 
-        nbBullet--;
-        if (nbBullet <= 0)
+        _remainingBullet--;
+        if (_remainingBullet <= 0)
             Reload();
     }
 
@@ -216,21 +223,21 @@ public class S_WeaponSlot : NetworkBehaviour
 
     public void Reload()
     {
-        if (!isReloading)
+        if (!_isReloading)
             StartCoroutine(ReloadCoroutine());
     }
 
     private IEnumerator ReloadCoroutine()
     {
-        isReloading = true;
+        _isReloading = true;
         Debug.Log("Reloading...");
 
-        yield return new WaitForSeconds(reloadTime);
+        yield return new WaitForSeconds(_reloadTime);
 
-        nbBullet = nbBulletMax;
+        _remainingBullet = _maxBulletNumber;
         Debug.Log("Reload complete");
 
-        isReloading = false;
+        _isReloading = false;
     }
 
     public override void OnNetworkDespawn()

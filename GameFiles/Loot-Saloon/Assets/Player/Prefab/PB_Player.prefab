@@ -553,6 +553,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  controller: {fileID: 4592600893772838868}
   _cameraTransform: {fileID: 0}
   _rightArmTransform: {fileID: 5973440091477464354}
   OnWeaponPickUp:
@@ -689,16 +690,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  interact: {fileID: 5168879295098494647}
-  weaponName: 
-  damage: 0
-  nbBullet: 0
-  nbBulletMax: 0
-  cooldown: 0
-  weaponObject: {fileID: 0}
+  _playerInteractComponent: {fileID: 5168879295098494647}
+  _weaponName: 
+  _damage: 0
+  _remainingBullet: 0
+  _maxBulletNumber: 0
+  _cooldown: 0
+  _weaponObject: {fileID: 0}
   _angleSpread: 5
-  isReloading: 0
-  reloadTime: 20
+  _isReloading: 0
+  _reloadTime: 20
 --- !u!1 &2337550713985648122
 GameObject:
   m_ObjectHideFlags: 0
@@ -1525,6 +1526,7 @@ MonoBehaviour:
   _walkSpeed: 2
   _jumpForce: 5
   _sprintSpeed: 4
+  activeInputs: 1
 --- !u!1 &5152030334384138273
 GameObject:
   m_ObjectHideFlags: 0
