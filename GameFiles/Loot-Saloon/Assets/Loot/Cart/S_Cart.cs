@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,8 +12,8 @@ using UnityEngine.Events;
 public class S_Cart : S_Pickable
 {
     public int total { get; private set; } = 0;
-
     public E_PlayerTeam team;
+
     public static event Action<E_PlayerTeam, int> GetCartValue;
 
     private HashSet<S_Loot> _inCart = new();
@@ -21,37 +22,17 @@ public class S_Cart : S_Pickable
     [SerializeField] private UnityEvent OnLootAdded = new();
     [SerializeField] private UnityEvent OnLootRemoved = new();
 
-    private FixedJoint _joint;
-    private GameObject _attachPoint;
-
     private Rigidbody _cartRb;
+
     private bool _isCarried = false;
-    private Vector3 _direction;
     private Transform _parent;
 
     [SerializeField] float followDistance = 3f;
 
-    [SerializeField] private Vector3 _cartOffset = new Vector3(1, 0, 2); // Ajuster selon la position souhait�e
-
-
-    private void MoveCart(Vector3 dir)
-    {
-        Debug.Log("Move The Fucking cart");
-        if (!_isCarried) return;
-
-        //if (_cartRb != null)
-        {
-            // Appliquer un d�placement plus lisse en ajustant la vitesse
-            _direction = dir;
-            Debug.Log("with RB :: " + dir);
-        }
-        //else
-        //{
-        //    // D�placement avec interpolation si pas de Rigidbody
-        //    transform.position = Vector3.Lerp(transform.position, transform.position + dir * 0.1f, Time.deltaTime * 10f);
-        //    Debug.Log("without RB");
-        //}
-    }
+    /// Header Modif
+    /// On déplace uniquement le cart du côté du owner, et on synchronise la position via ServerRpc
+    /// pour éviter les désynchronisations entre clients.
+    /// End Modif
 
     private IEnumerator MoveCoroutine()
     {
@@ -67,26 +48,36 @@ public class S_Cart : S_Pickable
 
         while (_isCarried)
         {
-            // Direction sans le Y
             Vector3 forward = _parent.forward;
             forward.y = 0;
             forward.Normalize();
 
-            // Position souhaitée : devant le joueur
             Vector3 targetPosition = _parent.position + forward * followDistance;
             targetPosition.y = rb.position.y;
 
             rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, Time.deltaTime * moveSpeed));
-
-            // Rotation douce du cart pour pointer vers le joueur (son arrière)
             Quaternion targetRotation = Quaternion.LookRotation(-forward, Vector3.up);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.deltaTime * rotationSmoothness));
+
+            if (IsOwner) /**/
+            {
+                SyncCartPositionServerRpc(rb.position, rb.rotation); /**/
+            }
 
             yield return null;
         }
     }
 
-    // Lors de la prise du cart
+    /// Header Modif
+    /// Cette méthode est appelée uniquement par le owner pour synchroniser la position du cart.
+    /// Elle s'exécute côté serveur, et réplique la position/rotation à tous les autres clients.
+    /// End Modif
+    [ServerRpc]
+    private void SyncCartPositionServerRpc(Vector3 position, Quaternion rotation) /**/
+    {
+        transform.SetPositionAndRotation(position, rotation); /**/
+    }
+
     protected override void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         Debug.Log("Cart physics");
@@ -96,168 +87,67 @@ public class S_Cart : S_Pickable
 
         _parent = p_parent;
         _isCarried = true;
-        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(true, transform);
 
+        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(true, transform);
 
         S_PlayerInputsReciever.OnMove += MoveCart;
         StartCoroutine(MoveCoroutine());
-
-
-        //// Cr�ation du point d'attache pour le cart
-        //_attachPoint = new GameObject("CartAttachPoint");
-        //_attachPoint.transform.position = p_parent.position;
-        //_attachPoint.transform.rotation = p_parent.rotation;
-
-        //var rbAttach = _attachPoint.AddComponent<Rigidbody>();
-        //rbAttach.isKinematic = true;
-
-        // Attach le cart au joueur via un joint physique
-        //_cartRb = GetComponent<Rigidbody>();
-        //_cartRb.isKinematic = false;  // D�sactive la physique sur le cart
-
-        //_joint = gameObject.AddComponent<FixedJoint>();
-        //_joint.connectedBody = rbAttach;
-        //_joint.breakForce = Mathf.Infinity;
-        //_joint.breakTorque = Mathf.Infinity;
-
-        // Ajout d'un syst�me pour suivre le joueur
-        //StartCoroutine(FollowPlayer(p_parent));
+        var playerController = _parent.parent.GetComponentInChildren<S_PlayerController>();
+        playerController.EnableCartModeClientRpc(true, GetComponent<NetworkObject>());
     }
 
-    // D�placement fluide du cart avec le joueur
-    private IEnumerator FollowPlayer(Transform playerTransform)
+    [ClientRpc]
+    private void PutDownClientRpc()
     {
-        while (_isCarried)
+        if (!IsOwner) return;
+        var playerController = _parent?.parent.GetComponentInChildren<S_PlayerController>();
+        if (playerController == null)
         {
-            // D�placer le cart de mani�re fluide
-            transform.position = playerTransform.position + playerTransform.forward * _cartOffset.z + playerTransform.right * _cartOffset.x;
-
-            // Optionnel : appliquer rotation synchronis�e avec le joueur
-            transform.rotation = Quaternion.Euler(0, playerTransform.eulerAngles.y, 0);
-
-            yield return null;
+            Debug.LogError("PlayerController is null.");
+            return;
         }
+        playerController.EnableCartMode(false);
     }
 
-    // Lors du l�cher du cart
     public override void PutDown()
     {
         base.PutDown();
 
-        _isCarried = false;
-
-        if (_joint != null)
-        {
-            Destroy(_joint);
-            _joint = null;
-        }
+        Debug.Log("_isCarried: " + _isCarried);
+        Debug.Log("_cartRb: " + _cartRb);
+        Debug.Log("_parent: " + _parent);
 
         if (_cartRb != null)
         {
-            _cartRb.isKinematic = false;  // R�active la physique du cart
-            _cartRb.useGravity = true;  // Permet au cart de tomber � nouveau
+            _cartRb.isKinematic = false;  // Réactive la physique du cart
+            _cartRb.useGravity = true;  // Permet au cart de tomber à nouveau
         }
 
-        if (_attachPoint != null)
-        {
-            Destroy(_attachPoint);
-            _attachPoint = null;
-        }
-        _parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(false);
+        PutDownClientRpc();
     }
-private void Update()
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestPickUpServerRpc(ulong playerId)
     {
-        //if (_isCarried)
-        //{
-        //    // D�placer le cart en m�me temps que le joueur
-        //    if (_joint != null)
-        //    {
-        //        // Positionner le cart devant le joueur, avec un petit offset
-        //        transform.position = _attachPoint.transform.position + _cartOffset;
-        //        transform.rotation = _attachPoint.transform.rotation;
-        //    }
-        //}
+        var player = NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject;
+        var interact = player.GetComponentInChildren<S_PlayerInteract>();
+        var parent = interact.transform;
+
+        PickUp(interact, parent);
     }
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         if (IsEasyToPickUp(p_playerInteract))
         {
+            if (!IsServer)
+            {
+                ulong clientId = p_playerInteract.GetComponentInParent<NetworkObject>().OwnerClientId;
+                RequestPickUpServerRpc(clientId);
+                return;
+            }
+
             PickUp(p_playerInteract, p_parent);
-        }
-    }
-
-    private void AttachToPlayer(S_PlayerInteract p_playerInteract, Transform p_parent)
-    {
-        if (!interactable) return;
-
-        interactable = false;
-
-        Rigidbody myRb = GetComponent<Rigidbody>();
-        Rigidbody handRb = p_parent.GetComponentInParent<Rigidbody>();
-
-        if (myRb == null || handRb == null)
-        {
-            Debug.LogWarning("Missing rigidbody for FixedJoint attachment.");
-            return;
-        }
-
-        // D�sactiver la gravit� et rendre les objets kinematic avant l'attachement
-        if (myRb != null)
-        {
-            myRb.useGravity = false;  // D�sactiver la gravit� pour �viter que le cart ne tombe
-            myRb.isKinematic = true;  // Rendre le cart kinematic pendant l'attachement
-        }
-
-        if (handRb != null)
-        {
-            handRb.isKinematic = true;  // Rendre le rigidbody du joueur kinematic pendant l'attachement
-        }
-
-        // Positionner le cart devant le joueur
-        Vector3 desiredPosition = p_parent.position + p_parent.forward * _cartOffset.z + p_parent.right * _cartOffset.x + p_parent.up * _cartOffset.y;
-        p_parent.position = desiredPosition;
-
-        // Cr�er le FixedJoint
-        _joint = gameObject.AddComponent<FixedJoint>();
-        _joint.connectedBody = handRb;
-        _joint.breakForce = Mathf.Infinity;
-        _joint.breakTorque = Mathf.Infinity;
-
-        // R�activer la gravit� et le mouvement apr�s l'attachement
-        if (myRb != null)
-        {
-            myRb.isKinematic = false;  // Restaurer le mouvement physique du cart
-            myRb.useGravity = true;    // Restaurer la gravit� du cart
-        }
-
-        if (handRb != null)
-        {
-            handRb.isKinematic = false;  // Restaurer le mouvement physique du joueur
-        }
-
-        // Ignorer les collisions comme pr�c�demment
-        foreach (Collider colliderToIgnore in p_playerInteract.pickableIgnoresColliders)
-        {
-            foreach (Collider collider in _colliders)
-                Physics.IgnoreCollision(colliderToIgnore, collider, true);
-            _ignoredColliders.Add(colliderToIgnore);
-        }
-    }
-
-    private IEnumerator SynchronizeCartMovement(Transform p_parent)
-    {
-        while (!interactable)
-        {
-            // Synchronisation de la position
-            Vector3 targetPosition = p_parent.position;
-            transform.position = targetPosition;
-
-            // Synchronisation de la rotation
-            Quaternion targetRotation = p_parent.rotation;
-            transform.rotation = targetRotation;
-
-            yield return null;
         }
     }
 
@@ -297,5 +187,13 @@ private void Update()
     public void SetTextToTotal(TMP_Text text)
     {
         text.text = total.ToString();
+    }
+
+    /// Header Modif
+    /// Méthode vide volontaire : uniquement utilisée pour s’abonner au move input mais le vrai mouvement est calculé dans MoveCoroutine.
+    /// End Modif
+    private void MoveCart(Vector3 dir)
+    {
+        if (!_isCarried) return;
     }
 }

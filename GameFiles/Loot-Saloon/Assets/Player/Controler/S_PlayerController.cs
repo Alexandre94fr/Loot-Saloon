@@ -26,6 +26,18 @@ public class S_PlayerController : NetworkBehaviour
 
     [SerializeField] private bool _isCartModeEnabled = false;
 
+
+    [ClientRpc]
+    public void EnableCartModeClientRpc(bool isEnabled, NetworkObjectReference cartRef)
+    {
+        if (!IsOwner) return; /**/
+
+        cartRef.TryGet(out NetworkObject cartObj);
+        Transform cartTransform = cartObj.transform;
+
+        EnableCartMode(isEnabled, cartTransform); /**/
+    }
+
     public void EnableCartMode(bool enabled, Transform cart = null)
     {
         _isCartModeEnabled = enabled;
