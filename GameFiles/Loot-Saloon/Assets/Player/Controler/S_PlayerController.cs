@@ -10,6 +10,7 @@ public class S_PlayerController : NetworkBehaviour
 {
     public Vector3 boxExtents = new(0.4f, 0.05f, 0.4f);
     public LayerMask groundLayer;
+    [HideInInspector] public Transform respawnPoint;
 
     [Header(" Debugging :")] 
     [Tooltip("Allow the devs to test there scenes without having to pass throw the Lobby")]
@@ -17,7 +18,6 @@ public class S_PlayerController : NetworkBehaviour
 
     [Space]
     [SerializeField] private Animator _armsAnimator;
-    [SerializeField] private Transform _respawnPoint;
     [SerializeField] private GameObject _armsHandler;
 
     [SerializeField] private float _walkSpeed = 2f;
@@ -154,7 +154,7 @@ public class S_PlayerController : NetworkBehaviour
     IEnumerator RespawnCoroutine()
     {
         yield return new WaitForSeconds(5);
-        _playerTransform.position = _respawnPoint.position;
+        _playerTransform.position = respawnPoint.position;
         EnableAllMeshOfPlayer();
         HandleInputsEvents();
     }

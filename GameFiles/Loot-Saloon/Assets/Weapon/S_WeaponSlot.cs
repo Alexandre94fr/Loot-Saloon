@@ -6,7 +6,6 @@ public class S_WeaponSlot : NetworkBehaviour
 {
     Camera _camera;
 
-    public Transform weaponParent;
     private bool weaponIsActive;
     private SO_WeaponProperties heldWeapon;
 
@@ -22,7 +21,7 @@ public class S_WeaponSlot : NetworkBehaviour
 
     [SerializeField] private GameObject weaponObject;
 
-    [SerializeField][Range(1f, 10f)] protected float _angleSpread = 5;
+    [SerializeField] [Range(1f, 10f)] private float _angleSpread = 5;
 
 
     private void Start()
@@ -42,15 +41,15 @@ public class S_WeaponSlot : NetworkBehaviour
         _lastShotTime = -cooldown;
     }
 
-    public void SetWeaponSlot(Transform parent, S_Weapon newWeapon)
+    public void SetWeaponSlot(Transform p_parent, S_Weapon p_newWeapon)
     {
-        if (newWeapon == null)
+        if (p_newWeapon == null)
             return;
 
-        if (newWeapon.isHeld)
+        if (p_newWeapon.isHeld)
             return;
 
-        NetworkObject weaponNetworkObject = newWeapon.GetComponent<NetworkObject>();
+        NetworkObject weaponNetworkObject = p_newWeapon.GetComponent<NetworkObject>();
 
         if (weaponNetworkObject == null)
         {
@@ -61,7 +60,7 @@ public class S_WeaponSlot : NetworkBehaviour
         if (weaponObject != null)
             DropWeapon(weaponObject.GetComponent<S_Weapon>());
 
-        SO_WeaponProperties properties = newWeapon.properties;
+        SO_WeaponProperties properties = p_newWeapon.properties;
         heldWeapon = properties;
         weaponName = properties.weaponName;
         damage = properties.damage;
@@ -69,14 +68,14 @@ public class S_WeaponSlot : NetworkBehaviour
         nbBulletMax = properties.nbBulletMax;
         cooldown = properties.cooldown;
 
-        EnableWeapon(newWeapon.gameObject);
+        EnableWeapon(p_newWeapon.gameObject);
 
-        newWeapon.isHeld = true;
+        p_newWeapon.isHeld = true;
     }
 
-    public void OnGenericPickUp(S_Pickable pickable)
+    public void OnGenericPickUp(S_Pickable p_pickable)
     {
-        if (pickable != null)
+        if (p_pickable != null)
         {
             DisableWeapon();
         }
@@ -86,10 +85,10 @@ public class S_WeaponSlot : NetworkBehaviour
         }
     }
 
-    public void EnableWeapon(GameObject newWeaponObject)
+    public void EnableWeapon(GameObject p_newWeaponObject)
     {
         weaponIsActive = true;
-        weaponObject = newWeaponObject;
+        weaponObject = p_newWeaponObject;
         weaponObject.GetComponent<MeshRenderer>().enabled = true;
     }
 
@@ -100,10 +99,10 @@ public class S_WeaponSlot : NetworkBehaviour
             weaponObject.GetComponent<MeshRenderer>().enabled = false;
     }
 
-    public void DropWeapon(S_Weapon weapon)
+    public void DropWeapon(S_Weapon p_weapon)
     {
-        weapon.PutDown();
-        weapon.isHeld = false;
+        p_weapon.PutDown();
+        p_weapon.isHeld = false;
 
         weaponObject.transform.SetParent(null);
         weaponObject.transform.position = _camera.transform.position + _camera.transform.forward * 1.5f;
@@ -151,7 +150,7 @@ public class S_WeaponSlot : NetworkBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning("No NetworkObject found on target's parent!");
+                    Debug.LogWarning("No NetworkObject found on target's p_parent!");
                 }
             }
         }
@@ -160,9 +159,9 @@ public class S_WeaponSlot : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void OnHitServerRpc(ulong targetNetworkId, float damage)
+    public void OnHitServerRpc(ulong p_targetNetworkId, float p_damage)
     {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkId, out NetworkObject targetNetObj))
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_targetNetworkId, out NetworkObject targetNetObj))
         {
             var targetCharacter = targetNetObj.GetComponentInChildren<S_PlayerCharacter>();
             if (targetCharacter != null && targetCharacter.lifeManager != null)
@@ -170,7 +169,7 @@ public class S_WeaponSlot : NetworkBehaviour
                 ulong targetClientId = targetNetObj.OwnerClientId;
 
 
-                OnHitClientRpc(damage, targetClientId);
+                OnHitClientRpc(p_damage, targetClientId);
             }
             else
             {
@@ -185,18 +184,18 @@ public class S_WeaponSlot : NetworkBehaviour
 
 
     [ClientRpc]
-    public void OnHitClientRpc(float damage, ulong targetClientId)
+    public void OnHitClientRpc(float p_damage, ulong p_targetClientId)
     {
-        print("OnHitClientRpc" + targetClientId);
-        if (NetworkManager.Singleton.LocalClientId != targetClientId)
+        print("OnHitClientRpc" + p_targetClientId);
+        if (NetworkManager.Singleton.LocalClientId != p_targetClientId)
             return;
 
         var localPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
         var character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
         if (character != null && character.lifeManager != null)
         {
-            character.lifeManager.TakeDamage(damage);
-            Debug.Log($"You took {damage} damage!");
+            character.lifeManager.TakeDamage(p_damage);
+            Debug.Log($"You took {p_damage} p_damage!");
         }
     }
 
@@ -206,23 +205,25 @@ public class S_WeaponSlot : NetworkBehaviour
         nbBullet = nbBulletMax;
     }
 
-    private void OnDestroy()
+    public override void OnNetworkDespawn()
     {
+        base.OnNetworkDespawn();
+
         S_PlayerInputsReciever.OnInteract -= Shoot;
     }
 
-    private IEnumerator DebugShoot(Vector3 origin, Vector3 direction, float duration)
+    private IEnumerator DebugShoot(Vector3 p_origin, Vector3 p_direction, float p_duration)
     {
-        if (!Physics.Raycast(origin, direction, out RaycastHit hit))
+        if (!Physics.Raycast(p_origin, p_direction, out RaycastHit hit))
             yield break;
 
         Vector3 end = hit.point;
 
         float t = 0;
 
-        while (t < duration)
+        while (t < p_duration)
         {
-            Debug.DrawLine(origin, end);
+            Debug.DrawLine(p_origin, end);
             t += Time.deltaTime;
             yield return null;
         }
