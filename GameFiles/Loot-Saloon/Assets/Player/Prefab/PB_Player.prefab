@@ -370,6 +370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeManager: {fileID: 505570556356067103}
+  playerInteract: {fileID: 5168879295098494647}
 --- !u!1 &1941622484713472824
 GameObject:
   m_ObjectHideFlags: 0
@@ -696,6 +697,8 @@ MonoBehaviour:
   cooldown: 0
   weaponObject: {fileID: 0}
   _angleSpread: 5
+  isReloading: 0
+  reloadTime: 20
 --- !u!1 &2337550713985648122
 GameObject:
   m_ObjectHideFlags: 0
@@ -1515,9 +1518,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  respawnPoint: {fileID: 0}
   _isSoloTestModeEnabled: 0
   _armsAnimator: {fileID: 2432516737232652957}
-  _respawnPoint: {fileID: 0}
   _armsHandler: {fileID: 4347886814229625470}
   _walkSpeed: 2
   _jumpForce: 5

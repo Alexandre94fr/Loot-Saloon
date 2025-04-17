@@ -185,7 +185,7 @@ public class S_BankVault : S_Interactable
             return;
         }
 
-        S_PlayerInteract playerInteractComponent = networkObject.GetComponentInChildren<S_PlayerInteract>();
+        S_PlayerInteract playerInteractComponent = networkObject.GetComponentInChildren<S_PlayerCharacter>().playerInteract;
         
         if (playerInteractComponent == null)
         {
