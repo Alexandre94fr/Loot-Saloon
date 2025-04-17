@@ -126,6 +126,9 @@ public class S_WeaponSlot : NetworkBehaviour
 
     public void Shoot()
     {
+        if (!interact.controller.activeInputs)
+            return;
+
         if (!weaponIsActive || Time.time - _lastShotTime < cooldown)
             return;
 
