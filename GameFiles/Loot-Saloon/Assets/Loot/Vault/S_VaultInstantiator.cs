@@ -12,8 +12,19 @@ public class S_VaultInstantiator : NetworkBehaviour
     public Transform[] vaultSpawnPoints;
     public GameObject pb_vault;
 
+    [SerializeField] private E_PlayerTeam _instantiatedVaultsTeam;
+
     public override void OnNetworkSpawn()
     {
+        if (_instantiatedVaultsTeam == E_PlayerTeam.NONE)
+        {
+            Debug.LogError($"ERROR ! The '{name}' GameObject's (S_VaultInstantiator) variable '{nameof(_instantiatedVaultsTeam)}' does not contains a good value. " +
+                $"Please set the variable to {E_PlayerTeam.BLUE} or {E_PlayerTeam.RED} throw the inspector."
+            );
+
+            return;
+        }
+
         if (_lootInstantiatorInstance == null)
             Debug.Assert(true," Loot Instanciator Reference should be set in the Vault Instanciator + " + this.name);
 
@@ -71,6 +82,8 @@ public class S_VaultInstantiator : NetworkBehaviour
 
             vault.GenerateLoots();
             vault.UpdateQuotaClientRpc(vault.GetMoneyValue());
+
+            vault.SetLockpickableByTeam(_instantiatedVaultsTeam);
         }
     }
 

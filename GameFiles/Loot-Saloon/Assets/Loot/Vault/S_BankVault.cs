@@ -16,16 +16,17 @@ public class S_BankVault : S_Interactable
     [SerializeField] bool _isDebuggingModeOn;
 
     [Space]
+    [ReadOnlyInInspector] [SerializeField] private int _moneyValue;
+    [ReadOnlyInInspector] [SerializeField] private E_PlayerTeam _lockpickableByTeam;
+    [ReadOnlyInInspector] [SerializeField] private S_LootInstantiator _lootInstantiator;
+    [ReadOnlyInInspector] [SerializeField] private S_VaultInstantiator _vaultInstantiator;
+
     [ReadOnlyInInspector] [SerializeField] 
     private NetworkVariable<VaultState> _vaultState = new(
         VaultState.Closed,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
-
-    [ReadOnlyInInspector] [SerializeField] private int _moneyValue;
-    [ReadOnlyInInspector] [SerializeField] private S_LootInstantiator _lootInstantiator;
-    [ReadOnlyInInspector] [SerializeField] private S_VaultInstantiator _vaultInstantiator;
 
 
     [Header(" Properties :")]
@@ -39,11 +40,18 @@ public class S_BankVault : S_Interactable
 
     #region Getter setter methods
 
+    // For _moneyValue
     public int GetMoneyValue() { return _moneyValue; }
 
+    // For _lockpickableByTeam
+    public E_PlayerTeam GetLockpickableByTeam() { return _lockpickableByTeam; }
+    public void SetLockpickableByTeam(E_PlayerTeam p_lockpickableByTeam) { _lockpickableByTeam = p_lockpickableByTeam; }
+
+    // For _lootInstantiator
     public S_LootInstantiator GetLootInstantiator() { return _lootInstantiator; }
     public void SetLootInstantiator(in S_LootInstantiator p_lootInstantiator) { _lootInstantiator = p_lootInstantiator; }
 
+    // For _vaultInstantiator
     public S_VaultInstantiator GetVaultInstantiator() { return _vaultInstantiator; }
     public void SetVaultInstantiator(in S_VaultInstantiator p_vaultInstantiator) { _vaultInstantiator = p_vaultInstantiator; }
     #endregion

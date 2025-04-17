@@ -1461,6 +1461,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1754961018}
     - target: {fileID: 982020779057477206, guid: 7bf272f3a8a55674d988ccdd4fef67f1, type: 3}
+      propertyPath: _instantiatedVaultsTeam
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 982020779057477206, guid: 7bf272f3a8a55674d988ccdd4fef67f1, type: 3}
       propertyPath: _lootInstantiatorInstance
       value: 
       objectReference: {fileID: 276782623}
@@ -5131,6 +5135,10 @@ PrefabInstance:
       propertyPath: _quotaObject
       value: 
       objectReference: {fileID: 941723120}
+    - target: {fileID: 982020779057477206, guid: 7bf272f3a8a55674d988ccdd4fef67f1, type: 3}
+      propertyPath: _instantiatedVaultsTeam
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 982020779057477206, guid: 7bf272f3a8a55674d988ccdd4fef67f1, type: 3}
       propertyPath: _lootInstantiatorInstance
       value: 
