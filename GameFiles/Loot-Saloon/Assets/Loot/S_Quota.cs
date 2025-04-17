@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class S_Quota : MonoBehaviour
@@ -11,6 +12,8 @@ public class S_Quota : MonoBehaviour
     [Header(" Properties :")]
     [Tooltip("How much of the total sum the quota is equal to")]
     [SerializeField] [Range(0f, 1f)] private float _extractionQuotaRatio = 0.67f;
+
+    public event Action OnQuotaChanged;
 
 
     private void Start()
@@ -31,5 +34,7 @@ public class S_Quota : MonoBehaviour
     {
         total += p_bankVault.GetMoneyValue();
         quota = (int)(total * _extractionQuotaRatio);
+
+        OnQuotaChanged?.Invoke();
     }
 }

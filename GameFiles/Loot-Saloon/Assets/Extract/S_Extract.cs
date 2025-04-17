@@ -24,10 +24,13 @@ public class S_Extract : MonoBehaviour
     private void Awake()
     {
         quotaComponent = GetComponent<S_Quota>();
-        _quotaText = "{0} / " + quotaComponent.quota + "$";
-        MoneyRequiredText.text = string.Format(_quotaText, 0);
+        MoneyRequiredText.text = "-";
 
         OnExtract += (winner) => GetQuota.Invoke(_team, quotaComponent.quota);
+        quotaComponent.OnQuotaChanged += () => {
+            _quotaText = "{0} - " + quotaComponent.quota + " $";
+            MoneyRequiredText.text = string.Format(_quotaText, 0);
+        };
     }
 
     private void Start()
@@ -57,18 +60,24 @@ public class S_Extract : MonoBehaviour
     {
         if (other.gameObject.layer == 6)
         {
-            if (!_cartInExtract && other.TryGetComponent(out S_Cart cart))
+            if (!_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
-                MoneyRequiredText.text = string.Format(_quotaText, cart.total);
-                if (quotaComponent.quota - cart.total <= 0)
+                print("quota: " + quotaComponent.quota);
+                MoneyRequiredText.text = string.Format(_quotaText, cart.total, quotaComponent.quota);
+                if (quotaComponent.quota <= cart.total)
                 {
+                    print("cart in extract");
                     _totalEntityInExract++;
                     _cartInExtract = true;
                 }
             }
         }
+
         else if (other.gameObject.CompareTag("Player"))
+        {
             _totalEntityInExract++;
+            print("player in extract");
+        }
 
         if (_totalEntityInExract >= 2 && _cartInExtract)
         {
@@ -80,11 +89,11 @@ public class S_Extract : MonoBehaviour
     {
         if (other.gameObject.layer == 6)
         {
-            if (_cartInExtract && other.TryGetComponent(out S_Cart cart))
+            if (_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
                 _cartInExtract = false;
                 _totalEntityInExract--;
-                MoneyRequiredText.text = string.Format(_quotaText, 0);
+                MoneyRequiredText.text = string.Format(_quotaText, 0, quotaComponent.quota);
             }
         }
 

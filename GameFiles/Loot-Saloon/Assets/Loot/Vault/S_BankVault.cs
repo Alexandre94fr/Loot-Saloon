@@ -48,6 +48,13 @@ public class S_BankVault : S_Interactable
     public void SetVaultInstantiator(in S_VaultInstantiator p_vaultInstantiator) { _vaultInstantiator = p_vaultInstantiator; }
     #endregion
 
+    [ClientRpc]
+    public void UpdateQuotaClientRpc(int value)
+    {
+        _moneyValue = value;
+        _vaultInstantiator.UpdateQuota(this);
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -97,8 +104,6 @@ public class S_BankVault : S_Interactable
             _lootIndices.Add(lootIndex);
             _moneyValue += _lootInstantiator.GetLootPrice(lootIndex);
         }
-
-        _vaultInstantiator.UpdateQuota(this);
     }
 
     [ServerRpc(RequireOwnership = false)]
