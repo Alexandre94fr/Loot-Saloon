@@ -103,7 +103,7 @@ public class S_EndGamemenu : MonoBehaviour
     {
         S_Extract.ClearEvents();
         S_Cart.ClearEvents();
-        S_LobbyEvents.ClearEvents();
+        // S_LobbyEvents.ClearEvents();
         S_LifeManager.ClearEvents();
         S_PlayerInputsReciever.ClearEvents();
         S_GameTimer.ClearEvents();
