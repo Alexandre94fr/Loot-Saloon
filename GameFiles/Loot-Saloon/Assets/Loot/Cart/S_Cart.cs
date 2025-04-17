@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 #endregion
@@ -25,6 +26,10 @@ public class S_Cart : S_Pickable
 
     private Rigidbody _cartRb;
     private bool _isCarried = false;
+    private Vector3 _direction;
+    private Transform _parent;
+
+    [SerializeField] float followDistance = 3f;
 
     [SerializeField] private Vector3 _cartOffset = new Vector3(1, 0, 2); // Ajuster selon la position souhait�e
 
@@ -34,49 +39,97 @@ public class S_Cart : S_Pickable
         Debug.Log("Move The Fucking cart");
         if (!_isCarried) return;
 
-        if (_cartRb != null)
+        //if (_cartRb != null)
         {
             // Appliquer un d�placement plus lisse en ajustant la vitesse
-            _cartRb.linearVelocity = Vector3.Lerp(_cartRb.linearVelocity, dir * 5f, Time.deltaTime * 10f);
-            Debug.Log("with RB");
+            _direction = dir;
+            Debug.Log("with RB :: " + dir);
         }
-        else
+        //else
+        //{
+        //    // D�placement avec interpolation si pas de Rigidbody
+        //    transform.position = Vector3.Lerp(transform.position, transform.position + dir * 0.1f, Time.deltaTime * 10f);
+        //    Debug.Log("without RB");
+        //}
+    }
+
+    private IEnumerator MoveCoroutine()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb == null)
         {
-            // D�placement avec interpolation si pas de Rigidbody
-            transform.position = Vector3.Lerp(transform.position, transform.position + dir * 0.1f, Time.deltaTime * 10f);
-            Debug.Log("without RB");
+            Debug.LogError("Cart Rigidbody is missing.");
+            yield break;
+        }
+
+        float moveSpeed = 5f;
+        float turnSmoothness = 2f; // Plus petit = plus lent à tourner
+
+        Vector3 smoothedForward = _parent.forward;
+
+        while (_isCarried)
+        {
+            if (_direction.sqrMagnitude > 0.01f)
+            {
+                // Calcule direction du regard sans Y
+                Vector3 targetForward = _parent.forward;
+                targetForward.y = 0;
+                targetForward.Normalize();
+
+                // Interpolation douce de la direction
+                smoothedForward = Vector3.Slerp(smoothedForward, targetForward, Time.deltaTime * turnSmoothness);
+
+                // Calcule position cible avec offset devant
+                Vector3 targetPos = _parent.position + smoothedForward * followDistance;
+                targetPos.y = rb.position.y;
+
+                rb.MovePosition(Vector3.Lerp(rb.position, targetPos, Time.deltaTime * moveSpeed));
+
+                // Rotation en direction inverse pour que le cart regarde le joueur (cul vers joueur)
+                Quaternion targetRot = Quaternion.LookRotation(-smoothedForward, Vector3.up);
+                rb.MoveRotation(Quaternion.Lerp(rb.rotation, targetRot, Time.deltaTime * turnSmoothness));
+            }
+
+            yield return null;
         }
     }
 
     // Lors de la prise du cart
     protected override void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
+        Debug.Log("Cart physics");
+
         if (_isCarried)
             return;
 
+        _parent = p_parent;
         _isCarried = true;
+        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(true, transform);
+
 
         S_PlayerInputsReciever.OnMove += MoveCart;
+        StartCoroutine(MoveCoroutine());
 
-        // Cr�ation du point d'attache pour le cart
-        _attachPoint = new GameObject("CartAttachPoint");
-        _attachPoint.transform.position = p_parent.position;
-        _attachPoint.transform.rotation = p_parent.rotation;
 
-        var rbAttach = _attachPoint.AddComponent<Rigidbody>();
-        rbAttach.isKinematic = true;
+        //// Cr�ation du point d'attache pour le cart
+        //_attachPoint = new GameObject("CartAttachPoint");
+        //_attachPoint.transform.position = p_parent.position;
+        //_attachPoint.transform.rotation = p_parent.rotation;
+
+        //var rbAttach = _attachPoint.AddComponent<Rigidbody>();
+        //rbAttach.isKinematic = true;
 
         // Attach le cart au joueur via un joint physique
-        _cartRb = GetComponent<Rigidbody>();
-        _cartRb.isKinematic = true;  // D�sactive la physique sur le cart
+        //_cartRb = GetComponent<Rigidbody>();
+        //_cartRb.isKinematic = false;  // D�sactive la physique sur le cart
 
-        _joint = gameObject.AddComponent<FixedJoint>();
-        _joint.connectedBody = rbAttach;
-        _joint.breakForce = Mathf.Infinity;
-        _joint.breakTorque = Mathf.Infinity;
+        //_joint = gameObject.AddComponent<FixedJoint>();
+        //_joint.connectedBody = rbAttach;
+        //_joint.breakForce = Mathf.Infinity;
+        //_joint.breakTorque = Mathf.Infinity;
 
         // Ajout d'un syst�me pour suivre le joueur
-        StartCoroutine(FollowPlayer(p_parent));
+        //StartCoroutine(FollowPlayer(p_parent));
     }
 
     // D�placement fluide du cart avec le joueur
@@ -118,26 +171,27 @@ public class S_Cart : S_Pickable
             Destroy(_attachPoint);
             _attachPoint = null;
         }
+        _parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(false);
     }
 private void Update()
     {
-        if (_isCarried)
-        {
-            // D�placer le cart en m�me temps que le joueur
-            if (_joint != null)
-            {
-                // Positionner le cart devant le joueur, avec un petit offset
-                transform.position = _attachPoint.transform.position + _cartOffset;
-                transform.rotation = _attachPoint.transform.rotation;
-            }
-        }
+        //if (_isCarried)
+        //{
+        //    // D�placer le cart en m�me temps que le joueur
+        //    if (_joint != null)
+        //    {
+        //        // Positionner le cart devant le joueur, avec un petit offset
+        //        transform.position = _attachPoint.transform.position + _cartOffset;
+        //        transform.rotation = _attachPoint.transform.rotation;
+        //    }
+        //}
     }
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         if (IsEasyToPickUp(p_playerInteract))
         {
-            AttachToPlayer(p_playerInteract, p_parent);
+            PickUp(p_playerInteract, p_parent);
         }
     }
 

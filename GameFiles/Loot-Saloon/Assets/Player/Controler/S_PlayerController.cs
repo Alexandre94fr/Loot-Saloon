@@ -24,7 +24,19 @@ public class S_PlayerController : NetworkBehaviour
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private float _sprintSpeed = 4f;
 
+    [SerializeField] private bool _isCartModeEnabled = false;
+
+    public void EnableCartMode(bool enabled, Transform cart = null)
+    {
+        _isCartModeEnabled = enabled;
+
+        // Synchroniser avec la caméra aussi :
+        _playerTransform.GetComponentInChildren<S_PlayerCamera>().EnableCartMode(enabled, cart);
+    }
+
+
     private Transform _playerTransform;
+    private S_PlayerCamera _playerCamera;
     private Vector3 _playerDirection;
 
     private float _currentSpeed = 4f;
@@ -52,6 +64,13 @@ public class S_PlayerController : NetworkBehaviour
             return;
 
         _playerTransform = transform.parent.transform;
+        _playerCamera = _playerTransform.GetComponentInChildren<S_PlayerCamera>();
+        _playerCamera.SetPlayerTransform(_playerTransform);
+
+        if (_playerCamera == null)
+        {
+            Debug.Log("Player camera wasn't set Please Check :: " + _playerTransform.name);
+        }
 
         if (_playerTransform.parent.GetComponent<NetworkObject>().IsOwner)
         {
@@ -112,7 +131,30 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Move()
     {
-        _playerTransform.position += (transform.right * _playerDirection.x + transform.forward * _playerDirection.z) * (Time.deltaTime * _currentSpeed);
+        if (_isCartModeEnabled)
+        {
+            // Simulation de mouvement "caddie" — toujours aller tout droit
+            Vector3 forward = _playerTransform.forward * _playerDirection.z; // z = avant/arrière
+            _playerTransform.position += forward * (Time.deltaTime * _currentSpeed);
+
+            // Appliquer rotation si input horizontal
+            if (Mathf.Abs(_playerDirection.x) > 0.1f)
+            {
+                float rotationAmount = _playerDirection.x * 100f * Time.deltaTime; // 100 = vitesse rot
+                _playerTransform.Rotate(0, rotationAmount, 0);
+            }
+        }
+        else
+        {
+            if (_playerCamera == null)
+            {
+                Debug.LogWarning("Trying to move but _playerCamera is null. Skipping movement.");
+                return;
+            }
+
+            Vector3 moveDir = _playerCamera.GetMovementDirection(new Vector2(_playerDirection.x, _playerDirection.z));
+            _playerTransform.position += moveDir * (Time.deltaTime * _currentSpeed);
+        }
     }
 
     private void Sprint(bool sprint)
@@ -126,14 +168,8 @@ public class S_PlayerController : NetworkBehaviour
     {
         _playerDirection.x = p_playerDirection.x;
         _playerDirection.z = p_playerDirection.y;
-        if (_playerDirection.x != 0 || _playerDirection.z != 0)
-        {
-            _armsAnimator.SetBool("Walking", true);
-        }
-        else
-        {
-            _armsAnimator.SetBool("Walking", false);
-        }
+
+        _armsAnimator.SetBool("Walking", _playerDirection.sqrMagnitude > 0.01f);
     }
 
     public void OnObjectPickedUp(S_Pickable p_pickable)
