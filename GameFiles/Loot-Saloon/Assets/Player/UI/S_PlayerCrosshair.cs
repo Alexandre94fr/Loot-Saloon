@@ -15,6 +15,9 @@ public class S_PlayerCrosshair : MonoBehaviour
 
     public void ChangeColor(S_Interactable interactable)
     {
+        // TODO fix this shit
+        // when on the server, it stops working after all clients have spawned
+        // disabling / enabling the player gameobject fixes it
         _image.color = interactable == null ? _onCantInteractColor : _onCanInteractColor;
     }
 }
