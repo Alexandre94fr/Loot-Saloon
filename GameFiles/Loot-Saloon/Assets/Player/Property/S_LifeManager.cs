@@ -4,7 +4,7 @@ using UnityEngine;
 public class S_LifeManager : MonoBehaviour
 {
     private S_PlayerAttributes _playerAttributes;
-    public static event Action OnDie;
+    public static event Action<S_PlayerAttributes> OnDie;
     public static event Action TakeDamageEvent;
 
     private void Awake()
@@ -27,7 +27,7 @@ public class S_LifeManager : MonoBehaviour
         if (_playerAttributes.life <= 0)
         {
             _playerAttributes.life = 0;
-            OnDie?.Invoke();
+            OnDie?.Invoke(_playerAttributes);
         }
     }
     

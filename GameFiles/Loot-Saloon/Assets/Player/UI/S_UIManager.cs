@@ -42,7 +42,7 @@ public class S_UIManager : MonoBehaviour
         _respawningCountdownImage.gameObject.SetActive(false); 
     }
 
-    private void StartRespawnCountdown()
+    private void StartRespawnCountdown(S_PlayerAttributes attributes)
     {
         StartCoroutine(RespawnCountdown());
     }

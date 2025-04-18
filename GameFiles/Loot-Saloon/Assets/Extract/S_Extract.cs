@@ -1,5 +1,6 @@
 using System;
 using TMPro;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 
 public class S_Extract : MonoBehaviour
@@ -36,6 +37,7 @@ public class S_Extract : MonoBehaviour
     private void Start()
     {
         S_GameTimer.OnEnd += () => OnExtract?.Invoke(E_PlayerTeam.NONE);
+        S_LifeManager.OnDie += (attributes) => _canExtract = attributes.team != _team;
     }
 
     private void Update()
@@ -62,7 +64,7 @@ public class S_Extract : MonoBehaviour
         {
             if (!_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
-                print("quota: " + quotaComponent.quota);
+                // print("quota: " + quotaComponent.quota);
                 MoneyRequiredText.text = string.Format(_quotaText, cart.total, quotaComponent.quota);
                 if (quotaComponent.quota <= cart.total)
                 {
@@ -76,7 +78,6 @@ public class S_Extract : MonoBehaviour
         else if (other.gameObject.CompareTag("Player"))
         {
             _totalEntityInExract++;
-            print("player in extract");
         }
 
         if (_totalEntityInExract >= 2 && _cartInExtract)

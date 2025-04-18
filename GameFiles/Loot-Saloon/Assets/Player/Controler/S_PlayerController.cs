@@ -229,7 +229,7 @@ public class S_PlayerController : NetworkBehaviour
         Sprint(_isSprinting);
     }
 
-    private void Respawn()
+    private void Respawn(S_PlayerAttributes attributes)
     {
         DropInputsEvents();
         DisableAllMeshOfPlayer();

@@ -14,7 +14,10 @@ public class S_PlayerAttributes : MonoBehaviour
     private void Awake()
     {
         ResetStat();
-        S_LifeManager.OnDie += ResetStat;
+        S_LifeManager.OnDie += (attributes) => {
+            if (attributes == this)
+                ResetStat();
+        };
     }
 
     public void SetTeam(E_PlayerTeam p_team)
