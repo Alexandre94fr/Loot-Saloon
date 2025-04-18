@@ -28,7 +28,7 @@ public class S_WeaponSlot : NetworkBehaviour
 
     private float _lastShotTime;
 
-    private void DropWeaponOnDeath()
+    private void DropWeaponOnDeath(S_PlayerAttributes attributes)
     {
         if (_weaponObject != null)
             DropWeapon(_weaponObject.GetComponent<S_Weapon>());

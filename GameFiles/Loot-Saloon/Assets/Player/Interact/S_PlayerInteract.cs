@@ -72,7 +72,7 @@ public class S_PlayerInteract : NetworkBehaviour
 
         if (_pickableHeld != null)
         {
-            PutDownPickable();
+            PutDownPickable(null);
             return;
         }
 
@@ -140,7 +140,7 @@ public class S_PlayerInteract : NetworkBehaviour
         OnPickUp.Invoke(p_pickable);
     }
 
-    private void PutDownPickable()
+    private void PutDownPickable(S_PlayerAttributes attributes)
     {
         if (_pickableHeld == null)
             return;
@@ -209,7 +209,7 @@ public class S_PlayerInteract : NetworkBehaviour
             clientRb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
         }
 
-        PutDownPickable();
+        PutDownPickable(null);
 
         ApplyImpulseServerRpc(objectId, throwDirection);
     }
