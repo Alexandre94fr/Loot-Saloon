@@ -1,4 +1,5 @@
 #region
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
@@ -140,7 +141,6 @@ public class S_GameLobbyManager : MonoBehaviour
 
         S_LobbyEvents.OnLobbyUpdated?.Invoke();
 
-        Debug.Log($"nb player ready  : {nbPlayerReady} / {_lobbyPlayerDatas.Count}");
         bool teamsBalanced = await SameNbPlayerInEachTeam();
         if (teamsBalanced && nbPlayerReady == _lobbyPlayerDatas.Count)
         {
@@ -275,5 +275,22 @@ public class S_GameLobbyManager : MonoBehaviour
     public Task<E_PlayerTeam> GetPlayerTeamAsync()
     {
         return Task.FromResult(_localLobbyPlayerData.Team);
+    }
+
+    public  async void HandleHostDisconnection()
+    {
+        try
+        {
+            await S_LobbyManager.instance.LeaveLobbyAsync();
+            Debug.Log("Player has left the lobby.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error while leaving the lobby: {ex.Message}");
+        }
+        finally
+        {
+            await SceneManager.LoadSceneAsync("MainMenu");
+        }
     }
 }

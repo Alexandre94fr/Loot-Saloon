@@ -31,7 +31,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
 
-            leaveButton.onClick.AddListener(HandleHostDisconnection);
+            leaveButton.onClick.AddListener(() => S_GameLobbyManager.instance.HandleHostDisconnection());
             readyButton.onClick.AddListener(OnReadyPressed);
             goRedTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.RED));
             goBlueTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.BLUE));
@@ -108,20 +108,5 @@ public class S_LobbyUINetworkTest : MonoBehaviour
         S_LobbyEvents.OnLobbyUnready?.Invoke();
     }
 
-    private async void HandleHostDisconnection()
-    {
-        try
-        {
-            await S_LobbyManager.instance.LeaveLobbyAsync();
-            Debug.Log("Player has left the lobby.");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error while leaving the lobby: {ex.Message}");
-        }
-        finally
-        {
-            await SceneManager.LoadSceneAsync("MainMenu");
-        }
-    }
+
 }

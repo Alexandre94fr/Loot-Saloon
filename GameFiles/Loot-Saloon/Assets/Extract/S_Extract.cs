@@ -106,4 +106,3 @@ public class S_Extract : MonoBehaviour
         }
     }
 }
-// :)
