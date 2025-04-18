@@ -73,7 +73,7 @@ public class S_Extract : MonoBehaviour
             }
         }
 
-        else if (other.gameObject.CompareTag("Player"))
+        else if (other.gameObject.GetComponentInChildren<S_PlayerAttributes>().team == _team)
         {
             _totalEntityInExract++;
             print("player in extract");
@@ -97,7 +97,7 @@ public class S_Extract : MonoBehaviour
             }
         }
 
-        else if (other.gameObject.CompareTag("Player")) 
+        else if (other.gameObject.GetComponentInChildren<S_PlayerAttributes>().team == _team) 
             _totalEntityInExract--;
 
         if (_totalEntityInExract < 2 || !_cartInExtract)
