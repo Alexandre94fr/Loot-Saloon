@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -29,6 +30,13 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
         refreshListBtn.onClick.AddListener(ShowLobbies);
 
         Cursor.lockState = CursorLockMode.None;
+
+        NetworkManager[] networkManagers = FindObjectsByType<NetworkManager>(FindObjectsSortMode.None);
+        foreach (NetworkManager networkManager in networkManagers)
+        {
+            networkManager.Shutdown();
+            Destroy(networkManager.gameObject);
+        }
     }
 
     private async void OnHostButtonClicked()
@@ -105,4 +113,7 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
             Debug.LogError("Failed to join lobby.");
         }
     }
+
+
+
 }

@@ -312,4 +312,9 @@ public class S_LobbyManager : MonoBehaviour
     {
         return _lobby?.Id ?? string.Empty;
     }
+
+    public Lobby GetLobbyInstance()
+    {
+        return _lobby;
+    }
 }
