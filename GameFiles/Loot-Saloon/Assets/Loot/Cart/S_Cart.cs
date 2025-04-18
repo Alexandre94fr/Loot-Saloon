@@ -29,13 +29,11 @@ public class S_Cart : S_Pickable
 
     [SerializeField] float followDistance = 3f;
 
-    /// Header Modif
-    /// On déplace uniquement le cart du côté du owner, et on synchronise la position via ServerRpc
-    /// pour éviter les désynchronisations entre clients.
-    /// End Modif
-
     private IEnumerator MoveCoroutine()
     {
+        Debug.Log($"Je suis {NetworkManager.Singleton.LocalClientId} et le owner est {GetComponent<NetworkObject>().OwnerClientId}");
+
+
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -59,23 +57,19 @@ public class S_Cart : S_Pickable
             Quaternion targetRotation = Quaternion.LookRotation(-forward, Vector3.up);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.deltaTime * rotationSmoothness));
 
-            if (IsOwner) /**/
+            if (IsOwner) 
             {
-                SyncCartPositionServerRpc(rb.position, rb.rotation); /**/
+                SyncCartPositionServerRpc(rb.position, rb.rotation); 
             }
 
             yield return null;
         }
     }
 
-    /// Header Modif
-    /// Cette méthode est appelée uniquement par le owner pour synchroniser la position du cart.
-    /// Elle s'exécute côté serveur, et réplique la position/rotation à tous les autres clients.
-    /// End Modif
     [ServerRpc]
-    private void SyncCartPositionServerRpc(Vector3 position, Quaternion rotation) /**/
+    private void SyncCartPositionServerRpc(Vector3 position, Quaternion rotation) 
     {
-        transform.SetPositionAndRotation(position, rotation); /**/
+        transform.SetPositionAndRotation(position, rotation); 
     }
 
     protected override void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
@@ -97,33 +91,75 @@ public class S_Cart : S_Pickable
     }
 
     [ClientRpc]
-    private void PutDownClientRpc()
+    private void PutDownClientRpc(ClientRpcParams rpcParams = default)
     {
-        if (!IsOwner) return;
-        var playerController = _parent?.parent.GetComponentInChildren<S_PlayerController>();
-        if (playerController == null)
+        Debug.Log(" PutDownClientRpc received");
+        Debug.Log($"[Client] Received PutDownClientRpc - IsOwner: {IsOwner}, IsClient: {IsClient}");
+
+        var netObj = GetComponent<NetworkObject>();
+        Debug.Log($"[Client] This Cart is owned by {netObj.OwnerClientId}, and I'm {NetworkManager.Singleton.LocalClientId}");
+
+        var playerObject = NetworkManager.Singleton.LocalClient?.PlayerObject;
+        if (playerObject == null)
         {
-            Debug.LogError("PlayerController is null.");
+            Debug.LogError(" Local PlayerObject is null.");
             return;
         }
-        playerController.EnableCartMode(false);
+
+        var playerController = playerObject.GetComponentInChildren<S_PlayerController>();
+        if (playerController == null)
+        {
+            Debug.LogError(" PlayerController is null.");
+            return;
+        }
+
+        playerController.EnableCartModeClientRpc(false, GetComponent<NetworkObject>());
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestPutDownServerRpc()
+    {
+        Debug.Log($"[Server] Received PutDown request from client {OwnerClientId}");
+        Debug.Log($"[Server] PutDown called on Cart by {OwnerClientId}. IsServer: {IsServer}");
+
+        base.PutDown();
+
+        if (!_isCarried) return;
+
+        Debug.Log("Putting down cart");
+
+        _isCarried = false;
+
+        if (_cartRb == null)
+            _cartRb = GetComponent<Rigidbody>();
+
+        if (_cartRb != null)
+        {
+            _cartRb.isKinematic = false;
+            _cartRb.useGravity = true;
+        }
+
+        S_PlayerInputsReciever.OnMove -= MoveCart;
+
+        StopAllCoroutines();
+
+        _parent = null;
+
+        ClientRpcParams clientRpcParams = new()
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { OwnerClientId }
+            }
+        };
+        Debug.Log($"[Server] Sending PutDownClientRpc to OwnerClientId: {OwnerClientId}");
+        PutDownClientRpc(clientRpcParams);
     }
 
     public override void PutDown()
     {
-        base.PutDown();
-
-        Debug.Log("_isCarried: " + _isCarried);
-        Debug.Log("_cartRb: " + _cartRb);
-        Debug.Log("_parent: " + _parent);
-
-        if (_cartRb != null)
-        {
-            _cartRb.isKinematic = false;  // Réactive la physique du cart
-            _cartRb.useGravity = true;  // Permet au cart de tomber à nouveau
-        }
-
-        PutDownClientRpc();
+        RequestPutDownServerRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -188,10 +224,6 @@ public class S_Cart : S_Pickable
     {
         text.text = total.ToString();
     }
-
-    /// Header Modif
-    /// Méthode vide volontaire : uniquement utilisée pour s’abonner au move input mais le vrai mouvement est calculé dans MoveCoroutine.
-    /// End Modif
     private void MoveCart(Vector3 dir)
     {
         if (!_isCarried) return;

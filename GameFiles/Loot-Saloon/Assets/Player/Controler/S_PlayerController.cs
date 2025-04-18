@@ -27,23 +27,64 @@ public class S_PlayerController : NetworkBehaviour
     [SerializeField] private bool _isCartModeEnabled = false;
 
 
+
+    [ClientRpc]
+    private void PutDownClientRpc(ClientRpcParams rpcParams = default)
+    {
+        Debug.Log("PutDownClientRpc received From Player Controller");
+
+        // unactive cart mode immediately
+        _isCartModeEnabled = false;
+        EnableCartMode(false, null);
+
+        // Unactive all component of cart mode
+        var playerCamera = _playerTransform.GetComponentInChildren<S_PlayerCamera>();
+        if (playerCamera != null)
+        {
+            playerCamera.EnableCartMode(false, null);
+        }
+
+        var playerObject = NetworkManager.Singleton.LocalClient?.PlayerObject;
+        if (playerObject != null)
+        {
+            var playerController = playerObject.GetComponentInChildren<S_PlayerController>();
+            if (playerController != null)
+            {
+                playerController.EnableCartMode(false, null);
+            }
+        }
+    }
+
     [ClientRpc]
     public void EnableCartModeClientRpc(bool isEnabled, NetworkObjectReference cartRef)
     {
-        if (!IsOwner) return; /**/
+        if (!IsOwner) return;
 
-        cartRef.TryGet(out NetworkObject cartObj);
-        Transform cartTransform = cartObj.transform;
+        Transform cartTransform = null;
 
-        EnableCartMode(isEnabled, cartTransform); /**/
+        if (isEnabled && cartRef.TryGet(out NetworkObject cartObj))
+        {
+            cartTransform = cartObj.transform;
+        }
+
+        EnableCartMode(isEnabled, cartTransform); // Local activation
+
+        if (!isEnabled)
+        {
+            // Unactivate localy the cart mode
+            PutDownClientRpc();
+            _isCartModeEnabled = false;
+            _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(false, null);
+        }
     }
 
     public void EnableCartMode(bool enabled, Transform cart = null)
     {
         _isCartModeEnabled = enabled;
 
-        // Synchroniser avec la caméra aussi :
-        _playerTransform.GetComponentInChildren<S_PlayerCamera>().EnableCartMode(enabled, cart);
+        Debug.Log($"[CART MODE] Set to {(enabled ? "ENABLED" : "DISABLED")} for {gameObject.name}");
+
+        _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(enabled, cart);
     }
 
 
@@ -145,14 +186,14 @@ public class S_PlayerController : NetworkBehaviour
     {
         if (_isCartModeEnabled)
         {
-            // Simulation de mouvement "caddie" — toujours aller tout droit
-            Vector3 forward = _playerTransform.forward * _playerDirection.z; // z = avant/arrière
+            // Simulate cart movement for always go forward
+            Vector3 forward = _playerTransform.forward * _playerDirection.z; // z = forward/rear
             _playerTransform.position += forward * (Time.deltaTime * _currentSpeed);
 
-            // Appliquer rotation si input horizontal
+            // Rotation for horizontal inputs
             if (Mathf.Abs(_playerDirection.x) > 0.1f)
             {
-                float rotationAmount = _playerDirection.x * 100f * Time.deltaTime; // 100 = vitesse rot
+                float rotationAmount = _playerDirection.x * 100f * Time.deltaTime; 
                 _playerTransform.Rotate(0, rotationAmount, 0);
             }
         }
