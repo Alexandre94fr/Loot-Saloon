@@ -1134,6 +1134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hostBtn: {fileID: 461945233}
   joinBtn: {fileID: 1359350239}
+  joinCodeBtn: {fileID: 1610217771}
   refreshListBtn: {fileID: 821768744}
   sceneToLoad: Lobby
   codeInputField: {fileID: 536499678}
