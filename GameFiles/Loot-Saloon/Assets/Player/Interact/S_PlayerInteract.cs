@@ -67,6 +67,9 @@ public class S_PlayerInteract : NetworkBehaviour
 
     private void Interact()
     {
+        if (!controller.activeInputs)
+            return;
+
         if (_pickableHeld != null)
         {
             PutDownPickable();

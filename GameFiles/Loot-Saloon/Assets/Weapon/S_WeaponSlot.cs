@@ -28,6 +28,12 @@ public class S_WeaponSlot : NetworkBehaviour
 
     private float _lastShotTime;
 
+    private void DropWeaponOnDeath()
+    {
+        if (_weaponObject != null)
+            DropWeapon(_weaponObject.GetComponent<S_Weapon>());
+    }
+
 
     private void Start()
     {
@@ -48,6 +54,9 @@ public class S_WeaponSlot : NetworkBehaviour
         _playerInteractComponent.OnPickUp.AddListener(OnGenericPickUp);
 
         _lastShotTime = -_cooldown;
+
+        if (IsOwner)
+            S_LifeManager.OnDie += DropWeaponOnDeath;
     }
 
     public void SetWeaponSlot(Transform p_parent, S_Weapon p_newWeapon)
