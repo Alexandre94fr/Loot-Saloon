@@ -105,12 +105,6 @@ public class S_PlayerController : NetworkBehaviour
             return;
 
         _playerTransform = transform.parent.transform;
-
-        HandleInputsEvents();
-
-        S_LifeManager.OnDie += Respawn;
-        S_Extract.OnExtract += DisableAllMeshOfPlayer;
-        S_Extract.OnExtract += DropInputsEvents;
     }
 
     public override void OnNetworkSpawn()
