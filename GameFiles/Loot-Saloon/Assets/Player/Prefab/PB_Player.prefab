@@ -476,6 +476,21 @@ MonoBehaviour:
   controller: {fileID: 4592600893772838868}
   _cameraTransform: {fileID: 0}
   _rightArmTransform: {fileID: 5973440091477464354}
+  OnLookAtInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8741611000399202604}
+        m_TargetAssemblyTypeName: S_PlayerCrosshair, Assembly-CSharp
+        m_MethodName: ChangeColor
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnWeaponPickUp:
     m_PersistentCalls:
       m_Calls: []
@@ -772,6 +787,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sensitivity: 50
+  _maxYawOffset: 45
 --- !u!95 &2432516737232652957
 Animator:
   serializedVersion: 7
@@ -1295,6 +1311,7 @@ MonoBehaviour:
   _walkSpeed: 2
   _jumpForce: 5
   _sprintSpeed: 4
+  _isCartModeEnabled: 0
   activeInputs: 1
 --- !u!1 &7329753644563634275
 GameObject:
@@ -1482,6 +1499,7 @@ GameObject:
   - component: {fileID: 6383329238378591768}
   - component: {fileID: 1407724519496441963}
   - component: {fileID: 2300798926536649469}
+  - component: {fileID: 8741611000399202604}
   m_Layer: 0
   m_Name: Crosshair
   m_TagString: Untagged
@@ -1529,7 +1547,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1546,6 +1564,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8741611000399202604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7739475665334446821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cde8dc7437dc7e4d87696e301883fac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _onCanInteractColor: {r: 1, g: 1, b: 1, a: 1}
+  _onCantInteractColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &8014317804076556876
 GameObject:
   m_ObjectHideFlags: 0
