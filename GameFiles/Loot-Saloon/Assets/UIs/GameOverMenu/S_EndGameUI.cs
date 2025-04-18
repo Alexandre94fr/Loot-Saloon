@@ -1,15 +1,19 @@
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EndGameUI : MonoBehaviour
+public class S_EndGameUI : MonoBehaviour
 {
+    [Header(" Internal references :")]
     [SerializeField] private Button _backToLobbyButton;
+
+    [Space]
     [SerializeField] private TextMeshProUGUI _myTeamResultText;
     [SerializeField] private TextMeshProUGUI _myTeamMoneyText;
 
+    [Space]
     [SerializeField] private TextMeshProUGUI _otherTeamResultText;
     [SerializeField] private TextMeshProUGUI _otherTeamMoneyText;
 
@@ -23,22 +27,22 @@ public class EndGameUI : MonoBehaviour
     {
         E_PlayerTeam myTeam = S_GameLobbyManager.instance.GetPlayerTeam();
 
-        S_Cart.GetCartValue += (team, total) => {
-            if (team == myTeam)
-                _myTeamMoney = total;
+        S_Cart.GetCartValue += (p_team, p_total) => {
+            if (p_team == myTeam)
+                _myTeamMoney = p_total;
         };
-        S_Cart.GetCartValue += (team, total) => {
-            if (team != myTeam)
-                _otherTeamMoney = total;
+        S_Cart.GetCartValue += (p_team, p_total) => {
+            if (p_team != myTeam)
+                _otherTeamMoney = p_total;
         };
 
-        S_Extract.GetQuota += (team, quota) => {
-            if (team == myTeam)
-                _myTeamQuota = quota;
+        S_Extract.GetQuota += (p_team, p_quota) => {
+            if (p_team == myTeam)
+                _myTeamQuota = p_quota;
         };
-        S_Extract.GetQuota += (team, quota) => {
-            if (team != myTeam)
-                _otherTeamQuota = quota;
+        S_Extract.GetQuota += (p_team, p_quota) => {
+            if (p_team != myTeam)
+                _otherTeamQuota = p_quota;
         };
 
         S_Extract.OnExtract += UpdateUI;
@@ -46,7 +50,7 @@ public class EndGameUI : MonoBehaviour
 
     }
 
-    private void UpdateUI(E_PlayerTeam winner)
+    private void UpdateUI(E_PlayerTeam p_winnerTeam)
     {
         const string VICTORY = "VICTORY";
         const string DEFEAT  = "DEFEAT";
@@ -63,12 +67,12 @@ public class EndGameUI : MonoBehaviour
 
         string myTeamResult, otherTeamResult;
 
-        if (winner == E_PlayerTeam.NONE)
+        if (p_winnerTeam == E_PlayerTeam.NONE)
         {
-            myTeamResult    = DRAW;
+            myTeamResult = DRAW;
             otherTeamResult = DRAW;
         }
-        else if (winner == myTeam)
+        else if (p_winnerTeam == myTeam)
         {
             myTeamResult = VICTORY;
             otherTeamResult = DEFEAT;
@@ -79,10 +83,10 @@ public class EndGameUI : MonoBehaviour
             otherTeamResult = VICTORY;
         }
 
-        var players = S_GameLobbyManager.instance.GetPlayers();
+        List<S_LobbyPlayerData> players = S_GameLobbyManager.instance.GetPlayers();
 
-        myTeamResult = $"{string.Join(' ', players.Where(player => player.Team == myTeam).Select(player => player.GamerTag))} - {myTeamResult}";
-        otherTeamResult = $"{otherTeamResult} - {string.Join(' ', players.Where(player => player.Team != myTeam).Select(player => player.GamerTag))}";
+        myTeamResult = $"{string.Join(' ', players.Where(p_player => p_player.Team == myTeam).Select(p_player => p_player.GamerTag))} - {myTeamResult}";
+        otherTeamResult = $"{otherTeamResult} - {string.Join(' ', players.Where(p_player => p_player.Team != myTeam).Select(p_player => p_player.GamerTag))}";
 
         const string format = "{0} - {1}$";
 
@@ -95,7 +99,7 @@ public class EndGameUI : MonoBehaviour
         _myTeamResultText.text = myTeamResult;
         _otherTeamResultText.text = otherTeamResult;
 
-        this.GetComponentInChildren<Image>(true).gameObject.SetActive(true);
+        GetComponentInChildren<Image>(true).gameObject.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
