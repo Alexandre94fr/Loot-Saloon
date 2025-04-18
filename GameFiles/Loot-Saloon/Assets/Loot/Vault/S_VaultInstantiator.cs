@@ -4,6 +4,7 @@ using UnityEngine.Events;
 
 public class S_VaultInstantiator : NetworkBehaviour
 {
+    [SerializeField] private S_Quota _quotaObject;
     [SerializeField] private S_LootInstantiator _lootInstantiatorInstance;
     public S_LootInstantiator LootInstanciator => _lootInstantiatorInstance;
     public UnityEvent<S_BankVault> OnVaultFilled = new();
@@ -37,11 +38,11 @@ public class S_VaultInstantiator : NetworkBehaviour
             var vault = vaultObject.GetComponent<S_BankVault>();
             if (vault != null)
             {
-                // Récupérer lootInstantiator via son ID réseau
+                // Rï¿½cupï¿½rer _lootInstantiator via son ID rï¿½seau
                 if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(lootInstantiatorNetworkId, out var lootInstantiatorObject))
                 {
-                    var lootInstantiator = lootInstantiatorObject.GetComponent<S_LootInstantiator>();
-                    vault.lootInstantiator = lootInstantiator;
+                    S_LootInstantiator lootInstantiator = lootInstantiatorObject.GetComponent<S_LootInstantiator>();
+                    vault.SetLootInstantiator(lootInstantiator);
                 }
             }
         }
@@ -55,21 +56,21 @@ public class S_VaultInstantiator : NetworkBehaviour
         {
             S_BankVault vault = Instantiate(pb_vault, t).GetComponent<S_BankVault>();
             Debug.Log(vault.name + " : Set loot Instanciator with : " + this.name);
-            vault.lootInstantiator = _lootInstantiatorInstance;
-            vault.vaultInstantiator = this;
 
-            vault.GenerateLoots();
+            NetworkObject vaultNetworkObject = vault.GetComponent<NetworkObject>();
+            vaultNetworkObject.Spawn();
 
-            ulong vaultNetworkId = vault.GetComponent<NetworkObject>().NetworkObjectId;
-            ulong vaultInstantiatorNetworkId = this.GetComponent<NetworkObject>().NetworkObjectId;
+            vault.SetLootInstantiator(_lootInstantiatorInstance);
+            vault.SetVaultInstantiator(this);
+
+            ulong vaultNetworkId = vaultNetworkObject.NetworkObjectId;
+            ulong vaultInstantiatorNetworkId = GetComponent<NetworkObject>().NetworkObjectId;
 
             SetLootInstantiatorServerRpc(vaultNetworkId, vaultInstantiatorNetworkId);
+            vault.SetInstantiatorsClientRpc(vaultInstantiatorNetworkId);
 
-            if (vault.TryGetComponent(out NetworkObject networkObject))
-            {
-                networkObject.Spawn();
-                vault.SetInstantiatorsClientRpc(vaultInstantiatorNetworkId);
-            }
+            vault.GenerateLoots();
+            vault.UpdateQuotaClientRpc(vault.GetMoneyValue());
         }
     }
 

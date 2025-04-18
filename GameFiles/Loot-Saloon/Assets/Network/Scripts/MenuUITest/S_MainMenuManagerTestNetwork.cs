@@ -25,6 +25,8 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
             OnJoinButtonClicked();
         });
         refreshListBtn.onClick.AddListener(ShowLobbies);
+
+        Cursor.lockState = CursorLockMode.None;
     }
 
     private async void OnHostButtonClicked()

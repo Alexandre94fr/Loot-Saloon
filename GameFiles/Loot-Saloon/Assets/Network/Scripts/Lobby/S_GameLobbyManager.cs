@@ -1,4 +1,5 @@
 #region
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
@@ -54,7 +55,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> CreateLobby()
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Host"), 0);
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Host"));
         _localLobbyPlayerData = playerData;
 
         _lobbyData = new S_LobbyData();
@@ -71,7 +72,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> JoinLobby(string p_code)
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"), 0);
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"));
         bool succeeded = await S_LobbyManager.instance.JoinLobby(p_code, playerData.Serialize());
         return succeeded;
     }
@@ -79,7 +80,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> JoinLobbyById(string p_id)
     {
         S_LobbyPlayerData playerData = new S_LobbyPlayerData();
-        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"), 0);
+        playerData.Initialize(AuthenticationService.Instance.PlayerId, PlayerPrefs.GetString("PlayerName", "Guest"));
         bool succeeded = await S_LobbyManager.instance.JoinLobbyById(p_id, playerData.Serialize());
 
         return succeeded;
@@ -140,8 +141,8 @@ public class S_GameLobbyManager : MonoBehaviour
 
         S_LobbyEvents.OnLobbyUpdated?.Invoke();
 
-        Debug.Log($"nb player ready  : {nbPlayerReady} / {_lobbyPlayerDatas.Count}");
-        if (nbPlayerReady == _lobbyPlayerDatas.Count)
+        bool teamsBalanced = await SameNbPlayerInEachTeam();
+        if (teamsBalanced && nbPlayerReady == _lobbyPlayerDatas.Count)
         {
             S_LobbyEvents.OnLobbyReady?.Invoke();
         }
@@ -150,6 +151,13 @@ public class S_GameLobbyManager : MonoBehaviour
             S_LobbyEvents.OnLobbyUnready?.Invoke();
         }
 
+        if (IsHost)
+        {
+            if (!teamsBalanced || nbPlayerReady != _lobbyPlayerDatas.Count)
+            {
+                S_LobbyEvents.OnLobbyUnready?.Invoke();
+            }
+        }
         if (_lobbyData.RelayJoinCode != default && !_inGame && !IsHost)
         {
             if (_wasDisconnected)
@@ -198,6 +206,7 @@ public class S_GameLobbyManager : MonoBehaviour
     public async Task<bool> SetPlayerTeam(E_PlayerTeam p_team)
     {
         _localLobbyPlayerData.Team = p_team;
+        _localLobbyPlayerData.IsReady = false;
         return await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
     }
 
@@ -213,6 +222,25 @@ public class S_GameLobbyManager : MonoBehaviour
         await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize(), allocationId, connectionData);
 
         await SceneManager.LoadSceneAsync(gameSceneName);
+    }
+
+    public async Task<bool> SameNbPlayerInEachTeam()
+    {
+        int redTeamCount = 0;
+        int blueTeamCount = 0;
+        foreach (S_LobbyPlayerData playerData in LobbyPlayerDatas)
+        {
+            if (playerData.Team == E_PlayerTeam.RED)
+            {
+                redTeamCount++;
+            }
+            else if (playerData.Team == E_PlayerTeam.BLUE)
+            {
+                blueTeamCount++;
+            }
+        }
+
+        return redTeamCount == blueTeamCount;
     }
 
     private async Task<bool> JoinRelayServer(string p_lobbyDataRelayJoinCode)
@@ -243,9 +271,26 @@ public class S_GameLobbyManager : MonoBehaviour
         _localLobbyPlayerData.IsReady = false;
         await S_LobbyManager.instance.UpdateLobbyData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize());
     }
-    
+
     public Task<E_PlayerTeam> GetPlayerTeamAsync()
     {
         return Task.FromResult(_localLobbyPlayerData.Team);
+    }
+
+    public  async void HandleHostDisconnection()
+    {
+        try
+        {
+            await S_LobbyManager.instance.LeaveLobbyAsync();
+            Debug.Log("Player has left the lobby.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error while leaving the lobby: {ex.Message}");
+        }
+        finally
+        {
+            await SceneManager.LoadSceneAsync("MainMenu");
+        }
     }
 }

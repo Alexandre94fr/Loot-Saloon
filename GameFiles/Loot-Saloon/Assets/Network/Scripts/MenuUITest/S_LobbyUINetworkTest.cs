@@ -31,7 +31,7 @@ public class S_LobbyUINetworkTest : MonoBehaviour
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
 
-            leaveButton.onClick.AddListener(HandleHostDisconnection);
+            leaveButton.onClick.AddListener(() => S_GameLobbyManager.instance.HandleHostDisconnection());
             readyButton.onClick.AddListener(OnReadyPressed);
             goRedTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.RED));
             goBlueTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.BLUE));
@@ -48,23 +48,19 @@ public class S_LobbyUINetworkTest : MonoBehaviour
 
     private async void OnStartButtonClicked()
     {
-
+        startGameButton.interactable = false;
         PlayerPrefs.SetInt("NbrOfPlayer", S_GameLobbyManager.instance.LobbyPlayerDatas.Count);
-
         if (S_GameLobbyManager.instance == null)
-        {
-            Debug.LogError("S_GameLobbyManager.instance is null !");
             return;
-        }
 
         await S_GameLobbyManager.instance.StartGame();
         
-        startGameButton.interactable = false;
     }
 
-    private void OnLobbyReady()
+    private async void OnLobbyReady()
     {
-        startGameButton.gameObject.SetActive(true);
+        if(await S_GameLobbyManager.instance.SameNbPlayerInEachTeam())
+            startGameButton.gameObject.SetActive(true);
     }
 
     private void OnLobbyUnready()
@@ -84,6 +80,8 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     private async void OnTeamBtnPressed(E_PlayerTeam p_choosedTeam)
     {
         readyButton.gameObject.SetActive(true);
+
+        // Mise à jour des boutons d'équipe
         if (p_choosedTeam == E_PlayerTeam.RED)
         {
             goBlueTeamButton.interactable = true;
@@ -97,31 +95,18 @@ public class S_LobbyUINetworkTest : MonoBehaviour
 
         if (await S_GameLobbyManager.instance.GetPlayerTeamAsync() != E_PlayerTeam.NONE)
         {
-            var succeeded1 = await S_GameLobbyManager.instance.SetPlayerUnready();
-            if (succeeded1)
+            var succeededUnready = await S_GameLobbyManager.instance.SetPlayerUnready();
+            if (succeededUnready)
             {
                 readyButton.interactable = true;
                 startGameButton.gameObject.SetActive(false);
             }
-
         }
-        var succeeded = await S_GameLobbyManager.instance.SetPlayerTeam(p_choosedTeam);
+
+        var succeededTeamChange = await S_GameLobbyManager.instance.SetPlayerTeam(p_choosedTeam);
+
+        S_LobbyEvents.OnLobbyUnready?.Invoke();
     }
 
-    private async void HandleHostDisconnection()
-    {
-        try
-        {
-            await S_LobbyManager.instance.LeaveLobbyAsync();
-            Debug.Log("Player has left the lobby.");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error while leaving the lobby: {ex.Message}");
-        }
-        finally
-        {
-            await SceneManager.LoadSceneAsync("MainMenu");
-        }
-    }
+
 }

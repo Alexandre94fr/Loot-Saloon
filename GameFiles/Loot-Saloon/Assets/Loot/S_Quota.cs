@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class S_Quota : MonoBehaviour
@@ -12,13 +13,15 @@ public class S_Quota : MonoBehaviour
     [Tooltip("How much of the total sum the quota is equal to")]
     [SerializeField] [Range(0f, 1f)] private float _extractionQuotaRatio = 0.67f;
 
+    public event Action OnQuotaChanged;
+
 
     private void Start()
     {
         if (!_vaultInstantiatorInstance)
         {
             Debug.LogError(
-                $"ERROR ! The '{nameof(_vaultInstantiatorInstance)}' variable of the '{nameof(name)}' GameObject was not set, the value is null. " +
+                $"ERROR ! The '{nameof(_vaultInstantiatorInstance)}' variable of the '{name}' GameObject was not set, the value is null. " +
                 $"Stopping Start method execution"
             );
             return;
@@ -29,7 +32,9 @@ public class S_Quota : MonoBehaviour
     
     public void OnVaultFilled(S_BankVault p_bankVault)
     {
-        total += p_bankVault.moneyValue;
+        total += p_bankVault.GetMoneyValue();
         quota = (int)(total * _extractionQuotaRatio);
+
+        OnQuotaChanged?.Invoke();
     }
 }
