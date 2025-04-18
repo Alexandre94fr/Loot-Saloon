@@ -24,7 +24,72 @@ public class S_PlayerController : NetworkBehaviour
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private float _sprintSpeed = 4f;
 
+    [SerializeField] private bool _isCartModeEnabled = false;
+
+
+
+    [ClientRpc]
+    private void PutDownClientRpc(ClientRpcParams rpcParams = default)
+    {
+        Debug.Log("PutDownClientRpc received From Player Controller");
+
+        // unactive cart mode immediately
+        _isCartModeEnabled = false;
+        EnableCartMode(false, null);
+
+        // Unactive all component of cart mode
+        var playerCamera = _playerTransform.GetComponentInChildren<S_PlayerCamera>();
+        if (playerCamera != null)
+        {
+            playerCamera.EnableCartMode(false, null);
+        }
+
+        var playerObject = NetworkManager.Singleton.LocalClient?.PlayerObject;
+        if (playerObject != null)
+        {
+            var playerController = playerObject.GetComponentInChildren<S_PlayerController>();
+            if (playerController != null)
+            {
+                playerController.EnableCartMode(false, null);
+            }
+        }
+    }
+
+    [ClientRpc]
+    public void EnableCartModeClientRpc(bool isEnabled, NetworkObjectReference cartRef)
+    {
+        if (!IsOwner) return;
+
+        Transform cartTransform = null;
+
+        if (isEnabled && cartRef.TryGet(out NetworkObject cartObj))
+        {
+            cartTransform = cartObj.transform;
+        }
+
+        EnableCartMode(isEnabled, cartTransform); // Local activation
+
+        if (!isEnabled)
+        {
+            // Unactivate localy the cart mode
+            PutDownClientRpc();
+            _isCartModeEnabled = false;
+            _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(false, null);
+        }
+    }
+
+    public void EnableCartMode(bool enabled, Transform cart = null)
+    {
+        _isCartModeEnabled = enabled;
+
+        Debug.Log($"[CART MODE] Set to {(enabled ? "ENABLED" : "DISABLED")} for {gameObject.name}");
+
+        _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(enabled, cart);
+    }
+
+
     private Transform _playerTransform;
+    private S_PlayerCamera _playerCamera;
     private Vector3 _playerDirection;
 
     private float _currentSpeed = 4f;
@@ -54,6 +119,13 @@ public class S_PlayerController : NetworkBehaviour
             return;
 
         _playerTransform = transform.parent.transform;
+        _playerCamera = _playerTransform.GetComponentInChildren<S_PlayerCamera>();
+        _playerCamera.SetPlayerTransform(_playerTransform);
+
+        if (_playerCamera == null)
+        {
+            Debug.Log("Player camera wasn't set Please Check :: " + _playerTransform.name);
+        }
 
         if (_playerTransform.parent.GetComponent<NetworkObject>().IsOwner)
         {
@@ -115,7 +187,30 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Move()
     {
-        _playerTransform.position += (transform.right * _playerDirection.x + transform.forward * _playerDirection.z) * (Time.deltaTime * _currentSpeed);
+        if (_isCartModeEnabled)
+        {
+            // Simulate cart movement for always go forward
+            Vector3 forward = _playerTransform.forward * _playerDirection.z; // z = forward/rear
+            _playerTransform.position += forward * (Time.deltaTime * _currentSpeed);
+
+            // Rotation for horizontal inputs
+            if (Mathf.Abs(_playerDirection.x) > 0.1f)
+            {
+                float rotationAmount = _playerDirection.x * 100f * Time.deltaTime; 
+                _playerTransform.Rotate(0, rotationAmount, 0);
+            }
+        }
+        else
+        {
+            if (_playerCamera == null)
+            {
+                Debug.LogWarning("Trying to move but _playerCamera is null. Skipping movement.");
+                return;
+            }
+
+            Vector3 moveDir = _playerCamera.GetMovementDirection(new Vector2(_playerDirection.x, _playerDirection.z));
+            _playerTransform.position += moveDir * (Time.deltaTime * _currentSpeed);
+        }
     }
 
     private void Sprint(bool sprint)
@@ -129,14 +224,8 @@ public class S_PlayerController : NetworkBehaviour
     {
         _playerDirection.x = p_playerDirection.x;
         _playerDirection.z = p_playerDirection.y;
-        if (_playerDirection.x != 0 || _playerDirection.z != 0)
-        {
-            _armsAnimator.SetBool("Walking", true);
-        }
-        else
-        {
-            _armsAnimator.SetBool("Walking", false);
-        }
+
+        _armsAnimator.SetBool("Walking", _playerDirection.sqrMagnitude > 0.01f);
     }
 
     public void OnObjectPickedUp(S_Pickable p_pickable)

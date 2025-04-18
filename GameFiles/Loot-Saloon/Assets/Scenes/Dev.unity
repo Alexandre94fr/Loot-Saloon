@@ -966,9 +966,33 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1462276014580249365, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: de5dcb771b66678488b589ebc8cbb104, type: 2}
+    - target: {fileID: 1526693922200476564, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: de5dcb771b66678488b589ebc8cbb104, type: 2}
+    - target: {fileID: 3328374440192194002, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: de5dcb771b66678488b589ebc8cbb104, type: 2}
+    - target: {fileID: 3972112533925709289, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_Drag
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972112533925709289, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_AngularDrag
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3972112533925709289, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_Constraints
       value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972112533925709289, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3983363614776680269, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1018,6 +1042,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 6131922059543646773, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: de5dcb771b66678488b589ebc8cbb104, type: 2}
     - target: {fileID: 6207627154039977417, guid: ccfa63bdc11715547bd1bf05242df1b3, type: 3}
       propertyPath: m_Layer
       value: 6
