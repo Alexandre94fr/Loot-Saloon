@@ -71,4 +71,9 @@ public static class S_Utils
     {
         return p_cam != null ? p_cam : Camera.main;
     }
+
+    public static void CopyToClipboard(string p_text)
+    {
+        GUIUtility.systemCopyBuffer = p_text;
+    }
 }
