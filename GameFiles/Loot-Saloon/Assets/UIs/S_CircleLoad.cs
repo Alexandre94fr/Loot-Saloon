@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class S_CircleLoad : MonoBehaviour
 {
-    public static Action<float> OnCircleChange;
+    public Action<float> OnCircleChange;
 
     [SerializeField] private Image _image;
     private float _timerValue;

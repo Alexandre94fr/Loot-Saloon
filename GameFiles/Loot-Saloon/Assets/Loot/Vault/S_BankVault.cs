@@ -168,7 +168,7 @@ public class S_BankVault : S_Interactable
         if (_isDebuggingModeOn)
             Debug.Log("Circle progression : {p_progress} / {p_targetClientId}");
 
-        S_CircleLoad.OnCircleChange(p_progress);
+        S_PlayerUseUI.OnCircleChange(p_progress);
     }
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
