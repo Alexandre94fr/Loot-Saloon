@@ -86,7 +86,7 @@ public class S_Cart : S_Pickable
 
         S_PlayerInputsReciever.OnMove += MoveCart;
         StartCoroutine(MoveCoroutine());
-        var playerController = _parent.parent.GetComponentInChildren<S_PlayerController>();
+        var playerController = _parent.parent.GetComponentInChildren<S_PlayerController>(true);
         playerController.EnableCartModeClientRpc(true, GetComponent<NetworkObject>());
     }
 
@@ -106,7 +106,7 @@ public class S_Cart : S_Pickable
             return;
         }
 
-        var playerController = playerObject.GetComponentInChildren<S_PlayerController>();
+        var playerController = playerObject.GetComponentInChildren<S_PlayerController>(true);
         if (playerController == null)
         {
             Debug.LogError(" PlayerController is null.");
@@ -166,7 +166,7 @@ public class S_Cart : S_Pickable
     private void RequestPickUpServerRpc(ulong playerId)
     {
         var player = NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject;
-        var interact = player.GetComponentInChildren<S_PlayerInteract>();
+        var interact = player.GetComponentInChildren<S_PlayerInteract>(true);
         var parent = interact.transform;
 
         PickUp(interact, parent);
