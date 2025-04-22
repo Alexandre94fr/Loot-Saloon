@@ -142,6 +142,8 @@ public class S_WeaponSlot : NetworkBehaviour
         _cooldown = 0;
     }
 
+
+
     public void Shoot()
     {
         if (!_playerInteractComponent.controller.activeInputs)
@@ -157,8 +159,6 @@ public class S_WeaponSlot : NetworkBehaviour
             return;
         }
 
-        print("SHOOT");
-
         _lastShotTime = Time.time;
 
         Vector3 rayOrigin = _camera.transform.position + _camera.transform.forward * 0.2f;
@@ -167,7 +167,14 @@ public class S_WeaponSlot : NetworkBehaviour
         float yAngle = S_Utils.RandomFloat(-_angleSpread, _angleSpread);
 
         Vector3 raycastDirection = Quaternion.Euler(xAngle, yAngle, 0) * _camera.transform.forward;
-        ShootServerRpc(raycastDirection);
+
+        ShootServerRpc(raycastDirection, _weaponObject.GetComponent<NetworkObject>().NetworkObjectId);
+        Debug.Log("Shoot raycastDirection : " + raycastDirection);
+        if (IsOwner)
+        {
+            PlayEffect(raycastDirection, _weaponObject);
+        }
+
         StartCoroutine(DebugShoot(rayOrigin, raycastDirection, 2f));
 
         if (Physics.Raycast(rayOrigin, raycastDirection, out RaycastHit hit))
@@ -185,75 +192,73 @@ public class S_WeaponSlot : NetworkBehaviour
                 }
             }
         }
-
         _remainingBullet--;
         if (_remainingBullet <= 0)
             Reload();
     }
 
     [ServerRpc(RequireOwnership = false)]
-private void ShootServerRpc(Vector3 p_direction)
-{
-    if (_weaponObject == null)
-        return;
-
-    // Pass the weapon's NetworkObjectId to the ClientRpc
-    OnShootClientRpc(p_direction, _weaponObject.GetComponent<NetworkObject>().NetworkObjectId);
-}
-
-[ClientRpc]
-public void OnShootClientRpc(Vector3 p_direction, ulong weaponNetworkId)
-{
-    // Retrieve the weapon object using the NetworkObjectId
-    if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(weaponNetworkId, out NetworkObject weaponNetObj))
+    private void ShootServerRpc(Vector3 p_direction, ulong p_weaponNetworkId)
     {
-        Debug.LogWarning("Weapon object not found for NetworkObjectId: " + weaponNetworkId);
-        return;
+        // Retrieve the weapon object using the NetworkObjectId
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_weaponNetworkId, out NetworkObject weaponNetObj))
+        {
+            return;
+        }
+        OnShootClientRpc(p_direction, p_weaponNetworkId);
     }
 
-    GameObject weaponObject = weaponNetObj.gameObject;
+    [ClientRpc]
+    public void OnShootClientRpc(Vector3 p_direction, ulong p_weaponNetworkId)
+    {
 
-    // Play the effect on the retrieved weapon object
-    PlayEffect(p_direction, weaponObject);
-}
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_weaponNetworkId, out NetworkObject weaponNetObj))
+        {
+            Debug.Log("Weapon not found in the network object pool.");
+            return;
+        }
 
-private void PlayEffect(Vector3 p_direction, GameObject weaponObject)
-{
-    // Play particle effect
-    ParticleSystem particleSystem = weaponObject.GetComponentInChildren<ParticleSystem>(true);
-    if (particleSystem != null)
-        particleSystem.Play();
+        GameObject weaponObject = weaponNetObj.gameObject;
+        Debug.Log("shoot client");
+        PlayEffect(p_direction, weaponObject);
+    }
 
-    StartCoroutine(GunLightEffect(weaponObject));
-    StartCoroutine(LineRenderer(p_direction, weaponObject));
-}
+    private void PlayEffect(Vector3 p_direction, GameObject p_weaponObject)
+    {
+        ParticleSystem particleSystem = p_weaponObject.GetComponentInChildren<ParticleSystem>(true);
+        if (particleSystem != null)
+            particleSystem.Play();
 
-private IEnumerator GunLightEffect(GameObject weaponObject)
-{
-    Light light = weaponObject.GetComponentInChildren<Light>(true);
-    if (!light)
-        yield break;
+        StartCoroutine(GunLightEffect(p_weaponObject));
+        StartCoroutine(LineRenderer(p_direction, p_weaponObject));
+    }
 
-    light.enabled = true;
-    yield return new WaitForSeconds(0.15f);
-    light.enabled = false;
-}
+    private IEnumerator GunLightEffect(GameObject p_weaponObject)
+    {
+        Light light = p_weaponObject.GetComponentInChildren<Light>(true);
+        if (!light)
+            yield break;
 
-private IEnumerator LineRenderer(Vector3 p_direction, GameObject weaponObject)
-{
-    Vector3 start = weaponObject.transform.position;
-    Vector3 end = Camera.main.transform.position + p_direction * 50f;
+        light.enabled = true;
+        yield return new WaitForSeconds(0.15f);
+        light.enabled = false;
+    }
 
-    LineRenderer lineRenderer = weaponObject.GetComponentInChildren<LineRenderer>(true);
-    if (!lineRenderer)
-        yield break;
+    private IEnumerator LineRenderer(Vector3 p_direction, GameObject p_weaponObject)
+    {
+        Vector3 start = p_weaponObject.transform.position;
+        Vector3 end = Camera.main.transform.position + p_direction * 50f;
 
-    lineRenderer.enabled = true;
-    lineRenderer.SetPosition(0, start);
-    lineRenderer.SetPosition(1, end);
-    yield return new WaitForSeconds(0.5f);
-    lineRenderer.enabled = false;
-}
+        LineRenderer lineRenderer = p_weaponObject.GetComponentInChildren<LineRenderer>(true);
+        if (!lineRenderer)
+            yield break;
+
+        lineRenderer.enabled = true;
+        lineRenderer.SetPosition(0, start);
+        lineRenderer.SetPosition(1, end);
+        yield return new WaitForSeconds(0.5f);
+        lineRenderer.enabled = false;
+    }
 
 
     [ServerRpc]
