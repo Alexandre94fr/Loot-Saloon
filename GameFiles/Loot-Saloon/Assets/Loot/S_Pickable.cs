@@ -135,9 +135,9 @@ public abstract class S_Pickable : S_Interactable
             rb.isKinematic = true;
         }
 
-        if(TryGetComponent(out SphereCollider sphereCollider) && TryGetComponent(out S_Cart _) == false)
+        if(TryGetComponent(out Collider collider) && TryGetComponent(out S_Cart _) == false)
         {
-            sphereCollider.enabled = false;
+            collider.enabled = false;
         }
     }
 
@@ -151,9 +151,9 @@ public abstract class S_Pickable : S_Interactable
         {
             rb.useGravity = false;
         }
-        if(TryGetComponent(out SphereCollider sphereCollider))
+        if(TryGetComponent(out Collider collider))
         {
-            sphereCollider.enabled = false;
+            collider.enabled = false;
         }
 
         transform.position = position;
@@ -167,9 +167,9 @@ public abstract class S_Pickable : S_Interactable
         {
             rb.useGravity = false;
         }
-        if(TryGetComponent(out SphereCollider sphereCollider)  && TryGetComponent(out S_Cart _)==false)
+        if(TryGetComponent(out Collider collider)  && TryGetComponent(out S_Cart _)==false)
         {
-            sphereCollider.enabled = false;
+            collider.enabled = false;
         }
         // Update the transform on the server
         transform.position = position;
@@ -207,9 +207,9 @@ public abstract class S_Pickable : S_Interactable
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
-        if(TryGetComponent(out SphereCollider sphereCollider) && TryGetComponent(out S_Cart _)==false)
+        if(TryGetComponent(out Collider collider) && TryGetComponent(out S_Cart _)==false)
         {
-            sphereCollider.enabled = true;
+            collider.enabled = true;
         }
 
         ResetRigidbodyClientRpc();
@@ -225,9 +225,9 @@ public abstract class S_Pickable : S_Interactable
         {
             rb.useGravity = true;
         }
-        if(TryGetComponent(out SphereCollider sphereCollider) && TryGetComponent(out S_Cart _)==false)
+        if(TryGetComponent(out Collider collider) && TryGetComponent(out S_Cart _)==false)
         {
-            sphereCollider.enabled = true;
+            collider.enabled = true;
         }
     }
 }
