@@ -628,6 +628,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   _playerInteractComponent: {fileID: 5168879295098494647}
+  _playerCharacterComponent: {fileID: 7496308992574988215}
   _weaponName: 
   _damage: 0
   _remainingBullet: 0
@@ -1400,6 +1401,7 @@ GameObject:
   - component: {fileID: 5944834594427622818}
   - component: {fileID: 541302485978495551}
   - component: {fileID: 7513308697994561563}
+  - component: {fileID: 8296905436598474919}
   m_Layer: 0
   m_Name: FeedBack
   m_TagString: Untagged
@@ -1477,6 +1479,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 541302485978495551}
+--- !u!114 &8296905436598474919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7329753644563634275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 469adf9fefc36f84dbb3976296cb5e63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loader: {fileID: 7513308697994561563}
 --- !u!1 &7552130842470226064
 GameObject:
   m_ObjectHideFlags: 0

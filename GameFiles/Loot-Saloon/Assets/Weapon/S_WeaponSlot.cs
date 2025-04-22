@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class S_WeaponSlot : NetworkBehaviour
 {
-    [Header(" External references :")] [SerializeField]
-    private S_PlayerInteract _playerInteractComponent;
+    [Header(" External references :")]
+    [SerializeField] private S_PlayerInteract _playerInteractComponent;
+    [SerializeField] private S_PlayerCharacter _playerCharacterComponent;
 
     [Space] [ReadOnlyInInspector] [SerializeField]
     private string _weaponName = "";
@@ -30,8 +31,11 @@ public class S_WeaponSlot : NetworkBehaviour
 
     private float _lastShotTime;
 
-    private void DropWeaponOnDeath()
+    private void DropWeaponOnDeath(S_PlayerCharacter p_playerCharacter, int p_currentPlayerHealth)
     {
+        if (p_playerCharacter != _playerCharacterComponent)
+            return;
+
         if (_weaponObject != null)
             DropWeapon(_weaponObject.GetComponent<S_Weapon>());
     }
@@ -40,8 +44,9 @@ public class S_WeaponSlot : NetworkBehaviour
     private void Start()
     {
         if (!S_VariablesChecker.AreVariablesCorrectlySetted(name, null,
-                (_playerInteractComponent, nameof(_playerInteractComponent))
-            )) return;
+            (_playerInteractComponent, nameof(_playerInteractComponent)),
+            (_playerCharacterComponent, nameof(_playerCharacterComponent))
+        )) return;
 
         if (!_playerInteractComponent.transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
             return;
@@ -58,7 +63,7 @@ public class S_WeaponSlot : NetworkBehaviour
         _lastShotTime = -_cooldown;
 
         if (IsOwner)
-            S_LifeManager.OnDie += DropWeaponOnDeath;
+            S_PlayerAttributes.OnPlayerDeathEvent += DropWeaponOnDeath;
     }
 
     public void SetWeaponSlot(Transform p_parent, S_Weapon p_newWeapon)
