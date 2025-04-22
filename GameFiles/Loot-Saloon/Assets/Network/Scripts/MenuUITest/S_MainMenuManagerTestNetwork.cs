@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,6 +9,7 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
 {
     public Button hostBtn;
     public Button joinBtn;
+    public Button joinCodeBtn;
     public Button refreshListBtn;
     public string sceneToLoad;
     public InputField codeInputField;
@@ -20,11 +22,21 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
     private void Start()
     {
         hostBtn.onClick.AddListener(OnHostButtonClicked);
+        joinCodeBtn.onClick.AddListener(JoinWithCode);
         joinBtn.onClick.AddListener(() =>
         {
             OnJoinButtonClicked();
         });
         refreshListBtn.onClick.AddListener(ShowLobbies);
+
+        Cursor.lockState = CursorLockMode.None;
+
+        NetworkManager[] networkManagers = FindObjectsByType<NetworkManager>(FindObjectsSortMode.None);
+        foreach (NetworkManager networkManager in networkManagers)
+        {
+            networkManager.Shutdown();
+            Destroy(networkManager.gameObject);
+        }
     }
 
     private async void OnHostButtonClicked()
@@ -88,4 +100,20 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
             Debug.LogError("Failed to join lobby.");
         }
     }
+    private async void JoinWithCode()
+    {
+        string code = codeInputField.text.Trim();
+        bool succedeed = await S_GameLobbyManager.instance.JoinLobby(code);
+        if (succedeed)
+        {
+            await SceneManager.LoadSceneAsync(sceneToLoad);
+        }
+        else
+        {
+            Debug.LogError("Failed to join lobby.");
+        }
+    }
+
+
+
 }

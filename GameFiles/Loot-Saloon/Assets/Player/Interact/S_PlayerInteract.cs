@@ -2,7 +2,8 @@
  using System.Collections.Generic;
  using System.Linq;
  using Unity.Netcode;
- using UnityEngine;
+using Unity.Services.Matchmaker.Models;
+using UnityEngine;
  using UnityEngine.Events;
 #endregion
 
@@ -11,13 +12,18 @@ public class S_PlayerInteract : NetworkBehaviour
 {
     // [SerializeField] private GameObject _interactPanel;
 
+    public S_PlayerController controller;
+
     private Transform _transform;
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] Transform _rightArmTransform;
+
     private S_Pickable _pickableHeld = null;
     private S_Interactable _currentInteraction = null;
-
+    
     public S_PlayerAttributes attributes { get; private set; }
+
+    public UnityEvent<S_Interactable> OnLookAtInteract = new(); 
 
     public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
     public UnityEvent<S_Pickable> OnPickUp = new();
@@ -44,9 +50,15 @@ public class S_PlayerInteract : NetworkBehaviour
         if (!S_VariablesChecker.AreVariablesCorrectlySetted(name, null,
             (_rightArmTransform, nameof(_rightArmTransform))
         )) return;
+    }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        
         if (GetComponentInParent<NetworkObject>().IsOwner)
         {
+            S_PlayerInputsReciever.OnLook += (_) => OnLookAtInteract.Invoke(CheckObjectRaycast());
             S_PlayerInputsReciever.OnInteract += Interact;
             S_PlayerInputsReciever.OnStopInteract += StopInteract;
             S_PlayerInputsReciever.OnThrow += Throw;
@@ -65,6 +77,9 @@ public class S_PlayerInteract : NetworkBehaviour
 
     private void Interact()
     {
+        if (!controller.activeInputs)
+            return;
+
         if (_pickableHeld != null)
         {
             PutDownPickable(null, 0); // Those parameters are not used, it's for the OnPlayerDeathEvent event to work

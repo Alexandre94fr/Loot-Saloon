@@ -1,6 +1,8 @@
 #region
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -10,7 +12,7 @@ using UnityEngine.UI;
 
 public class S_LobbyUINetworkTest : MonoBehaviour
 {
-    public Text lobbyIdText;
+    public Button lobbyIdButton;
     public Button startGameButton;
     public Button readyButton;
     public Button leaveButton;
@@ -22,7 +24,9 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     {
         if (S_GameLobbyManager.instance)
         {
-            lobbyIdText.text = "Lobby ID: " + S_GameLobbyManager.instance.GetLobbyCode();
+            lobbyIdButton.GetComponentInChildren<TextMeshProUGUI>().text = S_GameLobbyManager.instance.GetLobbyCode();
+            lobbyIdButton.onClick.AddListener(() => StartCoroutine(CopyLobbyIdToClipboard()));
+
             Debug.Log(S_GameLobbyManager.instance.IsHost ? "Host" : "Guest");
             if (S_GameLobbyManager.instance.IsHost)
             {
@@ -31,10 +35,10 @@ public class S_LobbyUINetworkTest : MonoBehaviour
                 startGameButton.onClick.AddListener(OnStartButtonClicked);
             }
 
-            leaveButton.onClick.AddListener(HandleHostDisconnection);
+            leaveButton.onClick.AddListener(() => S_GameLobbyManager.instance.HandleHostDisconnection());
             readyButton.onClick.AddListener(OnReadyPressed);
-            goRedTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.RED));
-            goBlueTeamButton.onClick.AddListener(()=>OnTeamBtnPressed(E_PlayerTeam.BLUE));
+            goRedTeamButton.onClick.AddListener(() => OnTeamBtnPressed(E_PlayerTeam.RED));
+            goBlueTeamButton.onClick.AddListener(() => OnTeamBtnPressed(E_PlayerTeam.BLUE));
         }
     }
 
@@ -45,6 +49,17 @@ public class S_LobbyUINetworkTest : MonoBehaviour
         startGameButton.onClick.RemoveAllListeners();
     }
 
+    private IEnumerator CopyLobbyIdToClipboard()
+    {
+        TextMeshProUGUI lobbyIdText = lobbyIdButton.GetComponentInChildren<TextMeshProUGUI>();
+        string lobbyId = lobbyIdText.text;
+
+        GUIUtility.systemCopyBuffer = lobbyId;
+
+        lobbyIdText.text = "Copied!";
+        yield return new WaitForSeconds(2f);
+        lobbyIdText.text = lobbyId;
+    }
 
     private async void OnStartButtonClicked()
     {
@@ -54,12 +69,11 @@ public class S_LobbyUINetworkTest : MonoBehaviour
             return;
 
         await S_GameLobbyManager.instance.StartGame();
-        
     }
 
     private async void OnLobbyReady()
     {
-        if(await S_GameLobbyManager.instance.SameNbPlayerInEachTeam())
+        if (await S_GameLobbyManager.instance.SameNbPlayerInEachTeam())
             startGameButton.gameObject.SetActive(true);
     }
 
@@ -106,22 +120,5 @@ public class S_LobbyUINetworkTest : MonoBehaviour
         var succeededTeamChange = await S_GameLobbyManager.instance.SetPlayerTeam(p_choosedTeam);
 
         S_LobbyEvents.OnLobbyUnready?.Invoke();
-    }
-
-    private async void HandleHostDisconnection()
-    {
-        try
-        {
-            await S_LobbyManager.instance.LeaveLobbyAsync();
-            Debug.Log("Player has left the lobby.");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error while leaving the lobby: {ex.Message}");
-        }
-        finally
-        {
-            await SceneManager.LoadSceneAsync("MainMenu");
-        }
     }
 }

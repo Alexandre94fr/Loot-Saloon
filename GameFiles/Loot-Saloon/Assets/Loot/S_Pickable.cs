@@ -14,7 +14,7 @@ public abstract class S_Pickable : S_Interactable
     private bool _isPickUp;
     [Range(0f, 20f)] public float weight;
 
-    private List<Collider> _ignoredColliders = new();
+    protected List<Collider> _ignoredColliders = new();
 
     public bool throwable = true;
 
@@ -34,7 +34,7 @@ public abstract class S_Pickable : S_Interactable
     public override void StopInteract(S_PlayerInteract p_playerInteract)
     {
         _isPickUp = false;
-        S_CircleLoad.OnCircleChange(0);
+        S_PlayerUseUI.OnCircleChange?.Invoke(0);
     }
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
@@ -58,7 +58,7 @@ public abstract class S_Pickable : S_Interactable
             if (!_isPickUp)
                 yield break;
 
-            S_CircleLoad.OnCircleChange?.Invoke(timer / _pickUpTime);
+            S_PlayerUseUI.OnCircleChange?.Invoke(timer / _pickUpTime);
 
             timer += Time.deltaTime;
             yield return null;
@@ -67,7 +67,7 @@ public abstract class S_Pickable : S_Interactable
         PickUp(p_playerInteract, p_parent);
     }
 
-    private void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
+    protected virtual void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
     {
         if (!interactable)
             return;

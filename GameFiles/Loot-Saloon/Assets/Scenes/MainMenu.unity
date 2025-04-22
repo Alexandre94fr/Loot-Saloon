@@ -1134,6 +1134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hostBtn: {fileID: 461945233}
   joinBtn: {fileID: 1359350239}
+  joinCodeBtn: {fileID: 1610217771}
   refreshListBtn: {fileID: 821768744}
   sceneToLoad: Lobby
   codeInputField: {fileID: 536499678}
@@ -1364,7 +1365,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 951905367}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 1000
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
