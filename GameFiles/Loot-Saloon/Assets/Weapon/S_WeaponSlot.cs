@@ -169,7 +169,29 @@ public class S_WeaponSlot : NetworkBehaviour
         Vector3 raycastDirection = Quaternion.Euler(xAngle, yAngle, 0) * _camera.transform.forward;
 
         ShootServerRpc(raycastDirection, _weaponObject.GetComponent<NetworkObject>().NetworkObjectId);
-        
+        Debug.Log("Shoot raycastDirection : " + raycastDirection);
+        if (IsOwner)
+        {
+            PlayEffect(raycastDirection, _weaponObject);
+        }
+
+        StartCoroutine(DebugShoot(rayOrigin, raycastDirection, 2f));
+
+        if (Physics.Raycast(rayOrigin, raycastDirection, out RaycastHit hit))
+        {
+            if (hit.transform.TryGetComponent(out S_PlayerCharacter target))
+            {
+                var playerRoot = target.GetComponentInParent<NetworkObject>();
+                if (playerRoot != null)
+                {
+                    OnHitServerRpc(playerRoot.NetworkObjectId, _damage);
+                }
+                else
+                {
+                    Debug.LogWarning("No NetworkObject found on target's p_parent!");
+                }
+            }
+        }
         _remainingBullet--;
         if (_remainingBullet <= 0)
             Reload();
@@ -178,28 +200,18 @@ public class S_WeaponSlot : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void ShootServerRpc(Vector3 p_direction, ulong p_weaponNetworkId)
     {
+        // Retrieve the weapon object using the NetworkObjectId
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_weaponNetworkId, out NetworkObject weaponNetObj))
         {
-            Debug.LogWarning("Weapon object not found for NetworkObjectId: " + p_weaponNetworkId);
             return;
         }
-
-        GameObject weaponObject = weaponNetObj.gameObject;
-
-        if (weaponObject == null)
-        {
-            Debug.LogWarning("Weapon object is null.");
-            return;
-        }
-
         OnShootClientRpc(p_direction, p_weaponNetworkId);
-        Debug.Log("ShootServerRpc executed successfully.");
     }
 
     [ClientRpc]
     public void OnShootClientRpc(Vector3 p_direction, ulong p_weaponNetworkId)
     {
-        Debug.Log("OnShootClientRpc");
+
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_weaponNetworkId, out NetworkObject weaponNetObj))
         {
             Debug.Log("Weapon not found in the network object pool.");
