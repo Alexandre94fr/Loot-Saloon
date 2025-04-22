@@ -142,6 +142,8 @@ public class S_WeaponSlot : NetworkBehaviour
         _cooldown = 0;
     }
 
+
+
     public void Shoot()
     {
         if (!_playerInteractComponent.controller.activeInputs)
@@ -157,7 +159,6 @@ public class S_WeaponSlot : NetworkBehaviour
             return;
         }
 
-
         _lastShotTime = Time.time;
 
         Vector3 rayOrigin = _camera.transform.position + _camera.transform.forward * 0.2f;
@@ -166,6 +167,7 @@ public class S_WeaponSlot : NetworkBehaviour
         float yAngle = S_Utils.RandomFloat(-_angleSpread, _angleSpread);
 
         Vector3 raycastDirection = Quaternion.Euler(xAngle, yAngle, 0) * _camera.transform.forward;
+
         ShootServerRpc(raycastDirection, _weaponObject.GetComponent<NetworkObject>().NetworkObjectId);
         Debug.Log("Shoot raycastDirection : " + raycastDirection);
         if (IsOwner)
@@ -190,7 +192,6 @@ public class S_WeaponSlot : NetworkBehaviour
                 }
             }
         }
-
         _remainingBullet--;
         if (_remainingBullet <= 0)
             Reload();
@@ -210,6 +211,7 @@ public class S_WeaponSlot : NetworkBehaviour
     [ClientRpc]
     public void OnShootClientRpc(Vector3 p_direction, ulong p_weaponNetworkId)
     {
+
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_weaponNetworkId, out NetworkObject weaponNetObj))
         {
             Debug.Log("Weapon not found in the network object pool.");
