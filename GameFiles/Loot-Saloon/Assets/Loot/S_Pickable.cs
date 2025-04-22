@@ -34,7 +34,7 @@ public abstract class S_Pickable : S_Interactable
     public override void StopInteract(S_PlayerInteract p_playerInteract)
     {
         _isPickUp = false;
-        S_PlayerUseUI.OnCircleChange(0);
+        S_PlayerUseUI.OnCircleChange?.Invoke(0);
     }
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
