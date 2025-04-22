@@ -58,7 +58,7 @@ public class S_Extract : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == 6)
+        if (other.gameObject.layer == 6 || other.gameObject.layer == 8)
         {
             if (!_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
