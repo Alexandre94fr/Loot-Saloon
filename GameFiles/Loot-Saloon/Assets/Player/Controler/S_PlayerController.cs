@@ -105,6 +105,12 @@ public class S_PlayerController : NetworkBehaviour
             return;
 
         _playerTransform = transform.parent.transform;
+
+        HandleInputsEvents();
+
+        S_PlayerAttributes.OnPlayerDeathEvent += Respawn;
+        S_Extract.OnExtract += DisableAllMeshOfPlayer;
+        S_Extract.OnExtract += DropInputsEvents;
     }
 
     public override void OnNetworkSpawn()
@@ -125,7 +131,7 @@ public class S_PlayerController : NetworkBehaviour
         {
             HandleInputsEvents();
 
-            S_LifeManager.OnDie += Respawn;
+            S_PlayerAttributes.OnPlayerDeathEvent += Respawn;
             S_Extract.OnExtract += DisableAllMeshOfPlayer;
             S_Extract.OnExtract += DropInputsEvents;
 
@@ -229,7 +235,7 @@ public class S_PlayerController : NetworkBehaviour
         Sprint(_isSprinting);
     }
 
-    private void Respawn()
+    private void Respawn(S_PlayerCharacter p_playerCharacter, int p_currentPlayerHealthPoints)
     {
         DropInputsEvents();
         DisableAllMeshOfPlayer();

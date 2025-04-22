@@ -16,16 +16,18 @@ public class S_BankVault : S_Interactable
     [SerializeField] bool _isDebuggingModeOn;
 
     [Space]
+    [ReadOnlyInInspector] [SerializeField] private int _moneyValue;
+    [ReadOnlyInInspector] [SerializeField] private bool _isLockpickableByEveryone;
+    [ReadOnlyInInspector] [SerializeField] private E_PlayerTeam _lockpickableByTeam;
+    [ReadOnlyInInspector] [SerializeField] private S_LootInstantiator _lootInstantiator;
+    [ReadOnlyInInspector] [SerializeField] private S_VaultInstantiator _vaultInstantiator;
+
     [ReadOnlyInInspector] [SerializeField] 
     private NetworkVariable<VaultState> _vaultState = new(
         VaultState.Closed,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
-
-    [ReadOnlyInInspector] [SerializeField] private int _moneyValue;
-    [ReadOnlyInInspector] [SerializeField] private S_LootInstantiator _lootInstantiator;
-    [ReadOnlyInInspector] [SerializeField] private S_VaultInstantiator _vaultInstantiator;
 
 
     [Header(" Properties :")]
@@ -39,19 +41,30 @@ public class S_BankVault : S_Interactable
 
     #region Getter setter methods
 
+    // For _moneyValue
     public int GetMoneyValue() { return _moneyValue; }
 
+    // For _lockpickableByTeam
+    public E_PlayerTeam GetLockpickableByTeam() { return _lockpickableByTeam; }
+    public void SetLockpickableByTeam(E_PlayerTeam p_lockpickableByTeam) { _lockpickableByTeam = p_lockpickableByTeam; }
+
+    // For _lockpickableByTeam
+    public bool GetIsLockpickableByEveryone() { return _isLockpickableByEveryone; }
+    public void SetIsLockpickableByEveryone(bool p_isLockpickableByEveryone) { _isLockpickableByEveryone = p_isLockpickableByEveryone; }
+
+    // For _lootInstantiator
     public S_LootInstantiator GetLootInstantiator() { return _lootInstantiator; }
     public void SetLootInstantiator(in S_LootInstantiator p_lootInstantiator) { _lootInstantiator = p_lootInstantiator; }
 
+    // For _vaultInstantiator
     public S_VaultInstantiator GetVaultInstantiator() { return _vaultInstantiator; }
     public void SetVaultInstantiator(in S_VaultInstantiator p_vaultInstantiator) { _vaultInstantiator = p_vaultInstantiator; }
     #endregion
 
     [ClientRpc]
-    public void UpdateQuotaClientRpc(int value)
+    public void UpdateQuotaClientRpc(int p_value)
     {
-        _moneyValue = value;
+        _moneyValue = p_value;
         _vaultInstantiator.UpdateQuota(this);
     }
 
@@ -168,7 +181,7 @@ public class S_BankVault : S_Interactable
         if (_isDebuggingModeOn)
             Debug.Log("Circle progression : {p_progress} / {p_targetClientId}");
 
-        S_PlayerUseUI.OnCircleChange(p_progress);
+        S_PlayerUseUI.OnCircleChange?.Invoke(p_progress);
     }
 
     public override void Interact(S_PlayerInteract p_playerInteract, Transform p_parent)
@@ -195,6 +208,12 @@ public class S_BankVault : S_Interactable
 
         if (_vaultState.Value == VaultState.Opened) 
             return;
+
+        if (!_isLockpickableByEveryone &&
+            _lockpickableByTeam != networkObject.GetComponentInChildren<S_PlayerCharacter>().playerAttributes.Team)
+        {
+            return;
+        }
 
         if (_currentPlayerInteractComponent != null &&
             _currentPlayerInteractComponent != playerInteractComponent &&
