@@ -28,7 +28,7 @@ public abstract class S_Pickable : S_Interactable
 
     public bool IsEasyToPickUp(S_PlayerInteract p_player)
     {
-        return cart == null || cart.team == p_player.attributes.team;
+        return cart == null || cart.team == p_player.attributes.Team;
     }
 
     public override void StopInteract(S_PlayerInteract p_playerInteract)

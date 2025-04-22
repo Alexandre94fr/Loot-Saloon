@@ -290,8 +290,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04a9e44a8792c024bbc5ee89dde7d984, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifeManager: {fileID: 505570556356067103}
+  playerAttributes: {fileID: 1834316561176358421}
   playerInteract: {fileID: 5168879295098494647}
+  playerController: {fileID: 4592600893772838868}
 --- !u!1 &1941622484713472824
 GameObject:
   m_ObjectHideFlags: 0
@@ -627,6 +628,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   _playerInteractComponent: {fileID: 5168879295098494647}
+  _playerCharacterComponent: {fileID: 7496308992574988215}
   _weaponName: 
   _damage: 0
   _remainingBullet: 0
@@ -881,7 +883,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8907224730648965867}
   - component: {fileID: 1834316561176358421}
-  - component: {fileID: 505570556356067103}
   m_Layer: 0
   m_Name: Attributes
   m_TagString: Untagged
@@ -916,24 +917,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0f084d83fd7d6c4480d6071d392d3b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  properties: {fileID: 11400000, guid: 43868903bea762f4c8e16650924f3917, type: 2}
-  speed: 0
-  life: 0
-  maxLife: 0
-  strengh: 0
-  team: 0
---- !u!114 &505570556356067103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3008562612469331925}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eec9026e3cf375d4ea678527ef696525, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  _isDebugModeOn: 1
+  _playerCharacter: {fileID: 7496308992574988215}
+  _playerProperties: {fileID: 11400000, guid: 43868903bea762f4c8e16650924f3917, type: 2}
+  _walkingMovementSpeedNetworkVariable:
+    m_InternalValue: 0
+  _runningMovementSpeedNetworkVariable:
+    m_InternalValue: 0
+  _maxHealthPointsNetworkVariable:
+    m_InternalValue: 0
+  _currentHealthPointsNetworkVariable:
+    m_InternalValue: 0
+  _liftingStrenghNetworkVariable:
+    m_InternalValue: 0
+  _teamNetworkVariable:
+    m_InternalValue: 0
 --- !u!1 &3468696607227292602
 GameObject:
   m_ObjectHideFlags: 0
@@ -1402,6 +1401,7 @@ GameObject:
   - component: {fileID: 5944834594427622818}
   - component: {fileID: 541302485978495551}
   - component: {fileID: 7513308697994561563}
+  - component: {fileID: 8296905436598474919}
   m_Layer: 0
   m_Name: FeedBack
   m_TagString: Untagged
@@ -1479,6 +1479,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 541302485978495551}
+--- !u!114 &8296905436598474919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7329753644563634275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 469adf9fefc36f84dbb3976296cb5e63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loader: {fileID: 7513308697994561563}
 --- !u!1 &7552130842470226064
 GameObject:
   m_ObjectHideFlags: 0
