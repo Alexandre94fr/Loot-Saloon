@@ -16,6 +16,8 @@ public class S_PlayerAttributes : NetworkBehaviour
     public static Action<S_PlayerCharacter, float> OnPlayerWalkingMovementSpeedChangeEvent;
     public static Action<S_PlayerCharacter, float> OnPlayerRunningMovementSpeedChangeEvent;
 
+    public static Action<S_PlayerCharacter, float> OnPlayerJumpPowerChangeEvent;
+
     public static Action<S_PlayerCharacter, int > OnPlayerDeathEvent;
 
     public static Action<S_PlayerCharacter, int> OnPlayerMaxHealthPointChangeEvent;
@@ -30,6 +32,8 @@ public class S_PlayerAttributes : NetworkBehaviour
 
     public float WalkingMovementSpeed => _walkingMovementSpeedNetworkVariable.Value;
     public float RunningMovementSpeed => _runningMovementSpeedNetworkVariable.Value;
+
+    public float JumpPower => _jumpPowerNetworkVariable.Value;
 
     public int MaxHealthPoint => _maxHealthPointsNetworkVariable.Value;
     public int CurrentHealthPoint => _currentHealthPointsNetworkVariable.Value;
@@ -56,6 +60,11 @@ public class S_PlayerAttributes : NetworkBehaviour
         writePerm: NetworkVariableWritePermission.Server
     );
     [SerializeField] private NetworkVariable<float> _runningMovementSpeedNetworkVariable = new(
+        readPerm: NetworkVariableReadPermission.Everyone,
+        writePerm: NetworkVariableWritePermission.Server
+    );
+
+    [SerializeField] private NetworkVariable<float> _jumpPowerNetworkVariable = new(
         readPerm: NetworkVariableReadPermission.Everyone,
         writePerm: NetworkVariableWritePermission.Server
     );
@@ -87,8 +96,10 @@ public class S_PlayerAttributes : NetworkBehaviour
     //        if there are [SerializeField] it's to be able to debug
 
     [Header(" Attributes (check network variable to see the updated version) :")]
-    [ReadOnlyInInspector] float _walkingMovementSpeed = 3;
-    [ReadOnlyInInspector] float _runningMovementSpeed = 6;
+    [ReadOnlyInInspector] float _walkingMovementSpeed = 4;
+    [ReadOnlyInInspector] float _runningMovementSpeed = 8;
+
+    [ReadOnlyInInspector] float _jumpPower = 5;
 
     [ReadOnlyInInspector] int _maxHP = 100;
     [ReadOnlyInInspector] int _currentHP = 0;
@@ -124,6 +135,8 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         SetWalkingMovementSpeed_RPC(_playerProperties.walkingMovementSpeed);
         SetRunningMovementSpeed_RPC(_playerProperties.runningMovementSpeed);
+
+        SetJumpPower_RPC(_playerProperties.jumpPower);
 
         SetMaxHealthPoint_RPC(_playerProperties.maxHealthPoints);
         SetCurrentHealthPoint_RPC(MaxHealthPoint);
@@ -218,6 +231,44 @@ public class S_PlayerAttributes : NetworkBehaviour
     }
     #endregion
 
+    #endregion
+
+    #region - Jump power -
+
+    [Rpc(SendTo.Server)]
+    public void SetJumpPower_RPC(float p_newJumpPower)
+    {
+        if (!IsServer)
+            return;
+
+        _jumpPower = p_newJumpPower;
+        _jumpPowerNetworkVariable.Value = p_newJumpPower;
+
+        UpdateJumpPower_RPC(_jumpPower);
+    }
+
+    [Rpc(SendTo.Server)]
+    public void AddJumpPower_RPC(float p_newJumpPower)
+    {
+        if (!IsServer)
+            return;
+
+        SetJumpPower_RPC(JumpPower + p_newJumpPower);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void UpdateJumpPower_RPC(float p_newJumpPower)
+    {
+        if (_isDebugModeOn)
+            Debug.Log($"{nameof(UpdateJumpPower_RPC)} UPDATING | '{nameof(p_newJumpPower)}' : {p_newJumpPower}");
+
+        _jumpPower = p_newJumpPower;
+
+        OnPlayerJumpPowerChangeEvent?.Invoke(_playerCharacter, p_newJumpPower);
+
+        if (_isDebugModeOn)
+            Debug.Log($"{nameof(UpdateJumpPower_RPC)} UPDATED | '{nameof(p_newJumpPower)}' : {p_newJumpPower}");
+    }
     #endregion
 
     #region - Health points -
