@@ -235,7 +235,7 @@ public class S_PlayerController : NetworkBehaviour
         Sprint(_isSprinting);
     }
 
-    private void Respawn(S_PlayerCharacter p_playerCharacter, int p_currentPlayerHealthPoints)
+    private void Respawn(ulong p_playerID, int p_currentPlayerHealthPoints)
     {
         DropInputsEvents();
         DisableAllMeshOfPlayer();

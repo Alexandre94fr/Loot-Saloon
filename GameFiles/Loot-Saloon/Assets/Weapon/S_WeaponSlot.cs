@@ -31,9 +31,9 @@ public class S_WeaponSlot : NetworkBehaviour
 
     private float _lastShotTime;
 
-    private void DropWeaponOnDeath(S_PlayerCharacter p_playerCharacter, int p_currentPlayerHealth)
+    private void DropWeaponOnDeath(ulong p_playerID, int p_currentPlayerHealth)
     {
-        if (p_playerCharacter != _playerCharacterComponent)
+        if (p_playerID != NetworkManager.Singleton.LocalClientId)
             return;
 
         if (_weaponObject != null)
