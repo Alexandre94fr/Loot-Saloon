@@ -237,6 +237,9 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Respawn(ulong p_playerID, int p_currentPlayerHealthPoints)
     {
+        if (NetworkManager.Singleton.LocalClientId != p_playerID)
+            return;
+
         DropInputsEvents();
         DisableAllMeshOfPlayer();
         StartCoroutine(RespawnCoroutine());
