@@ -103,16 +103,9 @@ public abstract class S_Pickable : S_Interactable
         {
             Vector3 targetPosition = p_handTransform.position + p_handTransform.TransformDirection(_onPickUpOffset);
             Quaternion targetRotation = p_handTransform.rotation;
-            if (rb != null)
-            {
-                rb.MovePosition(targetPosition);
-                rb.MoveRotation(targetRotation);
-            }
-            else
-            {
-                transform.position = targetPosition;
-                transform.rotation = targetRotation;
-            }
+            transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 10f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+
 
             if (Time.frameCount % 2 == 0)
             {
