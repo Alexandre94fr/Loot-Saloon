@@ -13,23 +13,27 @@ public class S_PlayerAttributes : NetworkBehaviour
 {
     #region -= Events =-
 
-    public static Action<S_PlayerCharacter, float> OnPlayerWalkingMovementSpeedChangeEvent;
-    public static Action<S_PlayerCharacter, float> OnPlayerRunningMovementSpeedChangeEvent;
+    public static Action<ulong, float> OnPlayerWalkingMovementSpeedChangeEvent;
+    public static Action<ulong, float> OnPlayerRunningMovementSpeedChangeEvent;
 
-    public static Action<S_PlayerCharacter, int > OnPlayerDeathEvent;
+    public static Action<ulong, float> OnPlayerJumpPowerChangeEvent;
 
-    public static Action<S_PlayerCharacter, int> OnPlayerMaxHealthPointChangeEvent;
-    public static Action<S_PlayerCharacter, int> OnPlayerHealthPointChangeEvent;
+    public static Action<ulong, int > OnPlayerDeathEvent;
 
-    public static Action<S_PlayerCharacter, int> OnPlayerLiftingStrenghChangeEvent;
+    public static Action<ulong, int> OnPlayerMaxHealthPointChangeEvent;
+    public static Action<ulong, int> OnPlayerHealthPointChangeEvent;
 
-    public static Action<S_PlayerCharacter, E_PlayerTeam> OnPlayerTeamChangeEvent;
+    public static Action<ulong, int> OnPlayerLiftingStrenghChangeEvent;
+
+    public static Action<ulong, E_PlayerTeam> OnPlayerTeamChangeEvent;
     #endregion
 
     #region -= Getters =-
 
     public float WalkingMovementSpeed => _walkingMovementSpeedNetworkVariable.Value;
     public float RunningMovementSpeed => _runningMovementSpeedNetworkVariable.Value;
+
+    public float JumpPower => _jumpPowerNetworkVariable.Value;
 
     public int MaxHealthPoint => _maxHealthPointsNetworkVariable.Value;
     public int CurrentHealthPoint => _currentHealthPointsNetworkVariable.Value;
@@ -42,9 +46,6 @@ public class S_PlayerAttributes : NetworkBehaviour
     [Header(" Debugging")]
     [SerializeField] private bool _isDebugModeOn = true;
 
-    [Header(" External references :")]
-    [SerializeField] private S_PlayerCharacter _playerCharacter;
-
     [Header(" Properties :")]
     [SerializeField] private S_PlayerProperties _playerProperties;
 
@@ -56,6 +57,11 @@ public class S_PlayerAttributes : NetworkBehaviour
         writePerm: NetworkVariableWritePermission.Server
     );
     [SerializeField] private NetworkVariable<float> _runningMovementSpeedNetworkVariable = new(
+        readPerm: NetworkVariableReadPermission.Everyone,
+        writePerm: NetworkVariableWritePermission.Server
+    );
+
+    [SerializeField] private NetworkVariable<float> _jumpPowerNetworkVariable = new(
         readPerm: NetworkVariableReadPermission.Everyone,
         writePerm: NetworkVariableWritePermission.Server
     );
@@ -86,9 +92,16 @@ public class S_PlayerAttributes : NetworkBehaviour
     // NOTE : The ReadOnlyInInspector is there in case the variable are serialized,
     //        if there are [SerializeField] it's to be able to debug
 
+
     [Header(" Attributes (check network variable to see the updated version) :")]
-    [ReadOnlyInInspector] float _walkingMovementSpeed = 3;
-    [ReadOnlyInInspector] float _runningMovementSpeed = 6;
+
+    [SerializeField] [ReadOnlyInInspector] ulong _playerID;
+
+    [Space]
+    [ReadOnlyInInspector] float _walkingMovementSpeed = 4;
+    [ReadOnlyInInspector] float _runningMovementSpeed = 8;
+
+    [ReadOnlyInInspector] float _jumpPower = 5;
 
     [ReadOnlyInInspector] int _maxHP = 100;
     [ReadOnlyInInspector] int _currentHP = 0;
@@ -99,16 +112,29 @@ public class S_PlayerAttributes : NetworkBehaviour
     #endregion
 
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        _playerID = NetworkManager.Singleton.LocalClientId;
+    }
+
     private void Start()
     {
         if (!S_VariablesChecker.AreVariablesCorrectlySetted(name, null,
-            (_playerProperties, nameof(_playerProperties)),
-            (_playerCharacter, nameof(_playerCharacter))
+            (_playerProperties, nameof(_playerProperties))
         )) return;
 
         OnPlayerDeathEvent += OnDeathInitalization;
 
         Initialize();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+
+        OnPlayerDeathEvent -= OnDeathInitalization;
     }
 
     void Initialize()
@@ -125,13 +151,15 @@ public class S_PlayerAttributes : NetworkBehaviour
         SetWalkingMovementSpeed_RPC(_playerProperties.walkingMovementSpeed);
         SetRunningMovementSpeed_RPC(_playerProperties.runningMovementSpeed);
 
+        SetJumpPower_RPC(_playerProperties.jumpPower);
+
         SetMaxHealthPoint_RPC(_playerProperties.maxHealthPoints);
         SetCurrentHealthPoint_RPC(MaxHealthPoint);
 
         SetLiftingStrengh_RPC(_playerProperties.liftingStrengh);
     }
 
-    void OnDeathInitalization(S_PlayerCharacter p_playerCharacter, int p_currentPlayerHealthPoints)
+    void OnDeathInitalization(ulong p_playerID, int p_currentPlayerHealthPoints)
     {
         Initialize_ServerRPC();
 
@@ -173,7 +201,7 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _walkingMovementSpeed = p_newWalkingMovementSpeed;
 
-        OnPlayerWalkingMovementSpeedChangeEvent?.Invoke(_playerCharacter, p_newWalkingMovementSpeed);
+        OnPlayerWalkingMovementSpeedChangeEvent?.Invoke(_playerID, p_newWalkingMovementSpeed);
 
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateWalkingMovementSpeed_RPC)} UPDATED | '{nameof(p_newWalkingMovementSpeed)}' : {p_newWalkingMovementSpeed}");
@@ -211,13 +239,51 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _runningMovementSpeed = p_newRunningMovementSpeed;
 
-        OnPlayerRunningMovementSpeedChangeEvent?.Invoke(_playerCharacter, p_newRunningMovementSpeed);
+        OnPlayerRunningMovementSpeedChangeEvent?.Invoke(_playerID, p_newRunningMovementSpeed);
 
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateRunningMovementSpeed_RPC)} UPDATED | '{nameof(p_newRunningMovementSpeed)}' : {p_newRunningMovementSpeed}");
     }
     #endregion
 
+    #endregion
+
+    #region - Jump power -
+
+    [Rpc(SendTo.Server)]
+    public void SetJumpPower_RPC(float p_newJumpPower)
+    {
+        if (!IsServer)
+            return;
+
+        _jumpPower = p_newJumpPower;
+        _jumpPowerNetworkVariable.Value = p_newJumpPower;
+
+        UpdateJumpPower_RPC(_jumpPower);
+    }
+
+    [Rpc(SendTo.Server)]
+    public void AddJumpPower_RPC(float p_newJumpPower)
+    {
+        if (!IsServer)
+            return;
+
+        SetJumpPower_RPC(JumpPower + p_newJumpPower);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void UpdateJumpPower_RPC(float p_newJumpPower)
+    {
+        if (_isDebugModeOn)
+            Debug.Log($"{nameof(UpdateJumpPower_RPC)} UPDATING | '{nameof(p_newJumpPower)}' : {p_newJumpPower}");
+
+        _jumpPower = p_newJumpPower;
+
+        OnPlayerJumpPowerChangeEvent?.Invoke(_playerID, p_newJumpPower);
+
+        if (_isDebugModeOn)
+            Debug.Log($"{nameof(UpdateJumpPower_RPC)} UPDATED | '{nameof(p_newJumpPower)}' : {p_newJumpPower}");
+    }
     #endregion
 
     #region - Health points -
@@ -253,7 +319,7 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _maxHP = p_newMaxHP;
 
-        OnPlayerMaxHealthPointChangeEvent?.Invoke(_playerCharacter, p_newMaxHP);
+        OnPlayerMaxHealthPointChangeEvent?.Invoke(_playerID, p_newMaxHP);
 
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateMaxHealthPoint_RPC)} UPDATED | '{nameof(p_newMaxHP)}' : {p_newMaxHP}");
@@ -326,7 +392,7 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _currentHP = p_newHP;
 
-        OnPlayerHealthPointChangeEvent?.Invoke(_playerCharacter, p_newHP);
+        OnPlayerHealthPointChangeEvent?.Invoke(_playerID, p_newHP);
 
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateCurrentHealthPoint_RPC)} UPDATED | '{nameof(p_newHP)}' : {p_newHP}");
@@ -336,7 +402,7 @@ public class S_PlayerAttributes : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     void NotifyPlayerDeath_RPC()
     {
-        OnPlayerDeathEvent?.Invoke(_playerCharacter, CurrentHealthPoint);
+        OnPlayerDeathEvent?.Invoke(_playerID, CurrentHealthPoint);
     }
     #endregion
 
@@ -371,7 +437,7 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _liftingStrengh = p_newLiftingStrengh;
 
-        OnPlayerLiftingStrenghChangeEvent?.Invoke(_playerCharacter, p_newLiftingStrengh);
+        OnPlayerLiftingStrenghChangeEvent?.Invoke(_playerID, p_newLiftingStrengh);
 
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateLiftingStrengh_RPC)} UPDATED | '{nameof(p_newLiftingStrengh)}' : {p_newLiftingStrengh}");
@@ -400,7 +466,7 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _team = p_newTeam;
 
-        OnPlayerTeamChangeEvent?.Invoke(_playerCharacter, p_newTeam);
+        OnPlayerTeamChangeEvent?.Invoke(_playerID, p_newTeam);
 
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateTeam_RPC)} UPDATED | '{nameof(p_newTeam)}' : {p_newTeam}");
