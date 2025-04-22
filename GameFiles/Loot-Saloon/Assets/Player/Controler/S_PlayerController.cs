@@ -20,13 +20,18 @@ public class S_PlayerController : NetworkBehaviour
     [SerializeField] private Animator _armsAnimator;
     [SerializeField] private GameObject _armsHandler;
 
-    [SerializeField] private float _walkSpeed = 2f;
+
+    private S_PlayerAttributes _attributes;
     [SerializeField] private float _jumpForce = 5f;
-    [SerializeField] private float _sprintSpeed = 4f;
+    [SerializeField] private float _cartSpeedMultiplicator = 10f;
+
 
     [SerializeField] private bool _isCartModeEnabled = false;
 
-
+    public void SetPlayerAttribute(ref S_PlayerAttributes p_playerAttributes)
+    {
+        _attributes = p_playerAttributes;
+    }
 
     [ClientRpc]
     private void PutDownClientRpc(ClientRpcParams rpcParams = default)
@@ -80,11 +85,33 @@ public class S_PlayerController : NetworkBehaviour
 
     public void EnableCartMode(bool enabled, Transform cart = null)
     {
+        bool currentEnable = _isCartModeEnabled;
         _isCartModeEnabled = enabled;
 
         Debug.Log($"[CART MODE] Set to {(enabled ? "ENABLED" : "DISABLED")} for {gameObject.name}");
 
         _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(enabled, cart);
+
+        if (currentEnable == enabled)
+            return;
+
+        Debug.LogWarning("Sale Fils de Pute de point d'arret " +  enabled);
+        if (enabled)
+        {
+            _attributes.SetWalkingMovementSpeed_RPC(_attributes.WalkingMovementSpeed / _cartSpeedMultiplicator);
+            _attributes.SetRunningMovementSpeed_RPC(_attributes.RunningMovementSpeed / _cartSpeedMultiplicator);
+        }
+        else
+        {
+            _attributes.SetWalkingMovementSpeed_RPC(_attributes.WalkingMovementSpeed * _cartSpeedMultiplicator);
+            _attributes.SetRunningMovementSpeed_RPC(_attributes.RunningMovementSpeed * _cartSpeedMultiplicator);
+        }
+        Sprint(_isSprinting);
+        Debug.LogWarning("The Curent Speed is  " + _currentSpeed);
+        Debug.LogWarning("The Curent Walking Speed is  " + _attributes.WalkingMovementSpeed);
+        Debug.LogWarning("The Curent Running Speed is  " + _attributes.RunningMovementSpeed);
+
+
     }
 
 
@@ -113,6 +140,11 @@ public class S_PlayerController : NetworkBehaviour
         S_Extract.OnExtract += DropInputsEvents;
     }
 
+    private void SetSprintInEvent(S_PlayerCharacter _, float p_speed)
+    {
+
+    }
+
     public override void OnNetworkSpawn()
     {
         if (_isSoloTestModeEnabled)
@@ -134,6 +166,9 @@ public class S_PlayerController : NetworkBehaviour
             S_PlayerAttributes.OnPlayerDeathEvent += Respawn;
             S_Extract.OnExtract += DisableAllMeshOfPlayer;
             S_Extract.OnExtract += DropInputsEvents;
+            S_PlayerAttributes.OnPlayerWalkingMovementSpeedChangeEvent += Sprint();
+            S_PlayerAttributes.OnPlayerRunningMovementSpeedChangeEvent += Sprint();
+
 
             S_PlayersSpawner.Instance.SpawnPlayer(_playerTransform.transform.parent.gameObject, _playerTransform);
         }
@@ -187,6 +222,7 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Move()
     {
+        Debug.Log("The Actual Speed is ::::: " + _currentSpeed);
         if (_isCartModeEnabled)
         {
             // Simulate cart movement for always go forward
@@ -215,7 +251,7 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Sprint(bool sprint)
     {
-        _currentSpeed = (sprint ? _sprintSpeed : _walkSpeed) * _speedMult;
+        _currentSpeed = (sprint ? _attributes.RunningMovementSpeed : _attributes.WalkingMovementSpeed) * _speedMult;
         _isSprinting = sprint;
         _armsAnimator.speed = sprint ? 2 : 1;
     }
