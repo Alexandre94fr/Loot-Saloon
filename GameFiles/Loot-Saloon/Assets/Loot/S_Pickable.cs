@@ -90,26 +90,61 @@ public abstract class S_Pickable : S_Interactable
 
     private IEnumerator FollowHandCoroutine(Transform p_handTransform)
     {
+
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = false;
+            rb.isKinematic = true;
+        }
+
+        DisablePhysicsClientRpc();
+
         while (!interactable)
         {
             Vector3 targetPosition = p_handTransform.position + p_handTransform.TransformDirection(_onPickUpOffset);
             Quaternion targetRotation = p_handTransform.rotation;
-
-            // Update position and rotation locally
-            transform.position = targetPosition;
-            transform.rotation = targetRotation;
-
-
-            if (IsServer)
+            if (rb != null)
             {
-                UpdateTransformClientRpc(targetPosition, targetRotation);
+                rb.MovePosition(targetPosition);
+                rb.MoveRotation(targetRotation);
             }
             else
             {
-                UpdateTransformServerRpc(targetPosition, targetRotation);
+                transform.position = targetPosition;
+                transform.rotation = targetRotation;
+            }
+
+            if (Time.frameCount % 2 == 0)
+            {
+                if (IsServer)
+                {
+                    UpdateTransformClientRpc(targetPosition, targetRotation);
+                }
+                else
+                {
+                    UpdateTransformServerRpc(targetPosition, targetRotation);
+                }
             }
 
             yield return null;
+        }
+    }
+
+    [ClientRpc]
+    private void DisablePhysicsClientRpc()
+    {
+        if (NetworkManager.Singleton.IsServer)
+            return;
+
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = false;
+            rb.isKinematic = true;
+        }
+
+        if(TryGetComponent(out SphereCollider sphereCollider) && TryGetComponent(out S_Cart _) == false)
+        {
+            sphereCollider.enabled = false;
         }
     }
 
@@ -151,7 +186,13 @@ public abstract class S_Pickable : S_Interactable
     public virtual void PutDown()
     {
         interactable = true;
-
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
         foreach (Collider colliderToIgnore in _ignoredColliders)
         {
             foreach (Collider collider in _colliders)
@@ -168,6 +209,7 @@ public abstract class S_Pickable : S_Interactable
     {
         if (TryGetComponent(out Rigidbody rb))
         {
+            rb.isKinematic = false;
             rb.useGravity = true;
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
