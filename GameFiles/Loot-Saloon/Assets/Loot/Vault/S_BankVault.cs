@@ -17,6 +17,7 @@ public class S_BankVault : S_Interactable
 
     [Space]
     [ReadOnlyInInspector] [SerializeField] private int _moneyValue;
+    [ReadOnlyInInspector] [SerializeField] private bool _isLockpickableByEveryone;
     [ReadOnlyInInspector] [SerializeField] private E_PlayerTeam _lockpickableByTeam;
     [ReadOnlyInInspector] [SerializeField] private S_LootInstantiator _lootInstantiator;
     [ReadOnlyInInspector] [SerializeField] private S_VaultInstantiator _vaultInstantiator;
@@ -47,6 +48,10 @@ public class S_BankVault : S_Interactable
     public E_PlayerTeam GetLockpickableByTeam() { return _lockpickableByTeam; }
     public void SetLockpickableByTeam(E_PlayerTeam p_lockpickableByTeam) { _lockpickableByTeam = p_lockpickableByTeam; }
 
+    // For _lockpickableByTeam
+    public bool GetIsLockpickableByEveryone() { return _isLockpickableByEveryone; }
+    public void SetIsLockpickableByEveryone(bool p_isLockpickableByEveryone) { _isLockpickableByEveryone = p_isLockpickableByEveryone; }
+
     // For _lootInstantiator
     public S_LootInstantiator GetLootInstantiator() { return _lootInstantiator; }
     public void SetLootInstantiator(in S_LootInstantiator p_lootInstantiator) { _lootInstantiator = p_lootInstantiator; }
@@ -57,9 +62,9 @@ public class S_BankVault : S_Interactable
     #endregion
 
     [ClientRpc]
-    public void UpdateQuotaClientRpc(int value)
+    public void UpdateQuotaClientRpc(int p_value)
     {
-        _moneyValue = value;
+        _moneyValue = p_value;
         _vaultInstantiator.UpdateQuota(this);
     }
 
@@ -203,6 +208,12 @@ public class S_BankVault : S_Interactable
 
         if (_vaultState.Value == VaultState.Opened) 
             return;
+
+        if (!_isLockpickableByEveryone &&
+            _lockpickableByTeam != networkObject.GetComponentInChildren<S_PlayerCharacter>().playerAttributes.Team)
+        {
+            return;
+        }
 
         if (_currentPlayerInteractComponent != null &&
             _currentPlayerInteractComponent != playerInteractComponent &&

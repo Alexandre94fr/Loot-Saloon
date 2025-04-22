@@ -12,6 +12,8 @@ public class S_VaultInstantiator : NetworkBehaviour
     public Transform[] vaultSpawnPoints;
     public GameObject pb_vault;
 
+    [Header(" Lock picking :")]
+    [SerializeField] private bool _areInstantiatedVaultsLockpickableByEveryone;
     [SerializeField] private E_PlayerTeam _instantiatedVaultsTeam;
 
     public override void OnNetworkSpawn()
@@ -61,7 +63,8 @@ public class S_VaultInstantiator : NetworkBehaviour
 
     public void SpawnVaults()
     {
-        if (!IsServer) return;
+        if (!IsServer) 
+            return;
 
         foreach (Transform t in vaultSpawnPoints)
         {
@@ -83,6 +86,7 @@ public class S_VaultInstantiator : NetworkBehaviour
             vault.GenerateLoots();
             vault.UpdateQuotaClientRpc(vault.GetMoneyValue());
 
+            vault.SetIsLockpickableByEveryone(_areInstantiatedVaultsLockpickableByEveryone);
             vault.SetLockpickableByTeam(_instantiatedVaultsTeam);
         }
     }

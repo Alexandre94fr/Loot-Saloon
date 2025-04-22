@@ -133,6 +133,7 @@ public class S_WeaponSlot : NetworkBehaviour
         {
             if (!isReloading)
                 Reload();
+
             return;
         }
 
@@ -176,21 +177,20 @@ public class S_WeaponSlot : NetworkBehaviour
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_targetNetworkId, out NetworkObject targetNetObj))
         {
             var targetCharacter = targetNetObj.GetComponentInChildren<S_PlayerCharacter>();
-            if (targetCharacter != null && targetCharacter.lifeManager != null)
+            if (targetCharacter != null && targetCharacter.playerAttributes != null)
             {
                 ulong targetClientId = targetNetObj.OwnerClientId;
-
 
                 OnHitClientRpc(p_damage, targetClientId);
             }
             else
             {
-                Debug.LogWarning("Target has no S_PlayerCharacter or LifeManager! " + targetNetObj.name);
+                Debug.LogWarning("WARNING ! Target has no S_PlayerCharacter or S_PlayerAttributes ! " + targetNetObj.name);
             }
         }
         else
         {
-            Debug.LogWarning("Invalid target network object.");
+            Debug.LogWarning("WARNING ! Invalid target network object.");
         }
     }
 
@@ -202,12 +202,13 @@ public class S_WeaponSlot : NetworkBehaviour
         if (NetworkManager.Singleton.LocalClientId != p_targetClientId)
             return;
 
-        var localPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-        var character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
-        if (character != null && character.lifeManager != null)
+        NetworkObject localPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+        S_PlayerCharacter character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
+
+        if (character != null && character.playerAttributes != null)
         {
-            character.lifeManager.TakeDamage(p_damage);
-            Debug.Log($"You took {p_damage} p_damage!");
+            character.playerAttributes.AddCurrentHealthPoint_RPC((int)-p_damage);
+            Debug.Log($"You took {(int)p_damage} p_damage!");
         }
     }
 
