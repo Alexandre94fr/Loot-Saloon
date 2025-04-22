@@ -106,7 +106,7 @@ public class S_PlayerAttributes : NetworkBehaviour
     [ReadOnlyInInspector] int _maxHP = 100;
     [ReadOnlyInInspector] int _currentHP = 0;
 
-    [ReadOnlyInInspector] int _liftingStrengh = 5;
+    [ReadOnlyInInspector] int _liftingStrengh = 20;
 
     [ReadOnlyInInspector] E_PlayerTeam _team = E_PlayerTeam.NONE;
     #endregion
@@ -402,6 +402,9 @@ public class S_PlayerAttributes : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     void NotifyPlayerDeath_RPC()
     {
+        if (!IsOwner)
+            return;
+
         OnPlayerDeathEvent?.Invoke(_playerID, CurrentHealthPoint);
     }
     #endregion

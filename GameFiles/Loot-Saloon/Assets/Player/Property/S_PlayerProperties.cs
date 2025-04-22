@@ -14,5 +14,5 @@ public class S_PlayerProperties : ScriptableObject
     public int maxHealthPoints = 100;
 
     [Header(" Lifting :")]
-    public int liftingStrengh = 5;
+    public int liftingStrengh = 20;
 }

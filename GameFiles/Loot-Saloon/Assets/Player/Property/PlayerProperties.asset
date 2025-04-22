@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkingMovementSpeed: 4
   runningMovementSpeed: 8
+  jumpPower: 5
   maxHealthPoints: 100
-  liftingStrengh: 10
+  liftingStrengh: 20
