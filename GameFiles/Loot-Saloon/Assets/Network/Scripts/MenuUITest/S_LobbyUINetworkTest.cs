@@ -20,6 +20,10 @@ public class S_LobbyUINetworkTest : MonoBehaviour
     public Button goRedTeamButton;
     public Button goBlueTeamButton;
 
+    public Button instructionsButton;
+    public Button instructBackButton;
+    public GameObject instructions;
+
     private void OnEnable()
     {
         if (S_GameLobbyManager.instance)
@@ -39,6 +43,8 @@ public class S_LobbyUINetworkTest : MonoBehaviour
             readyButton.onClick.AddListener(OnReadyPressed);
             goRedTeamButton.onClick.AddListener(() => OnTeamBtnPressed(E_PlayerTeam.RED));
             goBlueTeamButton.onClick.AddListener(() => OnTeamBtnPressed(E_PlayerTeam.BLUE));
+            instructionsButton.onClick.AddListener(() => ShowInstructions());
+            instructBackButton.onClick.AddListener(() => ShowInstructions());
         }
     }
 
@@ -120,5 +126,10 @@ public class S_LobbyUINetworkTest : MonoBehaviour
         var succeededTeamChange = await S_GameLobbyManager.instance.SetPlayerTeam(p_choosedTeam);
 
         S_LobbyEvents.OnLobbyUnready?.Invoke();
+    }
+
+    private void ShowInstructions()
+    {
+        instructions.SetActive(!instructions.activeSelf);
     }
 }
