@@ -149,9 +149,6 @@ public class S_PlayerController : NetworkBehaviour
             return;
 
         Sprint(_isSprinting);
-        Debug.LogWarning("The Curent Speed is  " + _currentSpeed);
-        Debug.LogWarning("The Curent Walking Speed is  " + _attributes.WalkingMovementSpeed);
-        Debug.LogWarning("The Curent Running Speed is  " + _attributes.RunningMovementSpeed);
     }
 
 
@@ -180,7 +177,6 @@ public class S_PlayerController : NetworkBehaviour
             S_Extract.OnExtract += DropInputsEvents;
             S_PlayerAttributes.OnPlayerWalkingMovementSpeedChangeEvent += SetSprintInEvent;
             S_PlayerAttributes.OnPlayerRunningMovementSpeedChangeEvent += SetSprintInEvent;
-            S_PlayerAttributes.OnAnySpeedChangeEvent += SetSprintInEvent;
 
 
             S_PlayersSpawner.Instance.SpawnPlayer(_playerTransform.transform.parent.gameObject, _playerTransform);

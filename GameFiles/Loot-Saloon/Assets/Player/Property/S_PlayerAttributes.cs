@@ -17,7 +17,6 @@ public class S_PlayerAttributes : NetworkBehaviour
 
     public static Action<ulong, float> OnPlayerWalkingMovementSpeedChangeEvent;
     public static Action<ulong, float> OnPlayerRunningMovementSpeedChangeEvent;
-    public static event Action<ulong, float> OnAnySpeedChangeEvent;
 
     public static Action<ulong, float> OnPlayerJumpPowerChangeEvent;
 
@@ -222,8 +221,6 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _runningMovementSpeed = p_newRunningMovementSpeed;
         _runningMovementSpeedNetworkVariable.Value = p_newRunningMovementSpeed;
-
-        OnAnySpeedChangeEvent?.Invoke(OwnerClientId, p_newRunningMovementSpeed);
 
         UpdateRunningMovementSpeed_RPC(_runningMovementSpeed);
     }
