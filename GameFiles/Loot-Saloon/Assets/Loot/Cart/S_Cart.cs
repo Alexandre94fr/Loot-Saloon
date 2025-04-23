@@ -96,12 +96,12 @@ public class S_Cart : S_Pickable
         _parent = p_parent;
         _isCarried = true;
 
-        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(true, transform);
+        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(transform);
 
         S_PlayerInputsReciever.OnMove += MoveCart;
         StartCoroutine(MoveCoroutine());
         var playerController = _parent.parent.GetComponentInChildren<S_PlayerController>(true);
-        playerController.EnableCartModeClientRpc(true, GetComponent<NetworkObject>());
+        playerController.EnableCartModeClientRpc(GetComponent<NetworkObject>());
     }
 
     [ClientRpc]
@@ -127,7 +127,7 @@ public class S_Cart : S_Pickable
             return;
         }
 
-        playerController.EnableCartModeClientRpc(false, GetComponent<NetworkObject>());
+        playerController.DisableCartModeClientRpc(GetComponent<NetworkObject>());
     }
 
 

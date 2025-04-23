@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class S_PlayerCamera : MonoBehaviour
@@ -51,10 +52,17 @@ public class S_PlayerCamera : MonoBehaviour
         }
     }
 
-    public void EnableCartMode(bool enable, Transform cart = null)
+    public void EnableCartMode(Transform cart = null)
     {
-        _hasCart = enable;
-        _cartReference = enable ? cart : null;
+        _hasCart = true;
+        _cartReference = cart;
+        _cartYawOffset = 0f;
+    }
+
+    internal void DisableCartMode()
+    {
+        _hasCart = false;
+        _cartReference = null;
         _cartYawOffset = 0f;
     }
 
