@@ -47,6 +47,7 @@ public class S_Cart : S_Pickable
 
         while (_isCarried)
         {
+            Debug.Log("IM MOVING !!!");
             Vector3 forward = _parent.forward;
             forward.y = 0;
             forward.Normalize();
@@ -61,6 +62,7 @@ public class S_Cart : S_Pickable
             if (!Physics.SphereCast(rb.position, sphereRadius, direction, out RaycastHit hit, distance + safeDistance, cartMask, QueryTriggerInteraction.Ignore))
             {
                 rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, Time.deltaTime * moveSpeed));
+                Debug.Log("Detect Collision");
             }
             else
             {
@@ -68,7 +70,7 @@ public class S_Cart : S_Pickable
                 // Optionnel : tu peux faire vibrer, rebondir, ou ralentir ici si tu veux un effet de "blocage"
             }
 
-            Quaternion targetRotation = Quaternion.LookRotation(-forward, Vector3.up);
+            Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.deltaTime * rotationSmoothness));
 
             if (IsOwner)

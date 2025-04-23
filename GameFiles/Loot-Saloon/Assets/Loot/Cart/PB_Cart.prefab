@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 468425270160199139}
   - component: {fileID: 5580489806465046066}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LeftHandleCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63,7 +63,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3303457346472643150}
   - component: {fileID: 6628698595677029332}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WheelCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,7 +116,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7892131903577367861}
   - component: {fileID: 4844869871462777352}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: RightHandleCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -168,7 +168,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6209109254526051248}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -208,7 +208,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7742293666943959662}
   - component: {fileID: 5865188556041584605}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: RightCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -261,7 +261,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4257865136759413071}
   - component: {fileID: 3547946611824271280}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FrontCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -314,7 +314,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8293204061876667281}
   - component: {fileID: 5150484460216110751}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BackCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1025,7 +1025,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7726140606891671019}
   - component: {fileID: 4687325417460069968}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BottomCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1066,8 +1066,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.009749181, y: 0.015635941, z: 0.0054820394}
-  m_Center: {x: 0, y: 0.0014470943, z: 0.004369918}
+  m_Size: {x: 0.009749181, y: 0.05, z: 0.009582546}
+  m_Center: {x: 0, y: 0.0014470936, z: 0.0054674614}
 --- !u!1 &6760514040946705506
 GameObject:
   m_ObjectHideFlags: 0
@@ -1492,7 +1492,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6925609156743109312}
   - component: {fileID: 1239328484518265363}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LeftCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1590,39 +1590,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5768818852587296447, guid: f71f62b8e7e60d2419dcb6d4db6b9251, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1683175741595168177}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f71f62b8e7e60d2419dcb6d4db6b9251, type: 3}
 --- !u!4 &225723046975193847 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4171650087681704669, guid: f71f62b8e7e60d2419dcb6d4db6b9251, type: 3}
   m_PrefabInstance: {fileID: 4234861725476552746}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &7695444927863805589 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5768818852587296447, guid: f71f62b8e7e60d2419dcb6d4db6b9251, type: 3}
-  m_PrefabInstance: {fileID: 4234861725476552746}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &1683175741595168177
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7695444927863805589}
-  m_Material: {fileID: 13400000, guid: de5dcb771b66678488b589ebc8cbb104, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.009749181, y: 0.015635941, z: 0.009271141}
-  m_Center: {x: 0, y: 0.0014470944, z: 0.004660167}
