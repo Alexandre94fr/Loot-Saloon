@@ -182,7 +182,6 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _walkingMovementSpeed = p_newWalkingMovementSpeed;
         _walkingMovementSpeedNetworkVariable.Value = p_newWalkingMovementSpeed;
-        OnAnySpeedChangeEvent?.Invoke(OwnerClientId, p_newWalkingMovementSpeed);
 
         UpdateWalkingMovementSpeed_RPC(_walkingMovementSpeed);
     }

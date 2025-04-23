@@ -109,11 +109,10 @@ public class S_PlayerController : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void DisableCartModeClientRpc(NetworkObjectReference cartRef)
+    public void DisableCartModeClientRpc(NetworkObjectReference p_cartReference)
     {
-        if (!IsOwner) return;
-
-        Transform cartTransform = null;
+        if (!IsOwner) 
+            return;
 
         DisableCartMode();
 
