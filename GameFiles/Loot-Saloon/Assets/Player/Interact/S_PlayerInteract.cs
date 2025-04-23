@@ -37,7 +37,7 @@ public class S_PlayerInteract : NetworkBehaviour
     public LayerMask objectLayer;
 
     private Material _lastRenderer;
-    private S_Pickable _lastPickableLookedAt;
+    private S_Loot _lastPickableLookedAt;
 
     private void Awake()
     {
@@ -180,7 +180,14 @@ public class S_PlayerInteract : NetworkBehaviour
     {
         if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
-            CheckPickableCanvasVisibility(hit);
+            S_Loot loot = hit.collider.GetComponent<S_Loot>();
+            if (loot != null)
+            {
+                if (!loot.interactable)
+                    return;
+                CheckPickableCanvasVisibility(loot);
+            }
+            
             MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
             if (renderer != null)
             {
@@ -216,18 +223,17 @@ public class S_PlayerInteract : NetworkBehaviour
         }
     }
 
-    private void CheckPickableCanvasVisibility(RaycastHit p_hit)
+    private void CheckPickableCanvasVisibility(S_Loot p_loot)
     {
-        S_Pickable pickable = p_hit.collider.GetComponent<S_Pickable>();
-        if (pickable != null)
+        if (p_loot != null)
         {
-            if (_lastPickableLookedAt != pickable)
+            if (_lastPickableLookedAt != p_loot)
             {
                 if (_lastPickableLookedAt != null)
                     _lastPickableLookedAt.SetWorldTextVisibility(false, Camera.main);
 
-                pickable.SetWorldTextVisibility(true, Camera.main);
-                _lastPickableLookedAt = pickable;
+                p_loot.SetWorldTextVisibility(true, Camera.main);
+                _lastPickableLookedAt = p_loot;
             }
             return;
         }
