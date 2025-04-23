@@ -1,6 +1,7 @@
 #region
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 #endregion
@@ -17,7 +18,6 @@ public abstract class S_Pickable : S_Interactable
     protected List<Collider> _ignoredColliders = new();
 
     public bool throwable = true;
-
 
     public S_Cart cart { get; private set; }
 
