@@ -2053,9 +2053,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e3eb5524f6dc3a4fb53256886228e11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPlayersSlider: {fileID: 0}
-  maxPlayersText: {fileID: 0}
-  privateToggle: {fileID: 0}
+  maxPlayersSlider: {fileID: 361512564}
+  maxPlayersText: {fileID: 26201672}
+  privateToggle: {fileID: 1613354418}
 --- !u!114 &769168871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2068,14 +2068,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edb85a317776c7044a8700185606ff4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hostBtn: {fileID: 0}
-  joinBtn: {fileID: 0}
-  joinCodeBtn: {fileID: 0}
-  refreshListBtn: {fileID: 0}
+  hostBtn: {fileID: 1423088618}
+  joinBtn: {fileID: 1417355644}
+  joinCodeBtn: {fileID: 509250227}
+  refreshListBtn: {fileID: 615970067}
   sceneToLoad: Lobby
-  codeInputField: {fileID: 0}
-  showLobbiesPanel: {fileID: 0}
-  content: {fileID: 0}
+  codeInputField: {fileID: 1356580718}
+  showLobbiesPanel: {fileID: 2067204490}
+  content: {fileID: 438223045}
   lobbyButtonPrefab: {fileID: 1765139650606697896, guid: c2c96a4e16f257d4d91f872fb37ea615, type: 3}
 --- !u!1 &796735576
 GameObject:
