@@ -175,11 +175,6 @@ public class S_WeaponSlot : NetworkBehaviour
         Vector3 raycastDirection = Quaternion.Euler(xAngle, yAngle, 0) * _camera.transform.forward;
 
         ShootServerRpc(raycastDirection, _weaponObject.GetComponent<NetworkObject>().NetworkObjectId);
-        Debug.Log("Shoot raycastDirection : " + raycastDirection);
-        if (IsOwner)
-        {
-            PlayEffect(raycastDirection, _weaponObject);
-        }
 
         StartCoroutine(DebugShoot(rayOrigin, raycastDirection, 2f));
 

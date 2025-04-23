@@ -141,12 +141,6 @@ public class S_PlayerController : NetworkBehaviour
             return;
 
         _playerTransform = transform.parent.transform;
-
-        HandleInputsEvents();
-
-        S_PlayerAttributes.OnPlayerDeathEvent += Respawn;
-        S_Extract.OnExtract += DisableAllMeshOfPlayer;
-        S_Extract.OnExtract += DropInputsEvents;
     }
 
     private void SetSprintInEvent(ulong p_playerID, float p_speed)
@@ -296,6 +290,9 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Respawn(ulong p_playerID, int p_currentPlayerHealthPoints)
     {
+        if (NetworkManager.Singleton.LocalClientId != p_playerID)
+            return;
+
         DropInputsEvents();
         DisableAllMeshOfPlayer();
         StartCoroutine(RespawnCoroutine());
