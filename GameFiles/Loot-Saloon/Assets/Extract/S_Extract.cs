@@ -58,7 +58,7 @@ public class S_Extract : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == 6)
+        if (other.gameObject.layer == 6 || other.gameObject.layer == 8)
         {
             if (!_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
@@ -73,7 +73,7 @@ public class S_Extract : MonoBehaviour
             }
         }
 
-        else if (other.gameObject.GetComponentInChildren<S_PlayerAttributes>().team == _team)
+        else if (other.gameObject.GetComponentInChildren<S_PlayerAttributes>().Team == _team)
         {
             _totalEntityInExract++;
             print("player in extract");
@@ -97,7 +97,7 @@ public class S_Extract : MonoBehaviour
             }
         }
 
-        else if (other.gameObject.GetComponentInChildren<S_PlayerAttributes>().team == _team) 
+        else if (other.gameObject.GetComponentInChildren<S_PlayerAttributes>().Team == _team) 
             _totalEntityInExract--;
 
         if (_totalEntityInExract < 2 || !_cartInExtract)

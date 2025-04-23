@@ -33,7 +33,6 @@ public class S_Cart : S_Pickable
     {
         Debug.Log($"Je suis {NetworkManager.Singleton.LocalClientId} et le owner est {GetComponent<NetworkObject>().OwnerClientId}");
 
-
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -43,6 +42,8 @@ public class S_Cart : S_Pickable
 
         float moveSpeed = 5f;
         float rotationSmoothness = 5f;
+        float sphereRadius = 0.5f; // Ajuste selon la taille de ton Cart
+        float safeDistance = 0.1f; // Distance de sécurité pour ne pas coller au mur
 
         while (_isCarried)
         {
@@ -53,13 +54,26 @@ public class S_Cart : S_Pickable
             Vector3 targetPosition = _parent.position + forward * followDistance;
             targetPosition.y = rb.position.y;
 
-            rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, Time.deltaTime * moveSpeed));
+            // Vérification collision entre la position actuelle et la cible
+            Vector3 direction = (targetPosition - rb.position).normalized;
+            float distance = Vector3.Distance(rb.position, targetPosition);
+            int cartMask = LayerMask.GetMask("Default", "Door");
+            if (!Physics.SphereCast(rb.position, sphereRadius, direction, out RaycastHit hit, distance + safeDistance, cartMask, QueryTriggerInteraction.Ignore))
+            {
+                rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, Time.deltaTime * moveSpeed));
+            }
+            else
+            {
+                Debug.DrawRay(rb.position, direction * distance, Color.red);
+                // Optionnel : tu peux faire vibrer, rebondir, ou ralentir ici si tu veux un effet de "blocage"
+            }
+
             Quaternion targetRotation = Quaternion.LookRotation(-forward, Vector3.up);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.deltaTime * rotationSmoothness));
 
-            if (IsOwner) 
+            if (IsOwner)
             {
-                SyncCartPositionServerRpc(rb.position, rb.rotation); 
+                SyncCartPositionServerRpc(rb.position, rb.rotation);
             }
 
             yield return null;

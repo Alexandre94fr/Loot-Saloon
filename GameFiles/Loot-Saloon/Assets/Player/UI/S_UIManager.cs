@@ -21,12 +21,12 @@ public class S_UIManager : MonoBehaviour
     #region Event
     private void OnEnable()
     {
-        S_LifeManager.OnDie += StartRespawnCountdown;
+        S_PlayerAttributes.OnPlayerDeathEvent += StartRespawnCountdown;
     }
 
     private void OnDisable()
     {
-        S_LifeManager.OnDie -= StartRespawnCountdown;
+        S_PlayerAttributes.OnPlayerDeathEvent -= StartRespawnCountdown;
     }
     #endregion
 
@@ -42,7 +42,7 @@ public class S_UIManager : MonoBehaviour
         _respawningCountdownImage.gameObject.SetActive(false); 
     }
 
-    private void StartRespawnCountdown()
+    private void StartRespawnCountdown(ulong p_playerID, int p_currentPlayerHealthPoints)
     {
         StartCoroutine(RespawnCountdown());
     }

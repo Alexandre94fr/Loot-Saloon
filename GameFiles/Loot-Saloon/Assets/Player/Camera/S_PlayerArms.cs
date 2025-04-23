@@ -5,7 +5,7 @@ using UnityEngine;
 public class S_PlayerArms : MonoBehaviour
 {
     private Vector2 _lookInput;
-    private float _sensitivity = 100f;
+    private float _sensitivity = 50;
     private float _xRotation = 0f;
     private Transform _playerTransform;
 

@@ -4,13 +4,153 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10cd80fa-7354-44e1-8db2-74c30a70eb3c" name="Changes" comment="" />
+    <list default="true" id="10cd80fa-7354-44e1-8db2-74c30a70eb3c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/ExternalTools/UsefulShortcuts.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ExternalTools/UsefulShortcuts/Editor.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ExternalTools/UsefulShortcuts/Editor/S_UsefulShortcuts.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ExternalTools/UsefulShortcuts/Editor/S_UsefulShortcuts.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Loot/Cart/CartMat.physicMaterial" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Loot/Cart/CartMat.physicMaterial.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Loot/Cart/S_LootFollowCart.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Loot/Cart/S_LootFollowCart.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/MuzzleFlash.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/MuzzleFlash/M_LineRenderer.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/MuzzleFlash/M_LineRenderer.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/MuzzleFlash/M_MuzzleFlash.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/MuzzleFlash/M_MuzzleFlash.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/MuzzleFlash/MuzzleFlashTexture.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/MuzzleFlash/MuzzleFlashTexture.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/Chara test.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/barbe_AO.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/barbe_AO.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/barbe_BaseMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/barbe_BaseMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/barbe_MaskMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/barbe_MaskMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/barbe_Normal.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/barbe_Normal.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/ceinture_AO.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/ceinture_AO.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/ceinture_BaseMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/ceinture_BaseMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/ceinture_MaskMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/ceinture_MaskMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/ceinture_Normal.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/ceinture_Normal.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/chapeau.001_AO.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/chapeau.001_AO.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/chapeau.001_BaseMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/chapeau.001_BaseMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/chapeau.001_MaskMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/chapeau.001_MaskMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/chapeau.001_Normal.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/chapeau.001_Normal.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/corps_AO.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/corps_AO.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/corps_BaseMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/corps_BaseMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/corps_MaskMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/corps_MaskMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/corps_Normal.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/corps_Normal.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/tenue_AO.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/tenue_AO.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/tenue_BaseMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/tenue_BaseMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/tenue_MaskMap.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/tenue_MaskMap.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/tenue_Normal.tga" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara/tenue_Normal.tga.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara_autorigpro.fbx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/3DModel/chara_autorigpro.fbx.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/Camera/S_CameraFollower.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/Camera/S_CameraFollower.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/Interact/S_PlayerUseUI.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/Interact/S_PlayerUseUI.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/Prefab/PB_PlayerModel.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/Prefab/PB_PlayerModel.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/Prefab/PB_RigTargets.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/Prefab/PB_RigTargets.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/UI/S_PlayerCrosshair.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/UI/S_PlayerCrosshair.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scenes/Rig.unity" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scenes/Rig.unity.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameOverMenu/PB_EndGameUI.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameOverMenu/PB_EndGameUI.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameOverMenu/S_EndGameUI.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameOverMenu/S_EndGameUI.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameTimer.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameTimer/PB_GameTimer.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameTimer/PB_GameTimer.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameTimer/S_GameTimer.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameTimer/S_PlayerShowTimer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/UIs/GameTimer/S_PlayerShowTimer.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Weapon/Weapons/MuzzleFlashColor.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Weapon/Weapons/MuzzleFlashColor.mat.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ExternalTools/S_Utils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ExternalTools/S_Utils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Extract/S_Extract.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Extract/S_Extract.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/GameTimer/S_GameTimer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/UIs/GameTimer/S_GameTimer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/GameTimer/S_GameTimer.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Loot/Cart/PB_Cart.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Loot/Cart/PB_Cart.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Loot/Cart/S_Cart.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Loot/Cart/S_Cart.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Loot/S_Pickable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Loot/S_Pickable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Loot/Vault/S_BankVault.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Loot/Vault/S_BankVault.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Network/Scripts/Lobby/S_GameLobbyManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Network/Scripts/Lobby/S_GameLobbyManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Network/Scripts/Lobby/S_LobbyManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Network/Scripts/Lobby/S_LobbyManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Network/Scripts/MenuUITest/S_LobbyUINetworkTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Network/Scripts/MenuUITest/S_LobbyUINetworkTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Network/Scripts/MenuUITest/S_MainMenuManagerTestNetwork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Network/Scripts/MenuUITest/S_MainMenuManagerTestNetwork.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Camera/S_PlayerArms.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Camera/S_PlayerArms.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Camera/S_PlayerCamera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Camera/S_PlayerCamera.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Controler/S_PlayerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Controler/S_PlayerController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Interact/S_PlayerInteract.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Interact/S_PlayerInteract.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Prefab/PB_Player.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Prefab/PB_Player.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Dev.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Dev.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Lobby.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Lobby.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MainMenu.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/MainMenu.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Map.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Map.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/UIs/S_CircleLoad.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/UIs/S_CircleLoad.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Weapon/S_WeaponSlot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Weapon/S_WeaponSlot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Weapon/Weapons/PB_Colt.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Weapon/Weapons/PB_Colt.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Weapon/Weapons/PB_Revolver.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Weapon/Weapons/PB_Revolver.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="2w50CQ8PiF0p5UBtzzRXF700t5V" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Merging merge-TeamVaultLockPicking"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="10cd80fa-7354-44e1-8db2-74c30a70eb3c" name="Changes" comment="" />
+      <created>1745316000602</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1745316000602</updated>
+    </task>
     <servers />
   </component>
 </project>
