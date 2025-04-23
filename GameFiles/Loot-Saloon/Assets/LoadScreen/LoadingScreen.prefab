@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 10945b837df711044b9c585552ade00a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2ee6619b7904ad8448143d86e822c283, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -222,6 +222,10 @@ PrefabInstance:
     - target: {fileID: 8925687087243580970, guid: 36921395aaae4a545bf18bd3b9109763, type: 3}
       propertyPath: m_Name
       value: LoadingBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 8925687087243580970, guid: 36921395aaae4a545bf18bd3b9109763, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
