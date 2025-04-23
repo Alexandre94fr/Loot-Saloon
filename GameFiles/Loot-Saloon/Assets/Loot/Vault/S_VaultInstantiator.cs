@@ -12,6 +12,8 @@ public class S_VaultInstantiator : NetworkBehaviour
     public Transform[] vaultSpawnPoints;
     public GameObject pb_vault;
 
+    [SerializeField] private Vector3 _instanciatedVaultRotation;
+
     [Header(" Lock picking :")]
     [SerializeField] private bool _areInstantiatedVaultsLockpickableByEveryone;
     [SerializeField] private E_PlayerTeam _instantiatedVaultsTeam;
@@ -68,7 +70,7 @@ public class S_VaultInstantiator : NetworkBehaviour
 
         foreach (Transform t in vaultSpawnPoints)
         {
-            S_BankVault vault = Instantiate(pb_vault, t).GetComponent<S_BankVault>();
+            S_BankVault vault = Instantiate(pb_vault, t.position, Quaternion.Euler(_instanciatedVaultRotation), null).GetComponent<S_BankVault>();
             Debug.Log(vault.name + " : Set loot Instanciator with : " + this.name);
 
             NetworkObject vaultNetworkObject = vault.GetComponent<NetworkObject>();
