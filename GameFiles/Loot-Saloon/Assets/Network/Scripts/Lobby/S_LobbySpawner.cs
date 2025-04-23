@@ -29,11 +29,11 @@ public class S_LobbySpawner : MonoBehaviour
             _players[i].SetData(playerData);
             if (playerData.Team == E_PlayerTeam.RED)
             {
-                _players[i].GetComponent<MeshRenderer>().material = RedMaterial;
+                _players[i].skinnedMeshRenderer.material = RedMaterial;
             }
             else if (playerData.Team == E_PlayerTeam.BLUE)
             {
-                _players[i].GetComponent<MeshRenderer>().material = BlueMaterial;
+                _players[i].skinnedMeshRenderer.material = BlueMaterial;
             }
         }
     }
