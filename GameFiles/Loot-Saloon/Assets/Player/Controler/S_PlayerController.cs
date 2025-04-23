@@ -20,13 +20,18 @@ public class S_PlayerController : NetworkBehaviour
     [SerializeField] private Animator _armsAnimator;
     [SerializeField] private GameObject _armsHandler;
 
-    [SerializeField] private float _walkSpeed = 2f;
+
+    private S_PlayerAttributes _attributes;
     [SerializeField] private float _jumpForce = 5f;
-    [SerializeField] private float _sprintSpeed = 4f;
+    [SerializeField] private float _cartSpeedMultiplicator = 0.5f;
+
 
     [SerializeField] private bool _isCartModeEnabled = false;
 
-
+    public void SetPlayerAttribute(ref S_PlayerAttributes p_playerAttributes)
+    {
+        _attributes = p_playerAttributes;
+    }
 
     [ClientRpc]
     private void PutDownClientRpc(ClientRpcParams rpcParams = default)
@@ -35,13 +40,13 @@ public class S_PlayerController : NetworkBehaviour
 
         // unactive cart mode immediately
         _isCartModeEnabled = false;
-        EnableCartMode(false, null);
+        DisableCartMode();
 
         // Unactive all component of cart mode
         var playerCamera = _playerTransform.GetComponentInChildren<S_PlayerCamera>();
         if (playerCamera != null)
         {
-            playerCamera.EnableCartMode(false, null);
+            playerCamera.DisableCartMode();
         }
 
         var playerObject = NetworkManager.Singleton.LocalClient?.PlayerObject;
@@ -50,41 +55,71 @@ public class S_PlayerController : NetworkBehaviour
             var playerController = playerObject.GetComponentInChildren<S_PlayerController>();
             if (playerController != null)
             {
-                playerController.EnableCartMode(false, null);
+                playerController.DisableCartMode();
             }
         }
     }
 
+    public void EnableCartMode(Transform cart = null)
+    {
+        if (_isCartModeEnabled)
+            return;
+
+        _isCartModeEnabled = true;
+
+        Debug.Log($"[CART MODE] Set to ENABLED for {gameObject.name}");
+
+        _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(cart);
+
+        Debug.LogWarning("Cart Mode is Enabled");
+
+        _speedMult = _cartSpeedMultiplicator;
+        UpdateSpeed();
+    }
+
     [ClientRpc]
-    public void EnableCartModeClientRpc(bool isEnabled, NetworkObjectReference cartRef)
+    public void EnableCartModeClientRpc(NetworkObjectReference cartRef)
     {
         if (!IsOwner) return;
 
         Transform cartTransform = null;
 
-        if (isEnabled && cartRef.TryGet(out NetworkObject cartObj))
+        if (cartRef.TryGet(out NetworkObject cartObj))
         {
             cartTransform = cartObj.transform;
         }
 
-        EnableCartMode(isEnabled, cartTransform); // Local activation
-
-        if (!isEnabled)
-        {
-            // Unactivate localy the cart mode
-            PutDownClientRpc();
-            _isCartModeEnabled = false;
-            _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(false, null);
-        }
+        EnableCartMode(cartTransform);
     }
 
-    public void EnableCartMode(bool enabled, Transform cart = null)
+    public void DisableCartMode()
     {
-        _isCartModeEnabled = enabled;
+        if (!_isCartModeEnabled)
+            return;
 
-        Debug.Log($"[CART MODE] Set to {(enabled ? "ENABLED" : "DISABLED")} for {gameObject.name}");
+        _isCartModeEnabled = false;
 
-        _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(enabled, cart);
+        Debug.Log($"[CART MODE] Set to DISABLED for {gameObject.name}");
+
+        _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.DisableCartMode();
+
+        Debug.LogWarning("Cart Mode is Disable");
+        _speedMult = 1.0f;
+        UpdateSpeed();
+    }
+
+    [ClientRpc]
+    public void DisableCartModeClientRpc(NetworkObjectReference p_cartReference)
+    {
+        if (!IsOwner) 
+            return;
+
+        DisableCartMode();
+
+        // Unactivate localy the cart mode
+        PutDownClientRpc();
+        _isCartModeEnabled = false;
+        _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.DisableCartMode();
     }
 
 
@@ -107,6 +142,17 @@ public class S_PlayerController : NetworkBehaviour
         _playerTransform = transform.parent.transform;
     }
 
+    private void SetSprintInEvent(ulong p_playerID, float p_speed)
+    {
+        if (NetworkManager.Singleton.LocalClientId != p_playerID)
+            return;
+
+        Sprint(_isSprinting);
+    }
+
+
+
+
     public override void OnNetworkSpawn()
     {
         if (_isSoloTestModeEnabled)
@@ -128,6 +174,9 @@ public class S_PlayerController : NetworkBehaviour
             S_PlayerAttributes.OnPlayerDeathEvent += Respawn;
             S_Extract.OnExtract += DisableAllMeshOfPlayer;
             S_Extract.OnExtract += DropInputsEvents;
+            S_PlayerAttributes.OnPlayerWalkingMovementSpeedChangeEvent += SetSprintInEvent;
+            S_PlayerAttributes.OnPlayerRunningMovementSpeedChangeEvent += SetSprintInEvent;
+
 
             S_PlayersSpawner.Instance.SpawnPlayer(_playerTransform.transform.parent.gameObject, _playerTransform);
         }
@@ -181,6 +230,7 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Move()
     {
+        Debug.Log("The Actual Speed is ::::: " + _currentSpeed);
         if (_isCartModeEnabled)
         {
             // Simulate cart movement for always go forward
@@ -207,9 +257,13 @@ public class S_PlayerController : NetworkBehaviour
         }
     }
 
+    private void UpdateSpeed()
+    {
+        _currentSpeed = (_isSprinting ? _attributes.RunningMovementSpeed : _attributes.WalkingMovementSpeed) * _speedMult;
+    }
     private void Sprint(bool sprint)
     {
-        _currentSpeed = (sprint ? _sprintSpeed : _walkSpeed) * _speedMult;
+        UpdateSpeed();
         _isSprinting = sprint;
         _armsAnimator.speed = sprint ? 2 : 1;
     }
