@@ -23,7 +23,6 @@ public class S_LobbySpawner : MonoBehaviour
     private void OnLobbyUpdated(Lobby p_lobby)
     {
         List<S_LobbyPlayerData> playersData = S_GameLobbyManager.instance.GetPlayers();
-
         for (int i = 0; i < playersData.Count; i++)
         {
             S_LobbyPlayerData playerData = playersData[i];

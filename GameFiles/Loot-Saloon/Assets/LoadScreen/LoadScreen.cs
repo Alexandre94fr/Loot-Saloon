@@ -1,29 +1,29 @@
 using System;
 using System.Collections;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LoadScreen : MonoBehaviour
 {
-    [SerializeField] private Image _fillerLoadingBar;
-    [SerializeField][Range(1.5f,4)] private float _loadingTime = 2f;
-
-
-    private void Awake()
+    private void OnEnable()
     {
-        StartCoroutine(LoadingBarIncrement());
+        S_LobbyEvents.OnLobbyUpdatedWithParam += OnLobbyLoaded;
     }
 
-    private IEnumerator LoadingBarIncrement()
+    private void OnLobbyLoaded(Lobby p_lobby)
     {
-        float elapsedTime = 0f;
-        while (elapsedTime < _loadingTime)
+        if (p_lobby != null)
         {
-            elapsedTime += Time.deltaTime;
-            _fillerLoadingBar.fillAmount = Mathf.Clamp01(elapsedTime / _loadingTime);
-            yield return null;
+            StartCoroutine(LoadScene());
         }
+    }
+
+    private IEnumerator LoadScene()
+    {
+        yield return new WaitForSeconds(2f);
         gameObject.SetActive(false);
-        Debug.Log("Loading complete!");
+        S_LobbyEvents.OnLobbyUpdatedWithParam -= OnLobbyLoaded;
+
     }
 }
