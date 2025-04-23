@@ -37,6 +37,7 @@ public class S_PlayerInteract : NetworkBehaviour
     public LayerMask objectLayer;
 
     private Material _lastRenderer;
+    private S_Loot _lastPickableLookedAt;
 
     private void Awake()
     {
@@ -179,6 +180,14 @@ public class S_PlayerInteract : NetworkBehaviour
     {
         if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
+            S_Loot loot = hit.collider.GetComponent<S_Loot>();
+            if (loot != null)
+            {
+                if (!loot.interactable)
+                    return;
+                CheckPickableCanvasVisibility(loot);
+            }
+            
             MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
             if (renderer != null)
             {
@@ -198,11 +207,35 @@ public class S_PlayerInteract : NetworkBehaviour
                     }
                 }
             }
+            return;
         }
-        else if (_lastRenderer != null)
+
+        if (_lastRenderer != null)
         {
             _lastRenderer.SetFloat("_Scale", 1f);
             _lastRenderer = null;
+        }
+
+        if (_lastPickableLookedAt != null)
+        {
+            _lastPickableLookedAt.SetWorldTextVisibility(false, Camera.main);
+            _lastPickableLookedAt = null;
+        }
+    }
+
+    private void CheckPickableCanvasVisibility(S_Loot p_loot)
+    {
+        if (p_loot != null)
+        {
+            if (_lastPickableLookedAt != p_loot)
+            {
+                if (_lastPickableLookedAt != null)
+                    _lastPickableLookedAt.SetWorldTextVisibility(false, Camera.main);
+
+                p_loot.SetWorldTextVisibility(true, Camera.main);
+                _lastPickableLookedAt = p_loot;
+            }
+            return;
         }
     }
 
