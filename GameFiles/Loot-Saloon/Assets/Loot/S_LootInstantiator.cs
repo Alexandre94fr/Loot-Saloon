@@ -90,7 +90,7 @@ public class S_LootInstantiator : NetworkBehaviour
         SO_LootProperties properties = GetLootProperties(p_index);
         GameObject lootObject = Instantiate(properties.PB_prefab, p_where.position, Quaternion.identity);
 
-        S_Loot loot = lootObject.GetComponent<S_Loot>();
+        S_Loot loot = lootObject.GetComponentInChildren<S_Loot>();
         loot.properties = Instantiate(properties);
 
         if (!IsServer) return;

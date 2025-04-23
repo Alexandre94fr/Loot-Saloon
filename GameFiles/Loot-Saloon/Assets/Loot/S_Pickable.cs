@@ -11,6 +11,7 @@ public abstract class S_Pickable : S_Interactable
     public bool parentIsPlayerInteract;
 
     [SerializeField] private float _pickUpTime = 2f;
+    [SerializeField] private Canvas _worldCanvas;
     private bool _isPickUp;
     [Range(0f, 20f)] public float weight;
 
@@ -20,6 +21,31 @@ public abstract class S_Pickable : S_Interactable
 
 
     public S_Cart cart { get; private set; }
+
+    private Camera _currentCamera;
+
+    public void SetWorldTextVisibility(bool visible, Camera cam)
+    {
+        if (_worldCanvas == null)
+            return;
+
+        _worldCanvas.gameObject.SetActive(visible);
+        _currentCamera = visible ? cam : null;
+    }
+
+    private void LateUpdate()
+    {
+        if (_worldCanvas != null && _currentCamera != null)
+        {
+            // Reste au-dessus de l'objet
+            _worldCanvas.transform.position = transform.position + Vector3.up * 0.5f;
+
+            // Regarde la caméra
+            Vector3 direction = _currentCamera.transform.position - _worldCanvas.transform.position;
+            direction.y = 0f; // Ignore la hauteur si tu veux un look plus stable
+            _worldCanvas.transform.rotation = Quaternion.LookRotation(-direction);
+        }
+    }
 
     public void SetCart(S_Cart p_cart)
     {
