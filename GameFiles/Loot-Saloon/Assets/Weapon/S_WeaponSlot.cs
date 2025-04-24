@@ -119,14 +119,19 @@ public class S_WeaponSlot : NetworkBehaviour
     {
         _weaponIsActive = true;
         _weaponObject = p_newWeaponObject;
-        _weaponObject.GetComponent<MeshRenderer>().enabled = true;
+        foreach (var comp in _weaponObject.GetComponentsInChildren<MeshRenderer>())
+            comp.enabled = true;
     }
 
     public void DisableWeapon()
     {
         _weaponIsActive = false;
         if (_weaponObject != null)
-            _weaponObject.GetComponent<MeshRenderer>().enabled = false;
+        {
+            foreach (var comp in _weaponObject.GetComponentsInChildren<MeshRenderer>())
+                comp.enabled = false;
+        }
+            
     }
 
     public void DropWeapon(S_Weapon p_weapon)
