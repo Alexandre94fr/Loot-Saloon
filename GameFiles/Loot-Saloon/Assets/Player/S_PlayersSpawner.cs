@@ -1,10 +1,11 @@
 #region
-
+using System;
 using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 #endregion
 
 public class S_PlayersSpawner : NetworkBehaviour
@@ -23,6 +24,12 @@ public class S_PlayersSpawner : NetworkBehaviour
     private int _bluePlayer = 0;
     private int _redPlayer = 0;
 
+    private Quaternion _redRotation = Quaternion.Euler(0, 0, 0);
+    private Quaternion _blueRotation = Quaternion.Euler(0, 180, 0);
+    private Quaternion _rotation;
+
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -39,7 +46,7 @@ public class S_PlayersSpawner : NetworkBehaviour
     {
         S_GameLobbyManager gameLobbyManager = S_GameLobbyManager.instance;
 
-        _playerTeam = await gameLobbyManager.GetPlayerTeamAsync();
+        playerTeam = await gameLobbyManager.GetPlayerTeamAsync();
 
         int count = NetworkManager.Singleton.ConnectedClients.Count;
         float totalWidth = (count - 1) * _spawnDistance;
@@ -50,29 +57,27 @@ public class S_PlayersSpawner : NetworkBehaviour
         S_PlayerCharacter playerCharacter = p_player.GetComponentInChildren<S_PlayerCharacter>();
         S_PlayerAttributes playerAttributes = playerCharacter.playerAttributes;
         S_PlayerController playerController = playerCharacter.playerController;
+        playerAttributes.SetTeam_RPC(playerTeam);
 
-        playerAttributes.SetTeam_RPC(_playerTeam);
-
-        if (_playerTeam == E_PlayerTeam.BLUE)
+        if (playerTeam == E_PlayerTeam.BLUE)
         {
             _bluePlayer++;
             nbPlayer = _bluePlayer;
             fixedZ = _blueTeam.position.z;
-            p_player.GetComponentInChildren<MeshRenderer>().material = _blueTeamMaterial;
             playerController.respawnPoint = _blueTeam;
-
+            _rotation = _blueRotation;
         }
         else
         {
             _redPlayer++;
             nbPlayer = _redPlayer;
             fixedZ = _redTeam.position.z;
-            p_player.GetComponentInChildren<MeshRenderer>().material = _redTeamMaterial;
             playerController.respawnPoint = _redTeam;
+            _rotation = _redRotation;
         }
 
         Vector3 newPosition = new(startX + nbPlayer * _spawnDistance, p_origin.position.y, fixedZ);
-        
+
         StartCoroutine(TPPlayer(p_player, newPosition));
     }
 
@@ -80,14 +85,11 @@ public class S_PlayersSpawner : NetworkBehaviour
     {
         if (p_player.GetComponentInChildren<NetworkTransform>() != null)
         {
-            
-            p_player.GetComponentInChildren<NetworkTransform>().Teleport(p_newPosition, Quaternion.identity, Vector3.one);
+            p_player.GetComponentInChildren<NetworkTransform>().Teleport(p_newPosition, _rotation, Vector3.one);
         }
         else
-        {
             Debug.LogWarning("WARNING ! NetworkTransform not founded on the player.");
-        }
-        
+
         yield break;
     }
 

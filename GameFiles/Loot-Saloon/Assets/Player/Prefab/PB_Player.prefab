@@ -873,7 +873,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  _isDebugModeOn: 1
+  _isDebugModeOn: 0
   _playerProperties: {fileID: 11400000, guid: 43868903bea762f4c8e16650924f3917, type: 2}
   _walkingMovementSpeedNetworkVariable:
     m_InternalValue: 0

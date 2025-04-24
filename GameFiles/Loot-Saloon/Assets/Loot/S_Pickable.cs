@@ -97,7 +97,7 @@ public abstract class S_Pickable : S_Interactable
 
         DisablePhysicsClientRpc();
 
-        while (!interactable)
+        while (!interactable && p_handTransform)
         {
             Vector3 targetPosition = p_handTransform.position + p_handTransform.TransformDirection(_onPickUpOffset);
             Quaternion targetRotation = p_handTransform.rotation;
