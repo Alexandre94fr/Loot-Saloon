@@ -8,7 +8,7 @@ using UnityEngine.Rendering.Universal;
 
 public class S_PlayerController : NetworkBehaviour
 {
-    public Vector3 boxExtents = new(0.4f, 0.05f, 0.4f);
+    public Vector3 boxExtents = new(0.4f, 0.01f, 0.4f);
     public LayerMask groundLayer;
     [HideInInspector] public Transform respawnPoint;
 
@@ -195,7 +195,7 @@ public class S_PlayerController : NetworkBehaviour
 
     private bool Grounded()
     {
-        Vector3 boxCenter = _playerTransform.position + Vector3.down * (_playerTransform.localScale.y / 2);
+        Vector3 boxCenter = _playerTransform.position + Vector3.down * _playerTransform.localScale.y;
 
         return Physics.CheckBox(
             boxCenter,
@@ -334,4 +334,5 @@ public class S_PlayerController : NetworkBehaviour
         _armsHandler.SetActive(true);
         _armsAnimator.enabled = true;
     }
+    
 }
