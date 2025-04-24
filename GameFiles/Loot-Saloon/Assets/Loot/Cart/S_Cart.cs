@@ -33,7 +33,6 @@ public class S_Cart : S_Pickable
     {
         Debug.Log($"Je suis {NetworkManager.Singleton.LocalClientId} et le owner est {GetComponent<NetworkObject>().OwnerClientId}");
 
-
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -43,9 +42,12 @@ public class S_Cart : S_Pickable
 
         float moveSpeed = 5f;
         float rotationSmoothness = 5f;
+        float sphereRadius = 0.5f; // Ajuste selon la taille de ton Cart
+        float safeDistance = 0.1f; // Distance de sécurité pour ne pas coller au mur
 
         while (_isCarried)
         {
+            Debug.Log("IM MOVING !!!");
             Vector3 forward = _parent.forward;
             forward.y = 0;
             forward.Normalize();
@@ -53,13 +55,27 @@ public class S_Cart : S_Pickable
             Vector3 targetPosition = _parent.position + forward * followDistance;
             targetPosition.y = rb.position.y;
 
-            rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, Time.deltaTime * moveSpeed));
-            Quaternion targetRotation = Quaternion.LookRotation(-forward, Vector3.up);
+            // Vérification collision entre la position actuelle et la cible
+            Vector3 direction = (targetPosition - rb.position).normalized;
+            float distance = Vector3.Distance(rb.position, targetPosition);
+            int cartMask = LayerMask.GetMask("Default", "Door");
+            if (!Physics.SphereCast(rb.position, sphereRadius, direction, out RaycastHit hit, distance + safeDistance, cartMask, QueryTriggerInteraction.Ignore))
+            {
+                rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, Time.deltaTime * moveSpeed));
+                Debug.Log("Detect Collision");
+            }
+            else
+            {
+                Debug.DrawRay(rb.position, direction * distance, Color.red);
+                // Optionnel : tu peux faire vibrer, rebondir, ou ralentir ici si tu veux un effet de "blocage"
+            }
+
+            Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.deltaTime * rotationSmoothness));
 
-            if (IsOwner) 
+            if (IsOwner)
             {
-                SyncCartPositionServerRpc(rb.position, rb.rotation); 
+                SyncCartPositionServerRpc(rb.position, rb.rotation);
             }
 
             yield return null;
@@ -67,9 +83,9 @@ public class S_Cart : S_Pickable
     }
 
     [ServerRpc]
-    private void SyncCartPositionServerRpc(Vector3 position, Quaternion rotation) 
+    private void SyncCartPositionServerRpc(Vector3 p_position, Quaternion p_rotation) 
     {
-        transform.SetPositionAndRotation(position, rotation); 
+        transform.SetPositionAndRotation(p_position, p_rotation); 
     }
 
     protected override void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
@@ -82,12 +98,12 @@ public class S_Cart : S_Pickable
         _parent = p_parent;
         _isCarried = true;
 
-        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(true, transform);
+        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(transform);
 
         S_PlayerInputsReciever.OnMove += MoveCart;
         StartCoroutine(MoveCoroutine());
-        var playerController = _parent.parent.GetComponentInChildren<S_PlayerController>();
-        playerController.EnableCartModeClientRpc(true, GetComponent<NetworkObject>());
+        var playerController = _parent.parent.GetComponentInChildren<S_PlayerController>(true);
+        playerController.EnableCartModeClientRpc(GetComponent<NetworkObject>());
     }
 
     [ClientRpc]
@@ -106,14 +122,14 @@ public class S_Cart : S_Pickable
             return;
         }
 
-        var playerController = playerObject.GetComponentInChildren<S_PlayerController>();
+        var playerController = playerObject.GetComponentInChildren<S_PlayerController>(true);
         if (playerController == null)
         {
             Debug.LogError(" PlayerController is null.");
             return;
         }
 
-        playerController.EnableCartModeClientRpc(false, GetComponent<NetworkObject>());
+        playerController.DisableCartModeClientRpc(GetComponent<NetworkObject>());
     }
 
 
@@ -163,10 +179,10 @@ public class S_Cart : S_Pickable
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestPickUpServerRpc(ulong playerId)
+    private void RequestPickUpServerRpc(ulong p_playerId)
     {
-        var player = NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject;
-        var interact = player.GetComponentInChildren<S_PlayerInteract>();
+        var player = NetworkManager.Singleton.ConnectedClients[p_playerId].PlayerObject;
+        var interact = player.GetComponentInChildren<S_PlayerInteract>(true);
         var parent = interact.transform;
 
         PickUp(interact, parent);
@@ -193,7 +209,7 @@ public class S_Cart : S_Pickable
         S_Extract.OnExtract += EndGameEvent;
     }
 
-    private void EndGameEvent(E_PlayerTeam winner)
+    private void EndGameEvent(E_PlayerTeam p_winner)
     {
         GetCartValue?.Invoke(team, total);
     }
@@ -220,11 +236,11 @@ public class S_Cart : S_Pickable
         }
     }
 
-    public void SetTextToTotal(TMP_Text text)
+    public void SetTextToTotal(TMP_Text p_text)
     {
-        text.text = total.ToString();
+        p_text.text = total.ToString();
     }
-    private void MoveCart(Vector3 dir)
+    private void MoveCart(Vector3 p_dir)
     {
         if (!_isCarried) return;
     }

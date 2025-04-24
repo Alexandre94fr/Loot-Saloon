@@ -6,9 +6,11 @@ public class S_WeaponSlot : NetworkBehaviour
 {
     [Header(" External references :")]
     [SerializeField] private S_PlayerInteract _playerInteractComponent;
+    [SerializeField] private S_PlayerCharacter _playerCharacterComponent;
 
-    [Space]
-    [ReadOnlyInInspector] [SerializeField] private string _weaponName = "";
+    [Space] [ReadOnlyInInspector] [SerializeField]
+    private string _weaponName = "";
+
     [ReadOnlyInInspector] [SerializeField] private float _damage;
     [ReadOnlyInInspector] [SerializeField] private int _remainingBullet;
     [ReadOnlyInInspector] [SerializeField] private int _maxBulletNumber;
@@ -16,7 +18,8 @@ public class S_WeaponSlot : NetworkBehaviour
 
     [ReadOnlyInInspector] [SerializeField] private GameObject _weaponObject;
 
-    [ReadOnlyInInspector] [SerializeField] [Range(1f, 10f)] private float _angleSpread = 5;
+    [ReadOnlyInInspector] [SerializeField] [Range(1f, 10f)]
+    private float _angleSpread = 5;
 
     [ReadOnlyInInspector] [SerializeField] private bool _isReloading = false;
     [ReadOnlyInInspector] [SerializeField] private float _reloadTime = 20f;
@@ -28,8 +31,11 @@ public class S_WeaponSlot : NetworkBehaviour
 
     private float _lastShotTime;
 
-    private void DropWeaponOnDeath(S_PlayerAttributes attributes)
+    private void DropWeaponOnDeath(ulong p_playerID, int p_currentPlayerHealth)
     {
+        if (p_playerID != NetworkManager.Singleton.LocalClientId)
+            return;
+
         if (_weaponObject != null)
             DropWeapon(_weaponObject.GetComponent<S_Weapon>());
     }
@@ -38,7 +44,8 @@ public class S_WeaponSlot : NetworkBehaviour
     private void Start()
     {
         if (!S_VariablesChecker.AreVariablesCorrectlySetted(name, null,
-            (_playerInteractComponent, nameof(_playerInteractComponent))
+            (_playerInteractComponent, nameof(_playerInteractComponent)),
+            (_playerCharacterComponent, nameof(_playerCharacterComponent))
         )) return;
 
         if (!_playerInteractComponent.transform.parent.parent.GetComponent<NetworkObject>().IsOwner)
@@ -56,7 +63,7 @@ public class S_WeaponSlot : NetworkBehaviour
         _lastShotTime = -_cooldown;
 
         if (IsOwner)
-            S_LifeManager.OnDie += DropWeaponOnDeath;
+            S_PlayerAttributes.OnPlayerDeathEvent += DropWeaponOnDeath;
     }
 
     public void SetWeaponSlot(Transform p_parent, S_Weapon p_newWeapon)
@@ -140,6 +147,8 @@ public class S_WeaponSlot : NetworkBehaviour
         _cooldown = 0;
     }
 
+
+
     public void Shoot()
     {
         if (!_playerInteractComponent.controller.activeInputs)
@@ -152,10 +161,9 @@ public class S_WeaponSlot : NetworkBehaviour
         {
             if (!_isReloading)
                 Reload();
+
             return;
         }
-
-        print("SHOOT");
 
         _lastShotTime = Time.time;
 
@@ -165,6 +173,8 @@ public class S_WeaponSlot : NetworkBehaviour
         float yAngle = S_Utils.RandomFloat(-_angleSpread, _angleSpread);
 
         Vector3 raycastDirection = Quaternion.Euler(xAngle, yAngle, 0) * _camera.transform.forward;
+
+        ShootServerRpc(raycastDirection, _weaponObject.GetComponent<NetworkObject>().NetworkObjectId);
 
         StartCoroutine(DebugShoot(rayOrigin, raycastDirection, 2f));
 
@@ -183,11 +193,74 @@ public class S_WeaponSlot : NetworkBehaviour
                 }
             }
         }
-
         _remainingBullet--;
         if (_remainingBullet <= 0)
             Reload();
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ShootServerRpc(Vector3 p_direction, ulong p_weaponNetworkId)
+    {
+        // Retrieve the weapon object using the NetworkObjectId
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_weaponNetworkId, out NetworkObject weaponNetObj))
+        {
+            return;
+        }
+        OnShootClientRpc(p_direction, p_weaponNetworkId);
+    }
+
+    [ClientRpc]
+    public void OnShootClientRpc(Vector3 p_direction, ulong p_weaponNetworkId)
+    {
+
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_weaponNetworkId, out NetworkObject weaponNetObj))
+        {
+            Debug.Log("Weapon not found in the network object pool.");
+            return;
+        }
+
+        GameObject weaponObject = weaponNetObj.gameObject;
+        Debug.Log("shoot client");
+        PlayEffect(p_direction, weaponObject);
+    }
+
+    private void PlayEffect(Vector3 p_direction, GameObject p_weaponObject)
+    {
+        ParticleSystem particleSystem = p_weaponObject.GetComponentInChildren<ParticleSystem>(true);
+        if (particleSystem != null)
+            particleSystem.Play();
+
+        StartCoroutine(GunLightEffect(p_weaponObject));
+        StartCoroutine(LineRenderer(p_direction, p_weaponObject));
+    }
+
+    private IEnumerator GunLightEffect(GameObject p_weaponObject)
+    {
+        Light light = p_weaponObject.GetComponentInChildren<Light>(true);
+        if (!light)
+            yield break;
+
+        light.enabled = true;
+        yield return new WaitForSeconds(0.15f);
+        light.enabled = false;
+    }
+
+    private IEnumerator LineRenderer(Vector3 p_direction, GameObject p_weaponObject)
+    {
+        Vector3 start = p_weaponObject.transform.position;
+        Vector3 end = Camera.main.transform.position + p_direction * 50f;
+
+        LineRenderer lineRenderer = p_weaponObject.GetComponentInChildren<LineRenderer>(true);
+        if (!lineRenderer)
+            yield break;
+
+        lineRenderer.enabled = true;
+        lineRenderer.SetPosition(0, start);
+        lineRenderer.SetPosition(1, end);
+        yield return new WaitForSeconds(0.5f);
+        lineRenderer.enabled = false;
+    }
+
 
     [ServerRpc]
     public void OnHitServerRpc(ulong p_targetNetworkId, float p_damage)
@@ -195,21 +268,20 @@ public class S_WeaponSlot : NetworkBehaviour
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_targetNetworkId, out NetworkObject targetNetObj))
         {
             var targetCharacter = targetNetObj.GetComponentInChildren<S_PlayerCharacter>();
-            if (targetCharacter != null && targetCharacter.lifeManager != null)
+            if (targetCharacter != null && targetCharacter.playerAttributes != null)
             {
                 ulong targetClientId = targetNetObj.OwnerClientId;
-
 
                 OnHitClientRpc(p_damage, targetClientId);
             }
             else
             {
-                Debug.LogWarning("Target has no S_PlayerCharacter or LifeManager! " + targetNetObj.name);
+                Debug.LogWarning("WARNING ! Target has no S_PlayerCharacter or S_PlayerAttributes ! " + targetNetObj.name);
             }
         }
         else
         {
-            Debug.LogWarning("Invalid target network object.");
+            Debug.LogWarning("WARNING ! Invalid target network object.");
         }
     }
 
@@ -221,12 +293,13 @@ public class S_WeaponSlot : NetworkBehaviour
         if (NetworkManager.Singleton.LocalClientId != p_targetClientId)
             return;
 
-        var localPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-        var character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
-        if (character != null && character.lifeManager != null)
+        NetworkObject localPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+        S_PlayerCharacter character = localPlayer.GetComponentInChildren<S_PlayerCharacter>();
+
+        if (character != null && character.playerAttributes != null)
         {
-            character.lifeManager.TakeDamage(p_damage);
-            Debug.Log($"You took {p_damage} p_damage!");
+            character.playerAttributes.AddCurrentHealthPoint_RPC((int)-p_damage);
+            Debug.Log($"You took {(int)p_damage} p_damage!");
         }
     }
 

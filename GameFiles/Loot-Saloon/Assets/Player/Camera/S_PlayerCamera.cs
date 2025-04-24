@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class S_PlayerCamera : MonoBehaviour
@@ -17,9 +18,9 @@ public class S_PlayerCamera : MonoBehaviour
     private Transform _cartReference = null;
     private float _cartYawOffset = 0f;
 
-    public void SetPlayerTransform(Transform player)
+    public void SetPlayerTransform(Transform p_player)
     {
-        _playerTransform = player;
+        _playerTransform = p_player;
     }
 
     private void Start()
@@ -51,19 +52,26 @@ public class S_PlayerCamera : MonoBehaviour
         }
     }
 
-    public void EnableCartMode(bool enable, Transform cart = null)
+    public void EnableCartMode(Transform p_cart = null)
     {
-        _hasCart = enable;
-        _cartReference = enable ? cart : null;
+        _hasCart = true;
+        _cartReference = p_cart;
+        _cartYawOffset = 0f;
+    }
+
+    internal void DisableCartMode()
+    {
+        _hasCart = false;
+        _cartReference = null;
         _cartYawOffset = 0f;
     }
 
     /// <summary>
     /// À appeler par le PlayerController pour déplacer le joueur dans la bonne direction.
     /// </summary>
-    public Vector3 GetMovementDirection(Vector2 moveInput)
+    public Vector3 GetMovementDirection(Vector2 p_moveInput)
     {
-        Vector3 inputDir = new Vector3(moveInput.x, 0, moveInput.y);
+        Vector3 inputDir = new Vector3(p_moveInput.x, 0, p_moveInput.y);
 
         if (_hasCart && _cartReference != null)
         {
@@ -80,8 +88,8 @@ public class S_PlayerCamera : MonoBehaviour
         }
     }
 
-    private void GetLookInput(Vector2 lookInput)
+    private void GetLookInput(Vector2 p_lookInput)
     {
-        _lookInput = lookInput;
+        _lookInput = p_lookInput;
     }
 }

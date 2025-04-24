@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -66,6 +67,13 @@ public class S_GameLobbyManager : MonoBehaviour
             _lobbyData.Serialize()
         );
 
+        if (succeeded)
+        {
+            // Trigger a manual lobby update to refresh UI and components
+            S_LobbyEvents.OnLobbyUpdatedWithParam?.Invoke(S_LobbyManager.instance.GetLobbyInstance());
+
+        }
+
         return succeeded;
     }
 
@@ -86,94 +94,88 @@ public class S_GameLobbyManager : MonoBehaviour
         return succeeded;
     }
 
-    private async void OnLobbyUpdated(Lobby p_lobby)
+ private async void OnLobbyUpdated(Lobby p_lobby)
+{
+    List<Dictionary<string, PlayerDataObject>> playerData = S_LobbyManager.instance.GetPlayerData();
+    _lobbyPlayerDatas.Clear();
+    int nbPlayerReady = 0;
+    List<string> currentPlayerIds = new List<string>();
+
+    foreach (Dictionary<string, PlayerDataObject> data in playerData)
     {
-        List<Dictionary<string, PlayerDataObject>> playerData = S_LobbyManager.instance.GetPlayerData();
-        _lobbyPlayerDatas.Clear();
-        int nbPlayerReady = 0;
-        List<string> currentPlayerIds = new List<string>();
+        S_LobbyPlayerData lobbyPlayerData = new S_LobbyPlayerData();
+        lobbyPlayerData.Initialize(data);
 
-        foreach (Dictionary<string, PlayerDataObject> data in playerData)
+        currentPlayerIds.Add(lobbyPlayerData.Id);
+
+        if (lobbyPlayerData.IsReady)
         {
-            S_LobbyPlayerData lobbyPlayerData = new S_LobbyPlayerData();
-            lobbyPlayerData.Initialize(data);
-
-            currentPlayerIds.Add(lobbyPlayerData.Id);
-
-            if (lobbyPlayerData.IsReady)
-            {
-                nbPlayerReady++;
-            }
-
-            if (lobbyPlayerData.Id == AuthenticationService.Instance.PlayerId)
-            {
-                _localLobbyPlayerData = lobbyPlayerData;
-            }
-
-            if (lobbyPlayerData.KickPlayer && !IsHost)
-            {
-                LeaveLobby();
-            }
-
-            _lobbyPlayerDatas.Add(lobbyPlayerData);
+            nbPlayerReady++;
         }
 
-        foreach (S_LobbyPlayerData previousPlayer in _previousLobbyPlayerDatas)
+        if (lobbyPlayerData.Id == AuthenticationService.Instance.PlayerId)
         {
-            if (!currentPlayerIds.Contains(previousPlayer.Id))
+            _localLobbyPlayerData = lobbyPlayerData;
+        }
+
+        if (lobbyPlayerData.KickPlayer && !IsHost)
+        {
+            LeaveLobby();
+        }
+
+        _lobbyPlayerDatas.Add(lobbyPlayerData);
+    }
+
+    foreach (S_LobbyPlayerData previousPlayer in _previousLobbyPlayerDatas)
+    {
+        if (!currentPlayerIds.Contains(previousPlayer.Id))
+        {
+            if (previousPlayer.PrefabInstance != null && previousPlayer.PrefabInstance.gameObject != null)
             {
-                if (previousPlayer.PrefabInstance != null && previousPlayer.PrefabInstance.gameObject != null) // Check if the GameObject is not null
-                {
-                    previousPlayer.PrefabInstance.SetActive(false);
-                    Debug.Log($"Player disconnected: {previousPlayer.GamerTag} (ID: {previousPlayer.Id})");
-                }
-                else
-                {
-                    Debug.LogWarning($"PrefabInstance for player {previousPlayer.GamerTag} (ID: {previousPlayer.Id}) is already destroyed or null.");
-                }
-            }
-        }
-
-        _previousLobbyPlayerDatas = new List<S_LobbyPlayerData>(_lobbyPlayerDatas);
-
-        _lobbyData = new S_LobbyData();
-        _lobbyData.Initialize(p_lobby.Data);
-
-        S_LobbyEvents.OnLobbyUpdated?.Invoke();
-
-        bool teamsBalanced = await SameNbPlayerInEachTeam();
-        if (teamsBalanced && nbPlayerReady == _lobbyPlayerDatas.Count)
-        {
-            S_LobbyEvents.OnLobbyReady?.Invoke();
-        }
-        else
-        {
-            S_LobbyEvents.OnLobbyUnready?.Invoke();
-        }
-
-        if (IsHost)
-        {
-            if (!teamsBalanced || nbPlayerReady != _lobbyPlayerDatas.Count)
-            {
-                S_LobbyEvents.OnLobbyUnready?.Invoke();
-            }
-        }
-        if (_lobbyData.RelayJoinCode != default && !_inGame && !IsHost)
-        {
-            if (_wasDisconnected)
-            {
-                if (_lobbyData.RelayJoinCode != _previousRelayCode)
-                {
-                    await JoinRelayServer(_lobbyData.RelayJoinCode);
-                }
+                previousPlayer.PrefabInstance.SetActive(false);
+                Debug.Log($"Player disconnected: {previousPlayer.GamerTag} (ID: {previousPlayer.Id})");
             }
             else
             {
-                await JoinRelayServer(_lobbyData.RelayJoinCode);
-                await SceneManager.LoadSceneAsync(gameSceneName);
+                Debug.LogWarning($"PrefabInstance for player {previousPlayer.GamerTag} (ID: {previousPlayer.Id}) is already destroyed or null.");
             }
         }
     }
+
+    _previousLobbyPlayerDatas = new List<S_LobbyPlayerData>(_lobbyPlayerDatas);
+
+    _lobbyData = new S_LobbyData();
+    _lobbyData.Initialize(p_lobby.Data);
+
+    S_LobbyEvents.OnLobbyUpdated?.Invoke();
+
+    bool teamsBalanced = await SameNbPlayerInEachTeam();
+    if (teamsBalanced && nbPlayerReady == _lobbyPlayerDatas.Count)
+    {
+        S_LobbyEvents.OnLobbyReady?.Invoke();
+    }
+    else
+    {
+        S_LobbyEvents.OnLobbyUnready?.Invoke();
+    }
+
+    if (IsHost)
+    {
+        if (!teamsBalanced || nbPlayerReady != _lobbyPlayerDatas.Count)
+        {
+            S_LobbyEvents.OnLobbyUnready?.Invoke();
+        }
+    }
+
+    // Ensure the client changes the scene when RelayJoinCode is available
+    if (_lobbyData.RelayJoinCode != default && !_inGame && !IsHost)
+    {
+        Debug.Log($"Client joining relay with code: {_lobbyData.RelayJoinCode}");
+        await JoinRelayServer(_lobbyData.RelayJoinCode);
+        _inGame = true; // Set _inGame to true after joining the relay
+        await SceneManager.LoadSceneAsync(gameSceneName);
+    }
+}
 
 
     public string GetLobbyCode()
@@ -221,10 +223,13 @@ public class S_GameLobbyManager : MonoBehaviour
         string connectionData = S_RelayManager.instance.GetConnectionData();
         await S_LobbyManager.instance.UpdatePlayerData(_localLobbyPlayerData.Id, _localLobbyPlayerData.Serialize(), allocationId, connectionData);
 
+        Debug.Log($"Starting game with scene: {gameSceneName}");
+        Debug.Log($"Relay Join Code: {_lobbyData.RelayJoinCode}");
+        // Ensure the host also loads the game scene
         await SceneManager.LoadSceneAsync(gameSceneName);
     }
 
-    public async Task<bool> SameNbPlayerInEachTeam()
+    public Task<bool> SameNbPlayerInEachTeam()
     {
         int redTeamCount = 0;
         int blueTeamCount = 0;
@@ -240,7 +245,7 @@ public class S_GameLobbyManager : MonoBehaviour
             }
         }
 
-        return redTeamCount == blueTeamCount;
+        return Task.FromResult(redTeamCount == blueTeamCount);
     }
 
     private async Task<bool> JoinRelayServer(string p_lobbyDataRelayJoinCode)
@@ -281,8 +286,8 @@ public class S_GameLobbyManager : MonoBehaviour
     {
         try
         {
+            _inGame = false;
             await S_LobbyManager.instance.LeaveLobbyAsync();
-            Debug.Log("Player has left the lobby.");
         }
         catch (Exception ex)
         {

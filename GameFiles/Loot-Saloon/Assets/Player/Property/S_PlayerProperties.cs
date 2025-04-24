@@ -1,10 +1,18 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "ScriptableObjects/Property")]
+[CreateAssetMenu(fileName = "PlayerProperties", menuName = "Scriptable Objects/PlayerProperties")]
 public class S_PlayerProperties : ScriptableObject
 {
-    public float speed;
-    public float life;
-    public float strengh;
-    
+    [Header(" Movement :")]
+    public float walkingMovementSpeed = 4;
+    public float runningMovementSpeed = 8;
+
+    [Space]
+    public float jumpPower = 5;
+
+    [Header(" Health :")]
+    public int maxHealthPoints = 100;
+
+    [Header(" Lifting :")]
+    public int liftingStrengh = 20;
 }

@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba6775f33d7da0d4fb8548ed1ba84f03, type: 3}
   m_Name: PlayerProperties
   m_EditorClassIdentifier: 
-  Speed: 0
-  Life: 100
-  Strengh: 0
+  walkingMovementSpeed: 4
+  runningMovementSpeed: 8
+  jumpPower: 5
+  maxHealthPoints: 100
+  liftingStrengh: 20

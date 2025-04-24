@@ -38,14 +38,20 @@ public class S_PlayersSpawner : NetworkBehaviour
     public async void SpawnPlayer(GameObject p_player, Transform p_origin)
     {
         S_GameLobbyManager gameLobbyManager = S_GameLobbyManager.instance;
+
         _playerTeam = await gameLobbyManager.GetPlayerTeamAsync();
+
         int count = NetworkManager.Singleton.ConnectedClients.Count;
         float totalWidth = (count - 1) * _spawnDistance;
         float startX = p_origin.position.x - totalWidth / 2f;
         int nbPlayer;
         float fixedZ = 0;
 
-        S_PlayerController playerController = p_player.GetComponentInChildren<S_PlayerController>();
+        S_PlayerCharacter playerCharacter = p_player.GetComponentInChildren<S_PlayerCharacter>();
+        S_PlayerAttributes playerAttributes = playerCharacter.playerAttributes;
+        S_PlayerController playerController = playerCharacter.playerController;
+
+        playerAttributes.SetTeam_RPC(_playerTeam);
 
         if (_playerTeam == E_PlayerTeam.BLUE)
         {
@@ -54,6 +60,7 @@ public class S_PlayersSpawner : NetworkBehaviour
             fixedZ = _blueTeam.position.z;
             p_player.GetComponentInChildren<MeshRenderer>().material = _blueTeamMaterial;
             playerController.respawnPoint = _blueTeam;
+
         }
         else
         {
@@ -64,21 +71,21 @@ public class S_PlayersSpawner : NetworkBehaviour
             playerController.respawnPoint = _redTeam;
         }
 
-        Vector3 pos = new Vector3(startX + nbPlayer * _spawnDistance, p_origin.position.y, fixedZ);
+        Vector3 newPosition = new(startX + nbPlayer * _spawnDistance, p_origin.position.y, fixedZ);
         
-        StartCoroutine(TPPlayer(p_player, pos));
+        StartCoroutine(TPPlayer(p_player, newPosition));
     }
 
-    IEnumerator TPPlayer(GameObject p_player, Vector3 pos)
+    IEnumerator TPPlayer(GameObject p_player, Vector3 p_newPosition)
     {
         if (p_player.GetComponentInChildren<NetworkTransform>() != null)
         {
             
-            p_player.GetComponentInChildren<NetworkTransform>().Teleport(pos, Quaternion.identity, Vector3.one);
+            p_player.GetComponentInChildren<NetworkTransform>().Teleport(p_newPosition, Quaternion.identity, Vector3.one);
         }
         else
         {
-            Debug.LogWarning("NetworkTransform non trouvé sur le joueur.");
+            Debug.LogWarning("WARNING ! NetworkTransform not founded on the player.");
         }
         
         yield break;

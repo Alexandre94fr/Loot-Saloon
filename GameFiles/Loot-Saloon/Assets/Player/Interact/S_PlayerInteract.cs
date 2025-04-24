@@ -2,7 +2,8 @@
  using System.Collections.Generic;
  using System.Linq;
  using Unity.Netcode;
- using UnityEngine;
+using Unity.Services.Matchmaker.Models;
+using UnityEngine;
  using UnityEngine.Events;
 #endregion
 
@@ -16,10 +17,13 @@ public class S_PlayerInteract : NetworkBehaviour
     private Transform _transform;
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] Transform _rightArmTransform;
+
     private S_Pickable _pickableHeld = null;
     private S_Interactable _currentInteraction = null;
-
+    
     public S_PlayerAttributes attributes { get; private set; }
+
+    public UnityEvent<S_Interactable> OnLookAtInteract = new(); 
 
     public UnityEvent<Transform, S_Weapon> OnWeaponPickUp = new();
     public UnityEvent<S_Pickable> OnPickUp = new();
@@ -33,6 +37,7 @@ public class S_PlayerInteract : NetworkBehaviour
     public LayerMask objectLayer;
 
     private Material _lastRenderer;
+    private S_Loot _lastPickableLookedAt;
 
     private void Awake()
     {
@@ -46,13 +51,19 @@ public class S_PlayerInteract : NetworkBehaviour
         if (!S_VariablesChecker.AreVariablesCorrectlySetted(name, null,
             (_rightArmTransform, nameof(_rightArmTransform))
         )) return;
+    }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        
         if (GetComponentInParent<NetworkObject>().IsOwner)
         {
+            S_PlayerInputsReciever.OnLook += (_) => OnLookAtInteract.Invoke(CheckObjectRaycast());
             S_PlayerInputsReciever.OnInteract += Interact;
             S_PlayerInputsReciever.OnStopInteract += StopInteract;
             S_PlayerInputsReciever.OnThrow += Throw;
-            S_LifeManager.OnDie += PutDownPickable;
+            S_PlayerAttributes.OnPlayerDeathEvent += PutDownPickable;
         }
     }
     
@@ -72,7 +83,7 @@ public class S_PlayerInteract : NetworkBehaviour
 
         if (_pickableHeld != null)
         {
-            PutDownPickable(null);
+            PutDownPickable(0, 0); // Those parameters are not used, it's for the OnPlayerDeathEvent event to work
             return;
         }
 
@@ -140,7 +151,9 @@ public class S_PlayerInteract : NetworkBehaviour
         OnPickUp.Invoke(p_pickable);
     }
 
-    private void PutDownPickable(S_PlayerAttributes attributes)
+    /// <summary>
+    /// Those parameters are not used, it's for the OnPlayerDeathEvent event to work. </summary>
+    private void PutDownPickable(ulong p_playerID, int p_currentPlayerHealthPoints)
     {
         if (_pickableHeld == null)
             return;
@@ -167,6 +180,14 @@ public class S_PlayerInteract : NetworkBehaviour
     {
         if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, out RaycastHit hit, 2f, objectLayer))
         {
+            S_Loot loot = hit.collider.GetComponent<S_Loot>();
+            if (loot != null)
+            {
+                if (!loot.interactable)
+                    return;
+                CheckPickableCanvasVisibility(loot);
+            }
+            
             MeshRenderer renderer = hit.collider.GetComponent<MeshRenderer>();
             if (renderer != null)
             {
@@ -186,11 +207,35 @@ public class S_PlayerInteract : NetworkBehaviour
                     }
                 }
             }
+            return;
         }
-        else if (_lastRenderer != null)
+
+        if (_lastRenderer != null)
         {
             _lastRenderer.SetFloat("_Scale", 1f);
             _lastRenderer = null;
+        }
+
+        if (_lastPickableLookedAt != null)
+        {
+            _lastPickableLookedAt.SetWorldTextVisibility(false, Camera.main);
+            _lastPickableLookedAt = null;
+        }
+    }
+
+    private void CheckPickableCanvasVisibility(S_Loot p_loot)
+    {
+        if (p_loot != null)
+        {
+            if (_lastPickableLookedAt != p_loot)
+            {
+                if (_lastPickableLookedAt != null)
+                    _lastPickableLookedAt.SetWorldTextVisibility(false, Camera.main);
+
+                p_loot.SetWorldTextVisibility(true, Camera.main);
+                _lastPickableLookedAt = p_loot;
+            }
+            return;
         }
     }
 
@@ -209,7 +254,7 @@ public class S_PlayerInteract : NetworkBehaviour
             clientRb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
         }
 
-        PutDownPickable(null);
+        PutDownPickable(0, 0); // Those parameters are not used, it's for the OnPlayerDeathEvent event to work
 
         ApplyImpulseServerRpc(objectId, throwDirection);
     }
