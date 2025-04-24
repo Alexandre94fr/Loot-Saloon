@@ -146,7 +146,7 @@ public class S_GameLobbyManager : MonoBehaviour
 
     _lobbyData = new S_LobbyData();
     _lobbyData.Initialize(p_lobby.Data);
-
+        
     S_LobbyEvents.OnLobbyUpdated?.Invoke();
 
     bool teamsBalanced = await SameNbPlayerInEachTeam();

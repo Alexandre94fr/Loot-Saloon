@@ -7,7 +7,7 @@ public class S_PlayerCharacter : MonoBehaviour
     public S_PlayerInteract playerInteract;
     public S_PlayerController playerController;
 
-    private void Start()
+    private void Awake()
     {
         if (!S_VariablesChecker.AreVariablesCorrectlySetted(name, null,
             (playerAttributes, nameof(playerAttributes)),

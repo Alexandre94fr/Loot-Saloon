@@ -71,8 +71,6 @@ public class S_PlayerController : NetworkBehaviour
 
         _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.EnableCartMode(cart);
 
-        Debug.LogWarning("Cart Mode is Enabled");
-
         _speedMult = _cartSpeedMultiplicator;
         UpdateSpeed();
     }
@@ -103,7 +101,6 @@ public class S_PlayerController : NetworkBehaviour
 
         _playerTransform.GetComponentInChildren<S_PlayerCamera>()?.DisableCartMode();
 
-        Debug.LogWarning("Cart Mode is Disable");
         _speedMult = 1.0f;
         UpdateSpeed();
     }
@@ -169,7 +166,9 @@ public class S_PlayerController : NetworkBehaviour
 
         if (_playerTransform.parent.GetComponent<NetworkObject>().IsOwner)
         {
-            HandleInputsEvents();
+            S_PlayersConnection.OnStartGame += HandleInputsEvents;
+            NotifyServerPlayerIsReadyServerRpc();
+
 
             S_PlayerAttributes.OnPlayerDeathEvent += Respawn;
             S_Extract.OnExtract += DisableAllMeshOfPlayer;
@@ -191,6 +190,20 @@ public class S_PlayerController : NetworkBehaviour
             _playerTransform.GetComponentInChildren<PlayerInput>().gameObject.SetActive(false);
             _playerTransform.GetComponentInChildren<S_PlayerInteract>().gameObject.SetActive(false);
         }
+    }
+
+    [ServerRpc]
+    private void NotifyServerPlayerIsReadyServerRpc(ServerRpcParams rpcParams = default)
+    {
+        S_PlayersConnection.InvokePlayerReady();
+        SubscribeToStartGameClientRpc();
+    }
+
+    [ClientRpc]
+    private void SubscribeToStartGameClientRpc(ClientRpcParams rpcParams = default)
+    {
+        if (!IsOwner) return;
+        S_PlayersConnection.OnStartGame += HandleInputsEvents;
     }
 
     private bool Grounded()
@@ -259,6 +272,11 @@ public class S_PlayerController : NetworkBehaviour
 
     private void UpdateSpeed()
     {
+        if (_attributes == null)
+        {
+            Debug.LogWarning($"{nameof(S_PlayerController)} :: _attributes is NULL when calling UpdateSpeed(). Ignoring.");
+            return;
+        }
         _currentSpeed = (_isSprinting ? _attributes.RunningMovementSpeed : _attributes.WalkingMovementSpeed) * _speedMult;
     }
     private void Sprint(bool sprint)
