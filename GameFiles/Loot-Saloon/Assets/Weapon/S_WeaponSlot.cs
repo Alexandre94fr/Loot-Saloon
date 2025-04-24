@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class S_WeaponSlot : NetworkBehaviour
 {
@@ -16,16 +17,18 @@ public class S_WeaponSlot : NetworkBehaviour
     [ReadOnlyInInspector] [SerializeField] private int _remainingBullet;
     [ReadOnlyInInspector] [SerializeField] private int _maxBulletNumber;
     [ReadOnlyInInspector] [SerializeField] private float _cooldown;
+    [SerializeField] private Image _reloadImage;
+
 
     [ReadOnlyInInspector] [SerializeField] private GameObject _weaponObject;
 
     //[ReadOnlyInInspector]
     [SerializeField]
     [Range(1f, 10f)]
-    private float _angleSpread = 2.5f;
+    private float _angleSpread = 2f;
 
     [ReadOnlyInInspector] [SerializeField] private bool _isReloading = false;
-    [ReadOnlyInInspector] [SerializeField] private float _reloadTime = 20f;
+    [SerializeField] private float _reloadTime = 7f;
 
     Camera _camera;
 
@@ -311,7 +314,19 @@ public class S_WeaponSlot : NetworkBehaviour
     {
         _isReloading = true;
 
-        yield return new WaitForSeconds(_reloadTime);
+        float elapsed = 0f;
+        _reloadImage.fillAmount = 0f;
+        _reloadImage.gameObject.SetActive(true);
+
+        while (elapsed < _reloadTime)
+        {
+            elapsed += Time.deltaTime;
+            _reloadImage.fillAmount = Mathf.Clamp01(elapsed / _reloadTime);
+            yield return null;
+        }
+
+        _reloadImage.fillAmount = 1f;
+        _reloadImage.gameObject.SetActive(false);
 
         _remainingBullet = _maxBulletNumber;
         OnBulletCountChanged?.Invoke(_remainingBullet, _maxBulletNumber);

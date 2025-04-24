@@ -11,7 +11,9 @@ public class S_Quota : MonoBehaviour
 
     [Header(" Properties :")]
     [Tooltip("How much of the total sum the quota is equal to")]
-    [SerializeField] [Range(0f, 1f)] private float _extractionQuotaRatio = 0.67f;
+    [SerializeField] [Range(0f, 1f)] private float _extractionQuotaRatio = 0.33f;
+
+    [SerializeField] private bool _quotaIsZero = false;
 
     public event Action OnQuotaChanged;
 
@@ -33,7 +35,10 @@ public class S_Quota : MonoBehaviour
     public void OnVaultFilled(S_BankVault p_bankVault)
     {
         total += p_bankVault.GetMoneyValue();
-        quota = (int)(total * _extractionQuotaRatio);
+
+        if (!_quotaIsZero)
+            quota = (int)(total * _extractionQuotaRatio);
+
         OnQuotaChanged?.Invoke();
     }
 }
