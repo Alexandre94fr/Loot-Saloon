@@ -193,14 +193,14 @@ public class S_PlayerController : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void NotifyServerPlayerIsReadyServerRpc(ServerRpcParams rpcParams = default)
+    private void NotifyServerPlayerIsReadyServerRpc()
     {
         S_PlayersConnection.InvokePlayerReady();
         SubscribeToStartGameClientRpc();
     }
 
     [ClientRpc]
-    private void SubscribeToStartGameClientRpc(ClientRpcParams rpcParams = default)
+    private void SubscribeToStartGameClientRpc()
     {
         if (!IsOwner) return;
         S_PlayersConnection.OnStartGame += HandleInputsEvents;
