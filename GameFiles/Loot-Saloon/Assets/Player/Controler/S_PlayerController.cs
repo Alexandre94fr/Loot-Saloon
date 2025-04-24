@@ -1,4 +1,5 @@
 #region
+using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -280,8 +281,8 @@ public class S_PlayerController : NetworkBehaviour
     }
     private void Sprint(bool sprint)
     {
-        UpdateSpeed();
         _isSprinting = sprint;
+        UpdateSpeed();
         _armsAnimator.speed = sprint ? 2 : 1;
     }
 
@@ -320,6 +321,8 @@ public class S_PlayerController : NetworkBehaviour
 
     private void HandleInputsEvents()
     {
+        DropInputsEvents();
+        Debug.Log("Set Inputs");
         S_PlayerInputsReciever.OnJump += Jump;
         S_PlayerInputsReciever.OnMove += GetDirection;
         S_PlayerInputsReciever.OnSprint += Sprint;
@@ -329,6 +332,7 @@ public class S_PlayerController : NetworkBehaviour
 
     private void DropInputsEvents(E_PlayerTeam team = E_PlayerTeam.NONE)
     {
+        Debug.Log("Remove Inputs");
         S_PlayerInputsReciever.OnJump -= Jump;
         S_PlayerInputsReciever.OnMove -= GetDirection;
         S_PlayerInputsReciever.OnSprint -= Sprint;
