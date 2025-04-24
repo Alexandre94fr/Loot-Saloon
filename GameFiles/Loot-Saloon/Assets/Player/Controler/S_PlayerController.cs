@@ -152,6 +152,7 @@ public class S_PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         if (_isSoloTestModeEnabled)
             return;
 
@@ -175,7 +176,6 @@ public class S_PlayerController : NetworkBehaviour
             S_Extract.OnExtract += DropInputsEvents;
             S_PlayerAttributes.OnPlayerWalkingMovementSpeedChangeEvent += SetSprintInEvent;
             S_PlayerAttributes.OnPlayerRunningMovementSpeedChangeEvent += SetSprintInEvent;
-
 
             S_PlayersSpawner.Instance.SpawnPlayer(_playerTransform.transform.parent.gameObject, _playerTransform);
         }
