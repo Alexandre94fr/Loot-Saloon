@@ -1233,7 +1233,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3355880344352240047, guid: 08133ce81e2925b4ab12f3ff46579fda, type: 3}
       propertyPath: m_Name
-      value: PB_BankDoor (1)
+      value: PB_BankDoor(1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
