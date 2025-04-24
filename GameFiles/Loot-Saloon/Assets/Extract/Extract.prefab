@@ -1067,5 +1067,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1474464714a50374a98e3d17d68f1c6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _instantiator: {fileID: 0}
-  _fraction: 0.67
+  _vaultInstantiatorInstance: {fileID: 0}
+  _extractionQuotaRatio: 0.67
+  _quotaIsZero: 0
