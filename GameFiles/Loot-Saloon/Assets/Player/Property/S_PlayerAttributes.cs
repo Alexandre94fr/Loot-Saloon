@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Xml.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,7 +19,7 @@ public class S_PlayerAttributes : NetworkBehaviour
 
     public static Action<ulong, float> OnPlayerJumpPowerChangeEvent;
 
-    public static Action<ulong, int > OnPlayerDeathEvent;
+    public static Action<ulong> OnPlayerDeathEvent;
 
     public static Action<ulong, int> OnPlayerMaxHealthPointChangeEvent;
     public static Action<ulong, int> OnPlayerHealthPointChangeEvent;
@@ -161,7 +160,7 @@ public class S_PlayerAttributes : NetworkBehaviour
         SetLiftingStrengh_RPC(_playerProperties.liftingStrengh);
     }
 
-    void OnDeathInitalization(ulong p_playerID, int p_currentPlayerHealthPoints)
+    void OnDeathInitalization(ulong p_playerID)
     {
         Initialize_ServerRPC();
 
@@ -363,7 +362,7 @@ public class S_PlayerAttributes : NetworkBehaviour
         }
 
         // Full life handling
-        if (_currentHP > _maxHP)
+        else if (_currentHP > _maxHP)
         {
             _currentHP = _maxHP;
         }
@@ -412,7 +411,7 @@ public class S_PlayerAttributes : NetworkBehaviour
         if (!IsOwner)
             return;
 
-        OnPlayerDeathEvent?.Invoke(_playerID, CurrentHealthPoint);
+        OnPlayerDeathEvent?.Invoke(_playerID);
     }
     #endregion
 

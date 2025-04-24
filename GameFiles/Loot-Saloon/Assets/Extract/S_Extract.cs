@@ -1,6 +1,6 @@
 using System;
 using TMPro;
-using Unity.Services.Matchmaker.Models;
+using Unity.Netcode;
 using UnityEngine;
 
 public class S_Extract : MonoBehaviour
@@ -14,6 +14,7 @@ public class S_Extract : MonoBehaviour
     [SerializeField] private E_PlayerTeam _team;
     public static event Action<E_PlayerTeam> OnExtract;
     public static event Action<E_PlayerTeam, int> GetQuota;
+    public static event Action<E_PlayerTeam> OnForceStopExtract;
 
     private int _totalEntityInExract = 0;
     private bool _cartInExtract = false;
@@ -37,7 +38,22 @@ public class S_Extract : MonoBehaviour
     private void Start()
     {
         S_GameTimer.OnEnd += () => OnExtract?.Invoke(E_PlayerTeam.NONE);
-        S_LifeManager.OnDie += (attributes) => _canExtract = attributes.team != _team;
+
+        S_PlayerAttributes.OnPlayerDeathEvent += (id) => {
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(id, out var client))
+            {
+                print(client.PlayerObject.name);
+
+                var attributes = client.PlayerObject.GetComponentInChildren<S_PlayerAttributes>();
+                if (attributes != null)
+                    OnForceStopExtract?.Invoke(attributes.Team);
+            }
+        };
+
+        OnForceStopExtract += (team) => {
+            print(team);
+            _canExtract = _canExtract && team != _team;
+        };
     }
 
     private void Update()
@@ -75,9 +91,11 @@ public class S_Extract : MonoBehaviour
             }
         }
 
-        else if (other.gameObject.GetComponentInChildren<S_PlayerAttributes>().Team == _team)
+        else
         {
-            _totalEntityInExract++;
+            var attributes = other.gameObject.GetComponentInChildren<S_PlayerAttributes>();
+            if (attributes != null && attributes.Team == _team)
+                _totalEntityInExract++;
         }
 
         if (_totalEntityInExract >= 2 && _cartInExtract)
@@ -98,8 +116,12 @@ public class S_Extract : MonoBehaviour
             }
         }
 
-        else if (other.gameObject.GetComponentInChildren<S_PlayerAttributes>().Team == _team) 
-            _totalEntityInExract--;
+        else
+        {
+            var attributes = other.gameObject.GetComponentInChildren<S_PlayerAttributes>();
+            if (attributes != null && attributes.Team == _team)
+                _totalEntityInExract--;
+        }
 
         if (_totalEntityInExract < 2 || !_cartInExtract)
         {
