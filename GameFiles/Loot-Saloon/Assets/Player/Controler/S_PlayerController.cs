@@ -294,8 +294,8 @@ public class S_PlayerController : NetworkBehaviour
 
     IEnumerator RespawnCoroutine()
     {
-        yield return new WaitForSeconds(5);
         _playerTransform.position = respawnPoint.position;
+        yield return new WaitForSeconds(5);
         EnableAllMeshOfPlayer();
         HandleInputsEvents();
     }
