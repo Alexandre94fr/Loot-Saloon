@@ -83,7 +83,7 @@ public class S_PlayerInteract : NetworkBehaviour
 
         if (_pickableHeld != null)
         {
-            PutDownPickable(0, 0); // Those parameters are not used, it's for the OnPlayerDeathEvent event to work
+            PutDownPickable(0); // Those parameters are not used, it's for the OnPlayerDeathEvent event to work
             return;
         }
 
@@ -153,7 +153,7 @@ public class S_PlayerInteract : NetworkBehaviour
 
     /// <summary>
     /// Those parameters are not used, it's for the OnPlayerDeathEvent event to work. </summary>
-    private void PutDownPickable(ulong p_playerID, int p_currentPlayerHealthPoints)
+    private void PutDownPickable(ulong p_playerID)
     {
         if (_pickableHeld == null)
             return;
@@ -254,7 +254,7 @@ public class S_PlayerInteract : NetworkBehaviour
             clientRb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
         }
 
-        PutDownPickable(0, 0); // Those parameters are not used, it's for the OnPlayerDeathEvent event to work
+        PutDownPickable(0); // Those parameters are not used, it's for the OnPlayerDeathEvent event to work
 
         ApplyImpulseServerRpc(objectId, throwDirection);
     }

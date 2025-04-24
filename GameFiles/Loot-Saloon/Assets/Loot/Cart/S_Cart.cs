@@ -43,11 +43,10 @@ public class S_Cart : S_Pickable
         float moveSpeed = 5f;
         float rotationSmoothness = 5f;
         float sphereRadius = 0.5f; // Ajuste selon la taille de ton Cart
-        float safeDistance = 0.1f; // Distance de sécurité pour ne pas coller au mur
+        float safeDistance = 0.1f; // Distance de sï¿½curitï¿½ pour ne pas coller au mur
 
         while (_isCarried)
         {
-            Debug.Log("IM MOVING !!!");
             Vector3 forward = _parent.forward;
             forward.y = 0;
             forward.Normalize();
@@ -55,14 +54,13 @@ public class S_Cart : S_Pickable
             Vector3 targetPosition = _parent.position + forward * followDistance;
             targetPosition.y = rb.position.y;
 
-            // Vérification collision entre la position actuelle et la cible
+            // Vï¿½rification collision entre la position actuelle et la cible
             Vector3 direction = (targetPosition - rb.position).normalized;
             float distance = Vector3.Distance(rb.position, targetPosition);
             int cartMask = LayerMask.GetMask("Default", "Door");
             if (!Physics.SphereCast(rb.position, sphereRadius, direction, out RaycastHit hit, distance + safeDistance, cartMask, QueryTriggerInteraction.Ignore))
             {
                 rb.MovePosition(Vector3.Lerp(rb.position, targetPosition, Time.deltaTime * moveSpeed));
-                Debug.Log("Detect Collision");
             }
             else
             {

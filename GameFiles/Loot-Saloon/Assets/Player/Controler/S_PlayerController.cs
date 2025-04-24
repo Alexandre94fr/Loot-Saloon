@@ -230,7 +230,6 @@ public class S_PlayerController : NetworkBehaviour
 
     private void Move()
     {
-        Debug.Log("The Actual Speed is ::::: " + _currentSpeed);
         if (_isCartModeEnabled)
         {
             // Simulate cart movement for always go forward
@@ -283,7 +282,7 @@ public class S_PlayerController : NetworkBehaviour
         Sprint(_isSprinting);
     }
 
-    private void Respawn(ulong p_playerID, int p_currentPlayerHealthPoints)
+    private void Respawn(ulong p_playerID)
     {
         if (NetworkManager.Singleton.LocalClientId != p_playerID)
             return;
@@ -295,8 +294,8 @@ public class S_PlayerController : NetworkBehaviour
 
     IEnumerator RespawnCoroutine()
     {
-        yield return new WaitForSeconds(5);
         _playerTransform.position = respawnPoint.position;
+        yield return new WaitForSeconds(5);
         EnableAllMeshOfPlayer();
         HandleInputsEvents();
     }

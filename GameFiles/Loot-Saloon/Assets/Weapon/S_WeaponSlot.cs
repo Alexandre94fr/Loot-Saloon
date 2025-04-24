@@ -34,7 +34,7 @@ public class S_WeaponSlot : NetworkBehaviour
     public static event Action<int, int> OnBulletCountChanged;
     public static event Action<bool,int, int> OnWeaponChanged;
 
-    private void DropWeaponOnDeath(ulong p_playerID, int p_currentPlayerHealth)
+    private void DropWeaponOnDeath(ulong p_playerID)
     {
         if (p_playerID != NetworkManager.Singleton.LocalClientId)
             return;
