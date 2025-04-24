@@ -225,6 +225,7 @@ MonoBehaviour:
   _vaultInstantiator: {fileID: 0}
   _vaultState:
     m_InternalValue: 0
+  vaultDoor: {fileID: 8892378424790204455}
   _spawnPoints:
   - {fileID: 9104762117149105255}
   - {fileID: 3259728575922776122}
@@ -340,6 +341,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: medium_box2
       objectReference: {fileID: 0}
+    - target: {fileID: 6221622215387666067, guid: 510b6ec22d4f9184f9733d678747fc1c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -348,5 +353,10 @@ PrefabInstance:
 --- !u!4 &902913017365721518 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2429830512802752282, guid: 510b6ec22d4f9184f9733d678747fc1c, type: 3}
+  m_PrefabInstance: {fileID: 3260526281324467892}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8892378424790204455 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6221622215387666067, guid: 510b6ec22d4f9184f9733d678747fc1c, type: 3}
   m_PrefabInstance: {fileID: 3260526281324467892}
   m_PrefabAsset: {fileID: 0}

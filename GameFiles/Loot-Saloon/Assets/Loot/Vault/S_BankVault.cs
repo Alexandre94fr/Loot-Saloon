@@ -29,6 +29,8 @@ public class S_BankVault : S_Interactable
         NetworkVariableWritePermission.Server
     );
 
+    [SerializeField] private GameObject vaultDoor;
+
 
     [Header(" Properties :")]
     [SerializeField] private Transform[] _spawnPoints;
@@ -284,6 +286,8 @@ public class S_BankVault : S_Interactable
                 $"(may have) changed from '{p_oldVaultState}' to '{p_newVaultState}'."
             );
         }
+
+        vaultDoor.SetActive(!(p_newVaultState == VaultState.Opened));
 
         // Here you can add for example particles, sound, and other stuff
     }
