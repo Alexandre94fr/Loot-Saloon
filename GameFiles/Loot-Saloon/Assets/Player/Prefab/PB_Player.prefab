@@ -590,7 +590,7 @@ MonoBehaviour:
   _maxBulletNumber: 0
   _cooldown: 0
   _weaponObject: {fileID: 0}
-  _angleSpread: 5
+  _angleSpread: 2.5
   _isReloading: 0
   _reloadTime: 20
 --- !u!1 &2337550713985648122

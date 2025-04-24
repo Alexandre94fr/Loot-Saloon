@@ -19,8 +19,10 @@ public class S_WeaponSlot : NetworkBehaviour
 
     [ReadOnlyInInspector] [SerializeField] private GameObject _weaponObject;
 
-    [ReadOnlyInInspector] [SerializeField] [Range(1f, 10f)]
-    private float _angleSpread = 5;
+    //[ReadOnlyInInspector]
+    [SerializeField]
+    [Range(1f, 10f)]
+    private float _angleSpread = 2.5f;
 
     [ReadOnlyInInspector] [SerializeField] private bool _isReloading = false;
     [ReadOnlyInInspector] [SerializeField] private float _reloadTime = 20f;
