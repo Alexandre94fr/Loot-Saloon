@@ -554,13 +554,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2191014429533671087}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.4, y: 0, z: 0.4}
+  m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: 0.4, y: -1, z: 0.4}
   m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5546709001090252882}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -90}
 --- !u!33 &991147365482781990
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -919,11 +919,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   _isDebugModeOn: 1
-  _playerCharacter: {fileID: 7496308992574988215}
   _playerProperties: {fileID: 11400000, guid: 43868903bea762f4c8e16650924f3917, type: 2}
   _walkingMovementSpeedNetworkVariable:
     m_InternalValue: 0
   _runningMovementSpeedNetworkVariable:
+    m_InternalValue: 0
+  _jumpPowerNetworkVariable:
     m_InternalValue: 0
   _maxHealthPointsNetworkVariable:
     m_InternalValue: 0
@@ -933,6 +934,7 @@ MonoBehaviour:
     m_InternalValue: 0
   _teamNetworkVariable:
     m_InternalValue: 0
+  _playerID: 0
 --- !u!1 &3468696607227292602
 GameObject:
   m_ObjectHideFlags: 0
@@ -1518,13 +1520,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7552130842470226064}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: -0.4, y: 0, z: 0.4}
   m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5546709001090252882}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!33 &7789166749274327528
 MeshFilter:
   m_ObjectHideFlags: 0
