@@ -36,8 +36,10 @@ public class S_PlayersConnection : NetworkBehaviour
         }
     }
 
-    private void OnDestroy()
+    public override void OnNetworkDespawn()
     {
+        base.OnNetworkDespawn();
+
         if (Instance == this)
             Instance = null;
     }
