@@ -9,10 +9,28 @@ public class LoadScreen : MonoBehaviour
 {
     [SerializeField] private RectTransform _rectComponent;
     [SerializeField] private float _rotateSpeed = 200f;
+    [SerializeField] private bool _isInGame = false;
+    [SerializeField] private float _maxWaitingTime = 30 * 30;
+    private bool _gameStart = false;
+    private float timer;
+
 
     private void OnEnable()
     {
-        S_LobbyEvents.OnLobbyUpdatedWithParam += OnLobbyLoaded;
+        if(!_isInGame)
+        {
+            S_LobbyEvents.OnLobbyUpdatedWithParam += OnLobbyLoaded;
+            return;
+        }
+        timer = Time.time + _maxWaitingTime;
+        S_PlayersConnection.OnStartGame += StartGame;
+    }
+
+    private void StartGame()
+    {
+        if (!_isInGame)
+            return;
+        StartCoroutine(LoadGame());
     }
 
     private void OnLobbyLoaded(Lobby p_lobby)
@@ -28,6 +46,15 @@ public class LoadScreen : MonoBehaviour
         yield return new WaitForSeconds(2f);
         gameObject.SetActive(false);
         S_LobbyEvents.OnLobbyUpdatedWithParam -= OnLobbyLoaded;
+    }
+
+    private IEnumerator LoadGame()
+    {
+        while(!_gameStart && Time.time < timer)
+        {
+            yield return null;
+        }
+        gameObject.SetActive(false);
     }
 
     private void Update()

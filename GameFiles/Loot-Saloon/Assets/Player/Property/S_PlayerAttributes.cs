@@ -203,7 +203,6 @@ public class S_PlayerAttributes : NetworkBehaviour
         _walkingMovementSpeed = p_newWalkingMovementSpeed;
 
         OnPlayerWalkingMovementSpeedChangeEvent?.Invoke(_playerID, p_newWalkingMovementSpeed);
-        Debug.LogWarning("Change Event was Called for :: " + p_newWalkingMovementSpeed);
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateWalkingMovementSpeed_RPC)} UPDATED | '{nameof(p_newWalkingMovementSpeed)}' : {p_newWalkingMovementSpeed}");
     }
@@ -240,7 +239,6 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _runningMovementSpeed = p_newRunningMovementSpeed;
 
-        Debug.LogWarning($"[Server] Call Coroutine Event {OwnerClientId}");
         StartCoroutine(DelayedEvent());
 
         if (_isDebugModeOn)
