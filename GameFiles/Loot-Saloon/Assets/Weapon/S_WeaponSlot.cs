@@ -231,7 +231,7 @@ public class S_WeaponSlot : NetworkBehaviour
             particleSystem.Play();
 
         StartCoroutine(GunLightEffect(p_weaponObject));
-        StartCoroutine(LineRenderer(p_direction, p_weaponObject));
+        StartCoroutine(LineRenderer(p_direction, particleSystem.gameObject));
     }
 
     private IEnumerator GunLightEffect(GameObject p_weaponObject)
@@ -250,10 +250,12 @@ public class S_WeaponSlot : NetworkBehaviour
         Vector3 start = p_weaponObject.transform.position;
         Vector3 end = Camera.main.transform.position + p_direction * 50f;
 
-        LineRenderer lineRenderer = p_weaponObject.GetComponentInChildren<LineRenderer>(true);
+
+        LineRenderer lineRenderer = p_weaponObject.transform.parent.GetComponentInChildren<LineRenderer>(true);
         if (!lineRenderer)
             yield break;
 
+        Debug.Log($"Start : {start}, End :: {end}, Line Renderer {lineRenderer}");
         lineRenderer.enabled = true;
         lineRenderer.SetPosition(0, start);
         lineRenderer.SetPosition(1, end);
