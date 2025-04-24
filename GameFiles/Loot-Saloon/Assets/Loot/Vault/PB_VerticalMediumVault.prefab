@@ -229,7 +229,7 @@ MonoBehaviour:
   - {fileID: 9104762117149105255}
   - {fileID: 3259728575922776122}
   - {fileID: 2802489670607691167}
-  _unlockTime: 2
+  _unlockTime: 6
 --- !u!54 &6052849851924987539
 Rigidbody:
   m_ObjectHideFlags: 0
