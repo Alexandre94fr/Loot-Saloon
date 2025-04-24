@@ -80,7 +80,6 @@ public class S_Extract : MonoBehaviour
         {
             if (!_cartInExtract && other.TryGetComponent(out S_Cart cart) && cart.team == _team)
             {
-                // print("quota: " + quotaComponent.quota);
                 MoneyRequiredText.text = string.Format(_quotaText, cart.total, quotaComponent.quota);
                 if (quotaComponent.quota <= cart.total)
                 {
@@ -91,12 +90,8 @@ public class S_Extract : MonoBehaviour
             }
         }
 
-        else
-        {
-            var attributes = other.gameObject.GetComponentInChildren<S_PlayerAttributes>();
-            if (attributes != null && attributes.Team == _team)
-                _totalEntityInExract++;
-        }
+        else if (other.gameObject.TryGetComponent(out S_PlayerCharacter character) && character.playerAttributes.Team == _team)
+            _totalEntityInExract++;
 
         if (_totalEntityInExract >= 2 && _cartInExtract)
         {
@@ -116,12 +111,8 @@ public class S_Extract : MonoBehaviour
             }
         }
 
-        else
-        {
-            var attributes = other.gameObject.GetComponentInChildren<S_PlayerAttributes>();
-            if (attributes != null && attributes.Team == _team)
-                _totalEntityInExract--;
-        }
+        else if (other.gameObject.TryGetComponent(out S_PlayerCharacter character) && character.playerAttributes.Team == _team)
+            _totalEntityInExract--;
 
         if (_totalEntityInExract < 2 || !_cartInExtract)
         {
