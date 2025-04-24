@@ -75,8 +75,6 @@ public abstract class S_Pickable : S_Interactable
         interactable = false;
 
         Transform handTransform = p_parent;
-        _transform.localPosition = _onPickUpOffset;
-
 
         StartCoroutine(FollowHandCoroutine(handTransform));
 
