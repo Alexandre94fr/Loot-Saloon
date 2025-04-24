@@ -172,8 +172,9 @@ public class S_PlayerController : NetworkBehaviour
             HandleInputsEvents();
 
             S_PlayerAttributes.OnPlayerDeathEvent += Respawn;
-            S_Extract.OnExtract += DisableAllMeshOfPlayer;
+            S_Extract.OnExtract += DisableMeshes;
             S_Extract.OnExtract += DropInputsEvents;
+            S_Extract.OnExtract += DisablePhysics;
             S_PlayerAttributes.OnPlayerWalkingMovementSpeedChangeEvent += SetSprintInEvent;
             S_PlayerAttributes.OnPlayerRunningMovementSpeedChangeEvent += SetSprintInEvent;
 
@@ -288,7 +289,8 @@ public class S_PlayerController : NetworkBehaviour
             return;
 
         DropInputsEvents();
-        DisableAllMeshOfPlayer();
+        DisableMeshes();
+        DisablePhysics();
         StartCoroutine(RespawnCoroutine());
     }
 
@@ -296,7 +298,8 @@ public class S_PlayerController : NetworkBehaviour
     {
         yield return new WaitForSeconds(5);
         _playerTransform.position = respawnPoint.position;
-        EnableAllMeshOfPlayer();
+        EnableMeshes();
+        EnablePhysics();
         HandleInputsEvents();
     }
 
@@ -320,17 +323,31 @@ public class S_PlayerController : NetworkBehaviour
         _playerDirection = Vector3.zero;
     }
 
-    private void DisableAllMeshOfPlayer(E_PlayerTeam team = E_PlayerTeam.NONE)
+    private void DisableMeshes(E_PlayerTeam team = E_PlayerTeam.NONE)
     {
         _playerTransform.GetComponent<MeshRenderer>().enabled = false;
         _armsHandler.SetActive(false);
         _armsAnimator.enabled = false;
     }
 
-    private void EnableAllMeshOfPlayer()
+    private void EnableMeshes()
     {
         _playerTransform.GetComponent<MeshRenderer>().enabled = true;
         _armsHandler.SetActive(true);
         _armsAnimator.enabled = true;
+    }
+
+    private void DisablePhysics(E_PlayerTeam team = E_PlayerTeam.NONE)
+    {
+        _playerTransform.GetComponent<Rigidbody>().useGravity = false;
+        foreach (Collider collider in _playerTransform.GetComponentsInChildren<Collider>())
+            collider.enabled = false;
+    }
+
+    private void EnablePhysics()
+    {
+        _playerTransform.GetComponent<Rigidbody>().useGravity = true;
+        foreach (Collider collider in _playerTransform.GetComponentsInChildren<Collider>())
+            collider.enabled = true;
     }
 }
