@@ -10,9 +10,9 @@ public class LoadScreen : MonoBehaviour
     [SerializeField] private RectTransform _rectComponent;
     [SerializeField] private float _rotateSpeed = 200f;
     [SerializeField] private bool _isInGame = false;
-    [SerializeField] private float _maxWaitingTime = 30 * 30;
+    [SerializeField] private float _maxWaitingTime = 30;
     private bool _gameStart = false;
-    private float timer;
+    private float _startTime = 0;
 
 
     private void OnEnable()
@@ -22,7 +22,6 @@ public class LoadScreen : MonoBehaviour
             S_LobbyEvents.OnLobbyUpdatedWithParam += OnLobbyLoaded;
             return;
         }
-        timer = Time.time + _maxWaitingTime;
         S_PlayersConnection.OnStartGame += StartGame;
     }
 
@@ -50,9 +49,10 @@ public class LoadScreen : MonoBehaviour
 
     private IEnumerator LoadGame()
     {
-        while(!_gameStart && Time.time < timer)
+        while(!_gameStart && _startTime < _maxWaitingTime)
         {
-            yield return null;
+            yield return new WaitForSecondsRealtime(1);
+            _startTime += 1;
         }
         gameObject.SetActive(false);
     }
