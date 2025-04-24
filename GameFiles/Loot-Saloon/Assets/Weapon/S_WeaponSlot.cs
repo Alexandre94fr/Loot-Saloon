@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -30,6 +31,8 @@ public class S_WeaponSlot : NetworkBehaviour
     private SO_WeaponProperties _heldWeapon;
 
     private float _lastShotTime;
+    public static event Action<int, int> OnBulletCountChanged;
+    public static event Action<bool,int, int> OnWeaponChanged;
 
     private void DropWeaponOnDeath(ulong p_playerID, int p_currentPlayerHealth)
     {
@@ -96,6 +99,8 @@ public class S_WeaponSlot : NetworkBehaviour
         EnableWeapon(p_newWeapon.gameObject);
 
         p_newWeapon.isHeld = true;
+        Debug.Log("Weapon picked up: " + _weaponName);
+        OnWeaponChanged?.Invoke(true, _remainingBullet, _maxBulletNumber);
     }
 
     public void OnGenericPickUp(S_Pickable p_pickable)
@@ -145,9 +150,8 @@ public class S_WeaponSlot : NetworkBehaviour
         _remainingBullet = 0;
         _maxBulletNumber = 0;
         _cooldown = 0;
+        OnWeaponChanged?.Invoke(false, _remainingBullet, _maxBulletNumber);
     }
-
-
 
     public void Shoot()
     {
@@ -187,13 +191,10 @@ public class S_WeaponSlot : NetworkBehaviour
                 {
                     OnHitServerRpc(playerRoot.NetworkObjectId, _damage);
                 }
-                else
-                {
-                    Debug.LogWarning("No NetworkObject found on target's p_parent!");
-                }
             }
         }
         _remainingBullet--;
+        OnBulletCountChanged?.Invoke(_remainingBullet, _maxBulletNumber);
         if (_remainingBullet <= 0)
             Reload();
     }
@@ -215,12 +216,10 @@ public class S_WeaponSlot : NetworkBehaviour
 
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(p_weaponNetworkId, out NetworkObject weaponNetObj))
         {
-            Debug.Log("Weapon not found in the network object pool.");
             return;
         }
 
         GameObject weaponObject = weaponNetObj.gameObject;
-        Debug.Log("shoot client");
         PlayEffect(p_direction, weaponObject);
     }
 
@@ -276,14 +275,6 @@ public class S_WeaponSlot : NetworkBehaviour
 
                 OnHitClientRpc(p_damage, targetClientId);
             }
-            else
-            {
-                Debug.LogWarning("WARNING ! Target has no S_PlayerCharacter or S_PlayerAttributes ! " + targetNetObj.name);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("WARNING ! Invalid target network object.");
         }
     }
 
@@ -291,7 +282,6 @@ public class S_WeaponSlot : NetworkBehaviour
     [ClientRpc]
     public void OnHitClientRpc(float p_damage, ulong p_targetClientId)
     {
-        print("OnHitClientRpc" + p_targetClientId);
         if (NetworkManager.Singleton.LocalClientId != p_targetClientId)
             return;
 
@@ -301,7 +291,6 @@ public class S_WeaponSlot : NetworkBehaviour
         if (character != null && character.playerAttributes != null)
         {
             character.playerAttributes.AddCurrentHealthPoint_RPC((int)-p_damage);
-            Debug.Log($"You took {(int)p_damage} p_damage!");
         }
     }
 
@@ -314,12 +303,11 @@ public class S_WeaponSlot : NetworkBehaviour
     private IEnumerator ReloadCoroutine()
     {
         _isReloading = true;
-        Debug.Log("Reloading...");
 
         yield return new WaitForSeconds(_reloadTime);
 
         _remainingBullet = _maxBulletNumber;
-        Debug.Log("Reload complete");
+        OnBulletCountChanged?.Invoke(_remainingBullet, _maxBulletNumber);
 
         _isReloading = false;
     }
@@ -347,4 +335,5 @@ public class S_WeaponSlot : NetworkBehaviour
             yield return null;
         }
     }
+
 }
