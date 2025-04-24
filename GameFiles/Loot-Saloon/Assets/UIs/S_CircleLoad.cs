@@ -8,6 +8,9 @@ public class S_CircleLoad : MonoBehaviour
 
     [SerializeField] private Image _image;
 
+    [SerializeField] private GameObject needlePivot;
+
+
     private void Awake()
     {
         OnCircleChange += SetLoader;
@@ -17,7 +20,12 @@ public class S_CircleLoad : MonoBehaviour
     public void SetLoader(float p_percentage)
     {
         p_percentage = Mathf.Clamp01(p_percentage);
-
         _image.fillAmount = p_percentage;
+
+        float angle = p_percentage * 360f;
+
+        if (needlePivot != null)
+            needlePivot.transform.localRotation = Quaternion.Euler(0f, 0f, -angle);
     }
+
 }
