@@ -34,9 +34,6 @@ public class S_Quota : MonoBehaviour
     {
         total += p_bankVault.GetMoneyValue();
         quota = (int)(total * _extractionQuotaRatio);
-
-        quota = 0;
-
         OnQuotaChanged?.Invoke();
     }
 }

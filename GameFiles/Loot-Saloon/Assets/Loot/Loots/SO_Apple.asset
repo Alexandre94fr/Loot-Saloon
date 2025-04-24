@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lootName: Apple
   sprite: {fileID: 0}
-  moneyValue: 5000
+  moneyValue: 4
   size: 1
   PB_prefab: {fileID: 3459067169089131319, guid: be9ad422ca01bd74eac3dd6101d3e65b, type: 3}

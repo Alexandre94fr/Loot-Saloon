@@ -46,7 +46,7 @@ public class S_PlayersSpawner : NetworkBehaviour
     {
         S_GameLobbyManager gameLobbyManager = S_GameLobbyManager.instance;
 
-        playerTeam = await gameLobbyManager.GetPlayerTeamAsync();
+        _playerTeam = await gameLobbyManager.GetPlayerTeamAsync();
 
         int count = NetworkManager.Singleton.ConnectedClients.Count;
         float totalWidth = (count - 1) * _spawnDistance;
@@ -57,9 +57,9 @@ public class S_PlayersSpawner : NetworkBehaviour
         S_PlayerCharacter playerCharacter = p_player.GetComponentInChildren<S_PlayerCharacter>();
         S_PlayerAttributes playerAttributes = playerCharacter.playerAttributes;
         S_PlayerController playerController = playerCharacter.playerController;
-        playerAttributes.SetTeam_RPC(playerTeam);
+        playerAttributes.SetTeam_RPC(_playerTeam);
 
-        if (playerTeam == E_PlayerTeam.BLUE)
+        if (_playerTeam == E_PlayerTeam.BLUE)
         {
             _bluePlayer++;
             nbPlayer = _bluePlayer;
