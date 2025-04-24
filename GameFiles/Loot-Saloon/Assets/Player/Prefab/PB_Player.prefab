@@ -2236,6 +2236,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5156938179704669195}
     m_Modifications:
+    - target: {fileID: 1521641781082656829, guid: 466d6a0faccd58e49803437e15e8297b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521641781082656829, guid: 466d6a0faccd58e49803437e15e8297b, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 8240083490727216023, guid: 466d6a0faccd58e49803437e15e8297b, type: 3}
       propertyPath: m_Name
       value: WeaponUI

@@ -10,7 +10,7 @@ public class S_PlayersConnection : NetworkBehaviour
 
     public static event Action OnStartGame;
     
-    private void Start()
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -25,7 +25,6 @@ public class S_PlayersConnection : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         PlayerIsReadyServerRpc();
-
     }
 
     public static void InvokePlayerReady()
