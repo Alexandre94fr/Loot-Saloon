@@ -11,7 +11,7 @@ public class S_Quota : MonoBehaviour
 
     [Header(" Properties :")]
     [Tooltip("How much of the total sum the quota is equal to")]
-    [SerializeField] [Range(0f, 1f)] private float _extractionQuotaRatio = 0.67f;
+    [SerializeField] [Range(0f, 1f)] private float _extractionQuotaRatio = 0.33f;
 
     [SerializeField] private bool _quotaIsZero = false;
 
