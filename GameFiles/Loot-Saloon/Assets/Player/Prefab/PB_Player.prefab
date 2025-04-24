@@ -2088,10 +2088,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: WeaponUI
       objectReference: {fileID: 0}
-    - target: {fileID: 8240083490727216023, guid: 466d6a0faccd58e49803437e15e8297b, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8730531875486436679, guid: 466d6a0faccd58e49803437e15e8297b, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
