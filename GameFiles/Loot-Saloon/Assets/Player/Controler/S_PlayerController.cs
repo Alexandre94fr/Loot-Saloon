@@ -253,7 +253,7 @@ public class S_PlayerController : NetworkBehaviour
             // Rotation for horizontal inputs
             if (Mathf.Abs(_playerDirection.x) > 0.1f)
             {
-                float rotationAmount = _playerDirection.x * 100f * Time.deltaTime; 
+                float rotationAmount = _playerDirection.x * 50f * Time.deltaTime; 
                 _playerTransform.Rotate(0, rotationAmount, 0);
             }
         }

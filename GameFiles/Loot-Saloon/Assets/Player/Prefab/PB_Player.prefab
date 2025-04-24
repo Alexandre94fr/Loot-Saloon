@@ -1269,6 +1269,7 @@ MonoBehaviour:
   _jumpForce: 5
   _cartSpeedMultiplicator: 0.5
   _isCartModeEnabled: 0
+  rb: {fileID: 3049018754043007467}
   activeInputs: 1
 --- !u!1 &5673144101025004097
 GameObject:
