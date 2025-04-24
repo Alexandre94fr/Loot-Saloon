@@ -29,6 +29,8 @@ public class S_PlayersSpawner : NetworkBehaviour
     private Quaternion _rotation;
 
 
+    public static event Action OnPlayerSpawned;
+
 
     private void Awake()
     {
@@ -86,6 +88,7 @@ public class S_PlayersSpawner : NetworkBehaviour
         if (p_player.GetComponentInChildren<NetworkTransform>() != null)
         {
             p_player.GetComponentInChildren<NetworkTransform>().Teleport(p_newPosition, _rotation, Vector3.one);
+            OnPlayerSpawned?.Invoke();
         }
         else
             Debug.LogWarning("WARNING ! NetworkTransform not founded on the player.");
