@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Xml.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -202,7 +204,7 @@ public class S_PlayerAttributes : NetworkBehaviour
         _walkingMovementSpeed = p_newWalkingMovementSpeed;
 
         OnPlayerWalkingMovementSpeedChangeEvent?.Invoke(_playerID, p_newWalkingMovementSpeed);
-
+        Debug.LogWarning("Change Event was Called for :: " + p_newWalkingMovementSpeed);
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateWalkingMovementSpeed_RPC)} UPDATED | '{nameof(p_newWalkingMovementSpeed)}' : {p_newWalkingMovementSpeed}");
     }
@@ -239,11 +241,20 @@ public class S_PlayerAttributes : NetworkBehaviour
 
         _runningMovementSpeed = p_newRunningMovementSpeed;
 
-        OnPlayerRunningMovementSpeedChangeEvent?.Invoke(_playerID, p_newRunningMovementSpeed);
+        Debug.LogWarning($"[Server] Call Coroutine Event {OwnerClientId}");
+        StartCoroutine(DelayedEvent());
 
         if (_isDebugModeOn)
             Debug.Log($"{nameof(UpdateRunningMovementSpeed_RPC)} UPDATED | '{nameof(p_newRunningMovementSpeed)}' : {p_newRunningMovementSpeed}");
     }
+
+    private IEnumerator DelayedEvent()
+    {
+        yield return new WaitUntil(() => _runningMovementSpeedNetworkVariable.Value != _runningMovementSpeed);
+
+        OnPlayerRunningMovementSpeedChangeEvent?.Invoke(_playerID, RunningMovementSpeed);
+    }
+
     #endregion
 
     #endregion
@@ -255,19 +266,15 @@ public class S_PlayerAttributes : NetworkBehaviour
     {
         if (!IsServer)
             return;
-
         _jumpPower = p_newJumpPower;
         _jumpPowerNetworkVariable.Value = p_newJumpPower;
-
         UpdateJumpPower_RPC(_jumpPower);
     }
-
     [Rpc(SendTo.Server)]
     public void AddJumpPower_RPC(float p_newJumpPower)
     {
         if (!IsServer)
             return;
-
         SetJumpPower_RPC(JumpPower + p_newJumpPower);
     }
 

@@ -5,6 +5,8 @@ public class S_LobbyPlayer : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _playerName;
     private S_LobbyPlayerData _data;
+    public SkinnedMeshRenderer skinnedMeshRenderer;
+
 
     public void SetData(S_LobbyPlayerData p_data)
     {

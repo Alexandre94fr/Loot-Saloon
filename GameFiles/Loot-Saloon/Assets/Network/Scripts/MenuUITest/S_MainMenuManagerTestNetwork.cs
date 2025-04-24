@@ -114,6 +114,9 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
         }
     }
 
-
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 
 }

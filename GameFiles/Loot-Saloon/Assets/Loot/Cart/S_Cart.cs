@@ -83,9 +83,9 @@ public class S_Cart : S_Pickable
     }
 
     [ServerRpc]
-    private void SyncCartPositionServerRpc(Vector3 position, Quaternion rotation) 
+    private void SyncCartPositionServerRpc(Vector3 p_position, Quaternion p_rotation) 
     {
-        transform.SetPositionAndRotation(position, rotation); 
+        transform.SetPositionAndRotation(p_position, p_rotation); 
     }
 
     protected override void PickUp(S_PlayerInteract p_playerInteract, Transform p_parent)
@@ -98,12 +98,12 @@ public class S_Cart : S_Pickable
         _parent = p_parent;
         _isCarried = true;
 
-        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(true, transform);
+        p_parent.parent.GetComponentInChildren<S_PlayerController>().EnableCartMode(transform);
 
         S_PlayerInputsReciever.OnMove += MoveCart;
         StartCoroutine(MoveCoroutine());
         var playerController = _parent.parent.GetComponentInChildren<S_PlayerController>(true);
-        playerController.EnableCartModeClientRpc(true, GetComponent<NetworkObject>());
+        playerController.EnableCartModeClientRpc(GetComponent<NetworkObject>());
     }
 
     [ClientRpc]
@@ -129,7 +129,7 @@ public class S_Cart : S_Pickable
             return;
         }
 
-        playerController.EnableCartModeClientRpc(false, GetComponent<NetworkObject>());
+        playerController.DisableCartModeClientRpc(GetComponent<NetworkObject>());
     }
 
 
@@ -179,9 +179,9 @@ public class S_Cart : S_Pickable
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestPickUpServerRpc(ulong playerId)
+    private void RequestPickUpServerRpc(ulong p_playerId)
     {
-        var player = NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject;
+        var player = NetworkManager.Singleton.ConnectedClients[p_playerId].PlayerObject;
         var interact = player.GetComponentInChildren<S_PlayerInteract>(true);
         var parent = interact.transform;
 
@@ -209,7 +209,7 @@ public class S_Cart : S_Pickable
         S_Extract.OnExtract += EndGameEvent;
     }
 
-    private void EndGameEvent(E_PlayerTeam winner)
+    private void EndGameEvent(E_PlayerTeam p_winner)
     {
         GetCartValue?.Invoke(team, total);
     }
@@ -236,11 +236,11 @@ public class S_Cart : S_Pickable
         }
     }
 
-    public void SetTextToTotal(TMP_Text text)
+    public void SetTextToTotal(TMP_Text p_text)
     {
-        text.text = total.ToString();
+        p_text.text = total.ToString();
     }
-    private void MoveCart(Vector3 dir)
+    private void MoveCart(Vector3 p_dir)
     {
         if (!_isCarried) return;
     }

@@ -23,18 +23,17 @@ public class S_LobbySpawner : MonoBehaviour
     private void OnLobbyUpdated(Lobby p_lobby)
     {
         List<S_LobbyPlayerData> playersData = S_GameLobbyManager.instance.GetPlayers();
-
         for (int i = 0; i < playersData.Count; i++)
         {
             S_LobbyPlayerData playerData = playersData[i];
             _players[i].SetData(playerData);
             if (playerData.Team == E_PlayerTeam.RED)
             {
-                _players[i].GetComponent<MeshRenderer>().material = RedMaterial;
+                _players[i].skinnedMeshRenderer.material = RedMaterial;
             }
             else if (playerData.Team == E_PlayerTeam.BLUE)
             {
-                _players[i].GetComponent<MeshRenderer>().material = BlueMaterial;
+                _players[i].skinnedMeshRenderer.material = BlueMaterial;
             }
         }
     }

@@ -14,5 +14,7 @@ public class S_PlayerCharacter : MonoBehaviour
             (playerInteract, nameof(playerInteract)),
             (playerController, nameof(playerController))
         )) return;
+
+        playerController.SetPlayerAttribute(ref playerAttributes);
     }
 }
