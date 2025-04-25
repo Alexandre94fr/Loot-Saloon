@@ -5206,7 +5206,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3909925925429405288, guid: 5b11d85738f7ba647974cd724ff3a829, type: 3}
       propertyPath: _extractionQuotaRatio
-      value: 0.67
+      value: 0.33
       objectReference: {fileID: 0}
     - target: {fileID: 3909925925429405288, guid: 5b11d85738f7ba647974cd724ff3a829, type: 3}
       propertyPath: _lootInstantiatorInstance
@@ -11150,6 +11150,10 @@ PrefabInstance:
     - target: {fileID: 3909925925429405288, guid: 5b11d85738f7ba647974cd724ff3a829, type: 3}
       propertyPath: _instantiator
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3909925925429405288, guid: 5b11d85738f7ba647974cd724ff3a829, type: 3}
+      propertyPath: _extractionQuotaRatio
+      value: 0.33
       objectReference: {fileID: 0}
     - target: {fileID: 3909925925429405288, guid: 5b11d85738f7ba647974cd724ff3a829, type: 3}
       propertyPath: _lootInstantiatorInstance
