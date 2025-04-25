@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 999956317998739437}
   - component: {fileID: 5038809764290520602}
   - component: {fileID: 4098280428203606883}
-  - component: {fileID: 6674641197204535772}
+  - component: {fileID: 5945470914848747614}
   m_Layer: 6
   m_Name: PB_Apple
   m_TagString: Untagged
@@ -285,11 +285,11 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3459067169089131319}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 3
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaTensor: {x: 5, y: 5, z: 5}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
@@ -298,11 +298,11 @@ Rigidbody:
     serializedVersion: 2
     m_Bits: 0
   m_ImplicitCom: 1
-  m_ImplicitTensor: 1
+  m_ImplicitTensor: 0
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
+  m_Interpolate: 1
+  m_Constraints: 112
   m_CollisionDetection: 2
 --- !u!114 &5038809764290520602
 MonoBehaviour:
@@ -357,8 +357,8 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
---- !u!65 &6674641197204535772
-BoxCollider:
+--- !u!135 &5945470914848747614
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -376,8 +376,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.42880678, y: 0.549666, z: 0.8329736}
-  m_Center: {x: 0.061748188, y: 0.0032298414, z: 0.103579484}
+  m_Radius: 0.41648683
+  m_Center: {x: -0.06174819, y: 0.10357949, z: 0.0032298416}
 --- !u!1 &8854245185277840421
 GameObject:
   m_ObjectHideFlags: 0
