@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using TMPro;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -12,7 +14,7 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
     public Button joinCodeBtn;
     public Button refreshListBtn;
     public string sceneToLoad;
-    public InputField codeInputField;
+    public TMP_InputField codeInputField;
 
     [Header("Show Lobbies Panel")]
     public GameObject showLobbiesPanel;
@@ -74,7 +76,7 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
         foreach (Lobby lobby in queryResponse.Results)
         {
             GameObject lobbyItem = Instantiate(lobbyButtonPrefab, content);
-            lobbyItem.GetComponentInChildren<Text>().text = lobby.Name;
+            lobbyItem.GetComponentInChildren<TextMeshProUGUI>().text = lobby.Name;
             lobbyItem.GetComponent<Button>().onClick.AddListener(() =>
             {
                 JoinPublicLobby(lobby.Id);
@@ -85,7 +87,14 @@ public class S_MainMenuManagerTestNetwork : MonoBehaviour
         content.sizeDelta = new Vector2(content.sizeDelta.x, (lobbyButtonPrefab.GetComponent<RectTransform>().sizeDelta.y
                                                               + content.GetComponent<VerticalLayoutGroup>().spacing) * queryResponse.Results.Count);
         // Wait for a while before refreshing
-        await System.Threading.Tasks.Task.Delay(5000);
+        StartCoroutine(SetButtonInteractable(refreshListBtn, true, 0.5f));
+
+    }
+
+    private IEnumerator SetButtonInteractable(Button p_button, bool p_interactable, float p_seconds)
+    {
+        yield return new WaitForSeconds(p_seconds);
+        p_button.interactable = p_interactable;
     }
 
     private async void JoinPublicLobby(string p_lobbyId)
